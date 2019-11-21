@@ -1,0 +1,28 @@
+```python
+<%- include(rootDirectory + '/templates/python.ejs') %>
+```
+
+```shell
+<%- include(rootDirectory + '/templates/curl.ejs') %>
+
+```
+
+```javascript
+<%- include(rootDirectory + '/templates/unirest.node.ejs') %>
+
+```
+
+```java
+System.out.println("Java example missing. Why not contribute one for us?");
+```
+
+> The above example should return `JSON` structured like this:
+
+```json
+The above example should return JSON structured like this:
+
+HTTP/1.0 <%= ok.status %>
+
+<%- ok.body %>
+
+```

@@ -1,0 +1,12 @@
+import requests
+<% if (locals.headers) { %><%='\n'%>headers = <%- headers %><% } %><% if (locals.pyBody) { %><%='\n'%>body = <%- pyBody %><% } %>
+
+response = requests.<%= request_method %>(
+    '<%= scheme %>://<%=server_name%><%=uri%>'<% if (locals.query_string) { %><%=',\n    '%>params='<%- query_string %>'<% } %><% if (locals.headers) { %><%=',\n    '%>headers=headers<% } %><% if (locals.pyBody) { %><%=',\n    '%>json=body<% } %>
+)
+
+print({
+    'raw_body': response.text,
+    'status': response.status_code,
+    'code': response.status_code
+})

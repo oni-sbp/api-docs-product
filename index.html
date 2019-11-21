@@ -1,0 +1,68 @@
+<head>
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+  <script>
+    function onInputTypeChange(radio) {
+      if(radio.value === "file") {
+        document.getElementById("file").style.display = "block"; 
+        document.getElementById("archive").style.display = "none"; 
+        document.getElementById("url").style.display = "none"; 
+      } else if(radio.value === "archive") {
+        document.getElementById("file").style.display = "none"; 
+        document.getElementById("archive").style.display = "block"; 
+        document.getElementById("url").style.display = "none"; 
+      } else if(radio.value === "url") {
+        document.getElementById("file").style.display = "none"; 
+        document.getElementById("archive").style.display = "none"; 
+        document.getElementById("url").style.display = "block"; 
+      }
+    }
+
+    {% comment %} function  onAuthenticationTypeChange(radio) {
+      if(radio.value === "bearer" || radio.value === "basic") {
+       document.getElementById("auth_token").removeAttribute("disabled");
+      } else if(radio.value === "none") {
+        document.getElementById("auth_token").setAttribute("disabled", true);
+      }
+    } {% endcomment %}
+  </script>
+</head>
+
+<div style=" margin-right: auto; margin-left: auto;  width: 500;">
+  <form action="fileupload" method="post" enctype="multipart/form-data">
+    <div style=" width: 500; border: black; border-style: groove ; padding-left: 10; padding-bottom: 10;">
+      <center><h3>Input files<br></h3></center>
+      Load a file or archive: <input type="file" name="file" tabindex="1" /> <br><br>
+      Or insert URL: <input type="input" name="url" style="width:75%"> <br>
+    </div>
+    <br>
+    <div style=" width: 500; border: black; border-style: groove ; padding-left: 10; padding-bottom: 10;">
+      <center><h3>Configuration file<br></h3></center>
+      Config file: <input type="file" name="config" tabindex="1"><br><br>
+      Or insert URL: <input type="input" name="config_url" style="width:75%"> <br>
+    </div>
+    <br>
+    <div style=" width: 100%; padding-left: 10; padding-bottom: 10;">
+      Host: <input type="text" name="host"><br><br>
+      Scheme: 
+      <input type="radio" name="scheme" value="https"> https
+      <input type="radio" name="scheme" value="http"> http<br><br>
+
+      Authentication type:
+      <input type="radio" name="authentication" onclick="onAuthenticationTypeChange(this);" value="none" checked> None
+      <input type="radio" name="authentication" onclick="onAuthenticationTypeChange(this);" value="basic"> Basic
+      <input type="radio" name="authentication" onclick="onAuthenticationTypeChange(this);" value="bearer"> Bearer<br><br>
+      AUTH_TOKEN: <input id="auth_token" type="text" name="auth_token" style="width:75%"><br><br>
+      Generate samples for:<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" checked name="python">Python</input><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" checked name="unirest.node">Unirest.node</input><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" checked name="curl">curl</input><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" checked name="2xx-response">2xx-response</input><br><br>
+        
+      <input type="checkbox" name="validate" title="Test"> Test <br><br>
+      Keyword: <input type="text" name="keyword"><br><br>
+
+      <input type="submit" value="Submit">
+    </div>
+  </form>
+  
+</div>
