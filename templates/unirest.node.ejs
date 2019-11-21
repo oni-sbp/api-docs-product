@@ -1,0 +1,9 @@
+const unirest = require("unirest");
+<% if (locals.headers) { %><%='\n'%>const headers = <%- headers %>; <% } %><% if (locals.body) { %><%='\n'%>const body = <%- body %>; <% } %>
+
+unirest
+  .<%= request_method %>("<%= scheme %>://<%=server_name%><%=uri%>")<% if (locals.headers) { %><%='\n  '%>.headers(headers)<% } %><% if (locals.query_string) { %><%='\n  '%>.query("<%- query_string %>")<% } %><% if (locals.body) { %><%='\n  '%>.send(body)<% } %>
+  .then(({ raw_body, status, code }) => {
+    // output response to console as JSON
+    console.log(JSON.stringify({ raw_body, status, code }, null, 4));
+  });

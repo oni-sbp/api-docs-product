@@ -1,0 +1,12 @@
+import requests
+<% if (locals.headers) { %><%='\n'%>headers = <%- headers %><% } %><% if (locals.body) { %><%='\n'%>body = <%- body %><% } %>
+
+response = requests.<%= request_method %>(
+    '<%= scheme %>://<%=server_name%><%=uri%>'<% if (locals.query_string) { %><%=',\n    '%>params='<%- query_string %>'<% } %><% if (locals.headers) { %><%=',\n    '%>headers=headers<% } %><% if (locals.body) { %><%=',\n    '%>json=body<% } %>
+)
+
+print({
+    <% if(request_method === 'delete') { %>'raw_body': response.text,<% } else { %>'raw_body': response.json(),<% } %>
+    'status': response.status_code,
+    'code': response.status_code
+})

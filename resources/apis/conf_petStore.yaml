@@ -1,0 +1,258 @@
+sample_timeout: 100
+debug: False
+api_url: '$TESTING_API_URL'
+access_token: '$AUTH_TOKEN'
+substitutions:
+  '{version}': 'v1'
+  '<ACCESS_TOKEN>': '$AUTH_TOKEN'
+  'api-sandbox.oftrust.net': '$TESTING_API_URL'
+  '{api_key}': '"123"'
+  '{petId}': 1
+  '{orderId}': 0
+
+resp_attr_replacements:
+  '/products/v1':
+    - 'productCode': 'product_code'
+  '/messages/v1':
+    - '@id': 'id'
+  '/calendars/v1':
+    - '@id': 'id'
+  '/identities/v1':
+    - '@id': 'id'
+  '/identities/v1/{from_identity}/link/{to_identity}':
+    - '@type': 'type'
+  '/identities/v1/{from_identity}/link/{to_identity}/{type}':
+    - '@type': 'type'
+
+operations_order:
+  '/identities/v1/{id}':
+    - 'PUT'
+    - 'GET'
+    - 'DELETE'
+
+before_sample:
+  '/messages/v1':
+    - resource: 'Identity'
+      method: 'POST'
+      subs:
+        '@id': '0920a84a-1548-4644-b95d-e3f80e1b9ca6'
+  '/calendars/v1':
+    - resource: 'Identity'
+      method: 'POST'
+      subs:
+        '@id': '0920a84a-1548-4644-b95d-e3f80e1b9ca6'
+  '/identities/v1/{from_identity}/link/{to_identity}':
+    - resource: 'Identity'
+      method: 'POST'
+      subs:
+        '@id': '{to_identity}'
+    - resource: 'Identity'
+      method: 'POST'
+      subs:
+        '@id': '{from_identity}'
+  '/products/v1':
+    - resource: 'DeleteProduct'
+      method: 'POST'
+      subs: {}
+
+allow_non_json_responses:
+  '/user/{username}':
+    'PUT': True
+    'DELETE': True
+  '/user/login':
+    'GET': True
+  '/user/createWithList':
+    'POST': True
+  '/user/createWithArray':
+    'POST': True
+  '/user':
+    'POST': True
+  '/pet/{petId}':
+    'POST': True
+    'DELETE': True
+  '/store/order/{orderId}':
+    'DELETE': True
+  '/user/logout':
+    'GET': True
+
+substitutions_before_sample:
+  '/identities/v1':
+    - method: 'POST'
+      subs: 
+        '{BODY}': >-
+          {
+            "context": "https://standards.lifeengine.io/v1/Context/Identity/Group",
+            "type": "Group",
+            "data": {
+              "name": "Company Oy"
+            }
+          }
+  '/identities/v1/{id}':
+    - method: 'PUT'
+      subs:
+        '{BODY}': >-
+          {
+            "context": "https://standards.lifeengine.io/v1/Context/Identity/Group",
+            "type": "Group",
+            "data": {
+              "name": "Company Oy"
+            }
+          }
+  '/identities/v1/{from_identity}/link/{to_identity}':
+    - method: 'POST'
+      subs: 
+        '{BODY}': >-
+          {
+            "context": "https://standards.lifeengine.io/v1/Context/Link/Role/MemberOf",
+            "type": "MemberOf"
+          }
+  '/identities/v1/{from_identity}/link/{to_identity}/{type}':
+    - method: 'PUT'
+      subs: 
+        '{BODY}': >-
+          {
+            "context": "https://example.com/contexts/type.jsonld",
+            "type": "Owner"
+          }
+  '/pet':
+    - method: 'POST'
+      subs:
+        '{BODY}': >-
+          {
+            "id": 1,
+            "category": {
+              "id": 0,
+              "name": "string"
+            },
+            "name": "doggie",
+            "photoUrls": [
+              "string"
+            ],
+            "tags": [
+              {
+                "id": 0,
+                "name": "string"
+              }
+            ],
+            "status": "available"
+          }
+    - method: 'PUT'
+      subs:
+        '{BODY}': >-
+          {
+            "id": 1,
+            "category": {
+              "id": 0,
+              "name": "string"
+            },
+            "name": "doggie",
+            "photoUrls": [
+              "string"
+            ],
+            "tags": [
+              {
+                "id": 0,
+                "name": "string"
+              }
+            ],
+            "status": "available"
+          }
+  '/store/order':
+    - method: 'POST'
+      subs:
+        '{BODY}': >-
+          {
+            "id": 0,
+            "petId": 0,
+            "quantity": 0,
+            "shipDate": "2019-10-25T13:29:40.274Z",
+            "status": "placed",
+            "complete": true
+          }
+  '/user':
+    - method: 'POST'
+      subs:
+        '{BODY}': >-
+          {
+            "id": 0,
+            "username": "string",
+            "firstName": "string",
+            "lastName": "string",
+            "email": "string",
+            "password": "string",
+            "phone": "string",
+            "userStatus": 0
+          }
+  '/user/createWithArray':
+    - method: 'POST'
+      subs:
+        '{BODY}': >-
+          [
+            {
+              "id": 0,
+              "username": "string",
+              "firstName": "string",
+              "lastName": "string",
+              "email": "string",
+              "password": "string",
+              "phone": "string",
+              "userStatus": 0
+            }
+          ]
+  '/user/createWithList':
+    - method: 'POST'
+      subs:
+        '{BODY}': >-
+          [
+            {
+              "id": 0,
+              "username": "string",
+              "firstName": "string",
+              "lastName": "string",
+              "email": "string",
+              "password": "string",
+              "phone": "string",
+              "userStatus": 0
+            }
+          ]
+  '/user/{username}':
+    - method: 'PUT'
+      subs:
+        '{BODY}': >-
+          {
+            "id": 0,
+            "username": "string",
+            "firstName": "string",
+            "lastName": "string",
+            "email": "string",
+            "password": "string",
+            "phone": "string",
+            "userStatus": 0
+          }
+  '/createAccountHolder':
+    - method: 'POST'
+      subs:
+        '{BODY}': >-
+          {
+            "accountHolderCode": "GENERATE_CODE1",
+            "accountHolderDetails": {
+              "email": "tim@green.com",
+              "individualDetails": {
+                "name": {
+                  "firstName": "Tim",
+                  "gender": "MALE",
+                  "lastName": "Green"
+                }
+              },
+              "address": {
+                "country": "US"
+              }
+            },
+            "legalEntity": "Individual"
+          }
+
+ignore_failures:
+  '/broker/{version}/fetch-data-product':
+    - 'POST'
+  '/products/{version}/{product_code}':
+    - 'DELETE'

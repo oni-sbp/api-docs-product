@@ -1,0 +1,5 @@
+exports.RESOURCES = 'resources'
+exports.ARCHIVES_FOLDER = process.cwd() + '/resources/Archives/'
+exports.LOG_FILES_FOLDER = process.cwd() + '/resources/Log Files/'
+exports.TEMP_FILES_FOLDER = process.cwd() + '/resources/Temp Files/'
+exports.GENERATED_EXAMPLES_FOLDER = process.cwd() + '/resources/Generated examples/'
