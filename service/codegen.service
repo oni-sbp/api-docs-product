@@ -1,0 +1,13 @@
+[Unit]
+Description=CodeGen Node.js Server
+
+[Service]
+User=root
+Group=root
+Restart=always
+KillSignal=SIGQUIT
+WorkingDirectory=path-to-code
+ExecStart=path-to-node path-to-code/index.js
+
+[Install]
+WantedBy=multi-user.target
