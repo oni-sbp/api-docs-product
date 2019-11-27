@@ -14,12 +14,7 @@ steps:
   inputs:
     versionSpec: '10.x'
   displayName: 'Install Node.js'
-  
- - task: UsePythonVersion@0
-  inputs:
-    versionSpec: '3.6'
-   displayName: 'Python'
-   
+ 
   - script: |
     python -m pip install --upgrade pip
     pip install virtualenv
