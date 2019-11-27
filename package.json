@@ -39,6 +39,7 @@
     "unzipper": "^0.10.5"
   },
   "scripts": {
+	"start": "node index.js"
     "test": "standard && mocha --recursive ./generation/*.spec.js ./validation/*.spec.js  ./validation/resources/*.spec.js"
   },
   "author": "",
