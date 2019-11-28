@@ -56,17 +56,20 @@
       
       var down = document.getElementById("down-arrow");
       var up = document.getElementById("up-arrow");
+	  var addit = document.getElementById("additional-options-text");
       
       if (x.innerHTML === "Expand") {
         x.innerHTML = "Collapse";
         y.style.display = "block";
-        down.style.display = "none";
-        up.style.display = "block"
+        //down.style.display = "none";
+        //up.style.display = "block"
+		addit.innerHTML = "Hide Additional Options";
       } else {
         x.innerHTML = "Expand";
         y.style.display = "none";
-        down.style.display = "block";
-        up.style.display = "none"
+        //down.style.display = "block";
+        //up.style.display = "none"
+		addit.innerHTML = "Show Additional Options";
       }
     }
 
@@ -207,15 +210,13 @@
               <button type="button" id="ButtonExpand" style="display: none;" class="btn center" type="button"
                  ></button>
               <a onclick="myFunction()" href="" style="color: #9073FF;" data-toggle="collapse" data-target="#collapseExample">
-                Additional options
+                <span id="additional-options-text">Show Additional Options</span>
                 <!-- <div class="inline-div">
                   <img src="public/resources/baseline_arrow_downward_white_18dp.png"  />
                 </div>
                 <div class="inline-div">
                   <img src="public/resources/baseline_arrow_upward_white_18dp.png" id="up-arrow" />
                 </div> -->
-                
-              </a><i id="down-arrow" class="fas fa-angle-down"></i><i id="up-arrow" class="fas fa-angle-up" style="display:none"></i>
             </div>
           </div>
         </div>
