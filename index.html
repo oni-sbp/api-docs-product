@@ -52,12 +52,12 @@
 	  var z = document.getElementById("firstSubmitButton");
 	  z.disabled = true;
       // add spinner to button
-      z.innerHTML ='<div class="spinner-grow text-secondary" role="status"><span class="sr-only">Loading...</span></div>';
+      z.innerHTML ='<span class="spinner-grow text-secondary" role="status">Loading...</span>';
 	  
 	  var w = document.getElementById("secondSubmitButton");
 	  w.disabled = true;
       // add spinner to button
-      w.innerHTML ='<div class="spinner-grow text-secondary" role="status"><span class="sr-only">Loading...</span></div>';
+      w.innerHTML ='<span class="spinner-grow text-secondary" role="status">Loading...</span>';
     }
     function removeValidator() {
       document.getElementById("validatorFile").style.display = "none";
