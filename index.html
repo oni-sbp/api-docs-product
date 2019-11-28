@@ -22,7 +22,7 @@
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-  <script>
+  <script>  
     function isValidationReady(fileName) {
       return true;
       console.log('sdasdas')
@@ -48,6 +48,20 @@
       }
 	  
 	  document.getElementById("logs").style.display = "none";
+	  
+	  var z = document.getElementById("firstSubmitButton");
+	  z.prop("disabled", true);
+      // add spinner to button
+      z.html(
+        `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...`
+      );
+	  
+	  var w = document.getElementById("secondSubmitButton");
+	  w.prop("disabled", true);
+      // add spinner to button
+      w.html(
+        `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...`
+      );
     }
     function removeValidator() {
       document.getElementById("validatorFile").style.display = "none";
@@ -325,7 +339,7 @@
                   </div>
                 </div>
                 <center>
-                  <input type="submit" class="btn btn-default btnColor" value="Generate Code Examples">
+                  <input type="submit" id="secondSubmitButton" class="btn btn-default btnColor" value="Generate Code Examples">
                 </center>
               </div>
             </div>
