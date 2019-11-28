@@ -52,53 +52,55 @@ app.post('/fileupload', (req, res) => {
       res.redirect('/ErrorPage')
     }
 
+    var archiveFileName = 'archive_' + Guid.create() + '.zip'
     var logFileName = 'log_' + Guid.create() + '.txt'
+    var validationLogFile = 'log_' + Guid.create() + '.txt'
     info.logFileStream = fs.createWriteStream(constants.LOG_FILES_FOLDER + logFileName, { flags: 'w' })
+
+    fs.readFile('index.html', function (err, data) {
+      if (!err) {
+        res.writeHead(200, { 'Content-Type': 'text/html' })
+        res.write(data)
+      }
+
+    })
+    
 
     generator.generateSamples(fields, files).then((samplesPath) => {
       if (samplesPath === '') {
         req.app.locals.errorMessage = 'API specification not found'
         res.redirect('/ErrorPage')
       } else {
-        var validationLogFile = 'log_' + Guid.create() + '.txt'
         info.logFileStream = fs.createWriteStream(constants.LOG_FILES_FOLDER + validationLogFile, { flags: 'w' })
         fields.samplespath = samplesPath
 
         var archive = archiver('zip')
         archive.directory(samplesPath, 'samples')
 
-        var archiveFileName = 'archive_' + Guid.create() + '.zip'
         var archiveFile = fs.createWriteStream(constants.ARCHIVES_FOLDER + archiveFileName, { flags: 'w' })
         archive.pipe(archiveFile)
         archive.finalize()
 
-        
 
         if (fields.validate === 'on') {
           fileReady[validationLogFile] = false;
         }
 
         validator.validateGeneratedSamples(fields, files).then(() => {
+
+          data = '<div id="logs"><center><p><a download href="/logfile?logfile=' + logFileName + '" class="link">Generation Log File</a></p>\n'
+          if (fields.validate === 'on') {
+            data += '<p><a download href="/logfile?logfile=' + validationLogFile + '" class="link" onclick="isValidationReady()">Validation Log File</a></p>\n'
+          }
+          data += '<p><a download href="/archive?archive=' + archiveFileName + '" class="link">Archive with generated samples</a><center></div>\n'
+
+          res.write(data)
+          res.end()
+
           fileReady[validationLogFile] = true;
 
           archiveFile.on('close', () => {
             fs.removeSync(samplesPath)
-          })
-
-          fs.readFile('index.html', function (err, data) {
-            if (!err) {
-              data += '<center><p><a download href="/logfile?logfile=' + logFileName + '" class="link">Generation Log File</a></p>\n'
-              if (fields.validate === 'on') {
-                data += '<p><a download href="/logfile?logfile=' + validationLogFile + '" class="link" onclick="isValidationReady()">Validation Log File</a></p>\n'
-              }
-              data += '<p><a download href="/archive?archive=' + archiveFileName + '" class="link">Archive with generated samples</a><center>\n'
-  
-              res.writeHead(200, { 'Content-Type': 'text/html', 'Content-Length': data.length })
-              res.write(data)
-            }
-  
-            res.write(data)
-            res.end()
           })
 
           setTimeout(function () {

@@ -30,6 +30,13 @@ async function generateSamples (fields, files) {
 
   if (!fs.existsSync(constants.GENERATED_EXAMPLES_FOLDER)) {
     fs.mkdirSync(constants.GENERATED_EXAMPLES_FOLDER)
+  } else {
+    try {
+      fs.removeSync(constants.GENERATED_EXAMPLES_FOLDER)
+      fs.mkdirSync(constants.GENERATED_EXAMPLES_FOLDER)
+    } catch (err) {
+      console.log(err)
+    }
   }
 
   if (fields.authentication !== 'none') {
