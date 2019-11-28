@@ -87,11 +87,11 @@ app.post('/fileupload', (req, res) => {
 
           fs.readFile('index.html', function (err, data) {
             if (!err) {
-              data += '<p><a download href="/logfile?logfile=' + logFileName + '">Generation Log File</a></p>\n'
+              data += '<center><p><a download href="/logfile?logfile=' + logFileName + '" class="link">Generation Log File</a></p>\n'
               if (fields.validate === 'on') {
-                data += '<p><a download href="/logfile?logfile=' + validationLogFile + '" onclick="isValidationReady()">Validation Log File</a></p>\n'
+                data += '<p><a download href="/logfile?logfile=' + validationLogFile + '" class="link" onclick="isValidationReady()">Validation Log File</a></p>\n'
               }
-              data += '<p><a download href="/archive?archive=' + archiveFileName + '">Archive with generated samples</a></p>\n'
+              data += '<p><a download href="/archive?archive=' + archiveFileName + '" class="link">Archive with generated samples</a><center>\n'
   
               res.writeHead(200, { 'Content-Type': 'text/html', 'Content-Length': data.length })
               res.write(data)

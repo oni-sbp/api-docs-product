@@ -17,6 +17,7 @@ class PythonRunner extends CodeRunner {
     var tmpPath = tempDirectory
     this._virtualenvPath = tmpPath + pathLib.sep + info.conf.virtualenv_name
     this._pythonPath = this._virtualenvPath + pathLib.sep + 'bin' + pathLib.sep + 'python'
+    // this._pythonPath = this._virtualenvPath + pathLib.sep + 'Scripts' + pathLib.sep + 'python'
 
     this._createVirtualenvIfNeeded()
   }
@@ -123,6 +124,7 @@ class PythonRunner extends CodeRunner {
   _installPythonPackages () {
     var packages = ['requests']
     var pipPath = this._virtualenvPath + pathLib.sep + 'bin' + pathLib.sep + 'pip'
+    // var pipPath = this._virtualenvPath + pathLib.sep + 'Scripts' + pathLib.sep + 'pip'
 
     utils.runShellCommand(pipPath + ' install ' + packages.join(' '), info.conf.virtualenv_creation_timeout, this._virtualenvPath)
   }

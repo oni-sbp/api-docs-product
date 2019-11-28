@@ -108,14 +108,12 @@
       </nav>
     </center>
     <div class="inline-div"><img src="resources/icon-platform-of-trust.png" alt=""> </div>
-    <div class="inline-div"></div>
     <div class="inline-div float-right" style="padding-right: 3%">
+      <br>
       <a href="https://platformoftrust.net/online-meeting" class="">
         <button class="btn btn-default btnColor ">Book an online meeting</button>
-        <!-- <img src="resources/book-online-meeting.png" alt="" class="float-right"> -->
       </a> </div>
-
-    <div class="inline-div">
+    <div>
       <center>
         <span class="title"> API Docs 2.0</span>
       </center>
@@ -126,25 +124,23 @@
   </div>
   <div>
     <br>
-    <div style=" margin-right: auto; margin-left: auto;  width: 1000;">
+    <div style=" margin-right: auto; margin-left: auto;  max-width: 1000;">
       <div class="mainInfo">Provide API spec file</div>
     </div>
-    <div style=" margin-right: auto; margin-left: auto;  width: 1000;">
+    <div style=" margin-right: auto; margin-left: auto;  max-width: 1000;">
       <form action="fileupload" method="post" name="submitForm" enctype="multipart/form-data"
         onsubmit="return validateForm()">
-        <div class="temp transparentBorder center-block" style=" width: 1000;">
+        <div class="temp transparentBorder center-block" style=" max-width: 1000;">
           <div class="bodyAlign">
             <h4><b>Upload API spec file</b></h4><br>
-            <div class="inline-div float-left" style="width:50%">Load a file or archive:<br>
+            <div class="inline-div float-left inputDiv" style="width:50%; min-width:250px ;">Load a file or archive:<br>
               <div id="validatorFile" class="validator">*No File or URL Selected</div>
               <div id="validatorSize" class="warning">*2 MB maximum file size</div>
-
               <div id="FileInitial" class="filename-div" onclick="callChooseFile('#FileUploadLabel')">
                 <img src="resources/document icon-14.png" height="14" width="14" class="icon-image" />
                 <input type="text" class="input-field filename-input" placeholder="No file selected" readonly
                   onclick="callChooseFile('#FileUploadLabel')">
               </div>
-
               <div id="FileAfter" class="filename-div-after" style="display: none;">
                 <img src="resources/pot icons-16.png" height="14" width="14" class="icon-image-left" />
                 <input type="text" class="input-field filename-input" id="FileName" placeholder="No file selected"
@@ -158,8 +154,7 @@
               </label>
               <input id="FileUpload" type="file" name="file" onchange="writeFileName(this); removeValidator();" />
             </div>
-
-            <div class="inline-div float-left" style="width:50%">
+            <div class="inline-div float-left inputDiv" style="width:50%; min-width:250px;">
               <br>
               <input type="input" class="inputText" name="url" onchange="removeValidator()" style="width:66%"
                 placeholder="Or insert URL:">
@@ -171,68 +166,57 @@
                   value="Generate Code Examples">
               </center>
             </div>
+            <br>
+            <br>
             <div class="new-line-div">
               <button type="button" id="ButtonExpand" class="btn center" type="button" data-toggle="collapse"
                 data-target="#collapseExample" onclick="myFunction()">Expand</button>
             </div>
           </div>
         </div>
-
         <br>
-
-        <div class="collapse" id="collapseExample" style=" width: 1000;">
+        <div class="collapse" id="collapseExample" style=" max-width: 1000;">
           <div class="additionalInfo">Additional options </div>
           <div class="temp transparentBorder ">
             <div class="bodyAlign">
               <h4><b>Configure Optional settings</b></h4>
-              
-              <br>
-
-              <div class="inline-div float-left" style="width:50%"> Config file: 
+              <div class="inline-div float-left inputDiv" style="width:50%; min-width:250px;"> Config file:
                 <div id="validatorSizeConfig" class="warning">*2 MB maximum file size</div> <br>
-                
                 <div id="ConfigInitial" class="filename-div" onclick="callChooseFile('#ConfigUploadLabel')">
                   <img src="resources/document icon-14.png" height="14" width="14" class="icon-image" />
                   <input type="text" class="input-field filename-input" placeholder="No file selected" readonly
                     onclick="callChooseFile('#ConfigUploadLabel')">
                 </div>
-
                 <div id="ConfigAfter" class="filename-div-after" style="display: none;">
                   <img src="resources/pot icons-16.png" height="14" width="14" class="icon-image-left" />
-                  <input type="text" class="input-field filename-input" id="ConfigFileName" placeholder="No file selected"
-                    readonly onclick="callChooseFile('#ConfigUploadLabel')">
+                  <input type="text" class="input-field filename-input" id="ConfigFileName"
+                    placeholder="No file selected" readonly onclick="callChooseFile('#ConfigUploadLabel')">
                   <img src="resources/pot icons-20.png" height="14" width="14" class="icon-image-right"
                     onclick="cancelConfigFile();" />
                 </div>
-
                 <br>
-
                 <label id="ConfigUploadLabel" for="ConfigUpload" class="btn btn-default custom-file-upload">
                   Choose file
                 </label>
                 <input id="ConfigUpload" type="file" name="config" onchange="writeConfigFileName(this);" />
               </div>
-
-              <div class="inline-div float-left" style="width:50%"> 
-                <input type="input" class="inputText" name="config_url" style="width:66%" placeholder="Or insert URL:"> 
+              <div class="inline-div float-left inputDiv" style="width:50%;min-width:250px;">
+                <br><br>
+                <input type="input" class="inputText" name="config_url" style="width:66%" placeholder="Or insert URL:">
               </div>
-
               <div class="new-line-div"></div>
-
               <div style=" width: 100%;">
                 <input type="text" class="inputText" name="host" placeholder="Validation API:"><br><br>
                 Scheme: <br>
                 <div class="flex inline-div float-left radio-div">
-                  <input id="scheme1" type="radio" value="https" name="scheme" checked/>
+                  <input id="scheme1" type="radio" value="https" name="scheme" checked />
                   <label for="scheme1">HTTPS</label>
                 </div>
                 <div class="flex inline-div float-left radio-div">
                   <input id="scheme2" type="radio" value="http" name="scheme" />
                   <label for="scheme2">HTTP</label>
                 </div>
-
                 <br><br>
-
                 Authentication type: <br>
                 <div class="flex inline-div float-left radio-div">
                   <input id="auth1" type="radio" value="none" name="authentication" checked />
@@ -246,42 +230,48 @@
                   <input id="auth3" type="radio" value="Basic" name="authentication" />
                   <label for="auth2">Bearer</label>
                 </div>
-
                 <br><br>
-
+                <br>
                 <input id="auth_token" type="text" class="inputText" name="auth_token" placeholder="AUTH_TOKEN:"
-                  style="width:33%">
-
+                  style="width:33%; min-width:110px;">
                 <br><br>
-
                 Generate samples for:<br>
                 &nbsp;&nbsp;&nbsp;&nbsp;
                 <div class="flex">
-                  <input id="tech1" type="checkbox" checked name="python" />
-                  <label for="tech1">Python</label><br>
+                  <label class="container" for="tech1">Python
+                    <input id="tech1" type="checkbox" checked name="python" />
+                    <span class="checkmark"></span>
+                  </label>
                 </div>
                 <div class="flex">
-                  <input id="tech2" type="checkbox" checked name="unirest.node" />
-                  <label for="tech2">Unirest.node</label><br>
+                  <label class="container" for="tech2">Unirest.node
+                    <input id="tech2" type="checkbox" checked name="unirest.node" />
+                    <span class="checkmark"></span>
+                  </label>
                 </div>
                 <div class="flex">
-                  <input id="tech3" type="checkbox" checked name="curl" />
-                  <label for="tech3">cURL</label><br>
+                  <label class="container" for="tech3"> cURL
+                    <input id="tech3" type="checkbox" checked name="curl" />
+                    <span class="checkmark"></span>
+                  </label>
                 </div>
                 <div class="flex">
-                  <input id="tech4" type="checkbox" checked name="2xx-response" />
-                  <label for="tech4">2xx-response</label><br>
+                  <label class="container" for="tech4">2xx-response
+                    <input id="tech4" type="checkbox" checked name="2xx-response" />
+                    <span class="checkmark"></span>
+                  </label>
                 </div>
-
                 <br>
-
                 <input class="inputText" type="text" name="keyword" placeholder="Keyword:">
-
                 <br><br>
-
                 <div class="flex">
-                  <label for="test">Test</label>
-                  <input id="test" type="checkbox" name="validate" />
+                  <div class="inline-div">Test&nbsp;&nbsp;</div>
+                  <div class="inline-div">
+                    <label class="container" for="test">
+                      <input id="test" type="checkbox" name="validate" />
+                      <span class="checkmark"></span>
+                    </label>
+                  </div>
                 </div>
                 <center>
                   <input type="submit" class="btn btn-default btnColor" value="Generate Code Examples">
@@ -291,7 +281,6 @@
           </div>
         </div>
       </form>
-
     </div>
   </div>
 </body>

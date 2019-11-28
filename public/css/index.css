@@ -11,7 +11,6 @@
     color: white;
 }
 
-
 .step2{
     visibility: visible;
 }
@@ -22,11 +21,13 @@
     padding-left: 10px;
     padding-bottom: 10px;
     padding-right: 10px;
+    border-radius: 7px;
 }
 
 .title{
     text-align: center;
     font-size: 40px;
+    width: 100%;
     color: white;
     font-family: 'MS Reference Sans Serif';
 }
@@ -67,7 +68,6 @@
 .mainInfo{
     color: white;
     font-size: 30px;
-    /* text-align: center; */
 }
 
 .additionalInfo{
@@ -84,13 +84,13 @@
 }
 
 .btnColor {
-    background-color:  #FB634D;
+    background-color:  #5CD328;
     color: white
 }
 
 .btnColor:hover {
   transition: all 0.4s ease 0s;
-  background-color: #DC4632;
+  background-color: rgb(65, 155, 26);
   color: white;
   box-shadow: rgb(73, 55, 143) 0px 0px 0.4rem;
 }
@@ -98,7 +98,6 @@
 .upperNav {
   position: relative;
   top: 0px;
-  /* left: 50%; */
   display: inline-block;
   padding: 0.2em 3em;
   text-align: right;
@@ -116,7 +115,6 @@
   text-shadow: rgba(240, 240, 240, 1) 0px 0px 2px;
   color: white;
   text-decoration: none;
-
   outline: currentcolor none medium;
 }
 
@@ -140,9 +138,8 @@ input[type="file"] {
     cursor: pointer;
     background-color: #9073FF;
     float: right;
-    margin-right: 25%;
+    margin-right: 34%;
     color: white;
-    /* margin-top: 20px; */
 }
 
 .custom-file-upload:hover {
@@ -181,7 +178,7 @@ input[type="file"] {
 }
 
 .filename-input {
-    width: 50%;
+    width: 80%;
     outline: none;
     border: 0;
     background-color: inherit;
@@ -191,8 +188,7 @@ input[type="file"] {
 .filename-div {
     display: -ms-flexbox; /* IE10 */
     display: flex;
-    width: 75%;
-    /* margin-bottom: 15px; */
+    width: 66%;
     align-content: center;
     background-color: black;
     border-radius: 1mm;
@@ -203,7 +199,6 @@ input[type="file"] {
     display: -ms-flexbox; /* IE10 */
     display: flex;
     width: 75%;
-    /* margin-bottom: 15px; */
     align-content: center;
     background-color: rgb(158, 141, 226);
     border-radius: 1mm;
@@ -225,7 +220,6 @@ input[type="radio"] {
     border: 1px solid #bbbbbb;
     background-color: #171C28;
     border-radius: 50%;
-
     margin-top: auto;
     margin-bottom: auto;
     margin-left: 5px;
@@ -251,7 +245,6 @@ input[type="checkbox"] {
     border: 1px solid #bbbbbb;
     background-color: #171C28;
     border-radius: 3px;
-
     margin-bottom: auto;
     margin-top: auto;
     margin-left: 5px;
@@ -269,3 +262,88 @@ input[type="checkbox"]:checked {
 .radio-div{
       width: 100px;
 }
+
+.container {
+    display: inline;
+    position: relative;
+    padding-left: 35px;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  
+  /* Hide the browser's default checkbox */
+  .container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+  }
+  
+  /* Create a custom checkbox */
+  .checkmark {
+    position: absolute;
+    top: 4;
+    left: 0;
+    width: 15px;
+    height: 15px;
+    padding: 1px;
+    background-clip: content-box;
+    border: 1px solid #bbbbbb;
+    background-color: #171C28;
+    border-radius: 3px;
+    margin-bottom: auto;
+    margin-top: auto;
+    margin-left: 5px;
+    margin-right: 10px;
+  }
+  
+  /* On mouse-over, add a grey background color */
+  .container:hover input ~ .checkmark {
+    background-color: #ccc;
+  }
+  
+  /* When the checkbox is checked, add a blue background */
+  .container input:checked ~ .checkmark {
+    background-color: #9073FF;
+  }
+  
+  /* Create the checkmark/indicator (hidden when not checked) */
+  .checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+  }
+  
+  /* Show the checkmark when checked */
+  .container input:checked ~ .checkmark:after {
+    display: block;
+  }
+  
+  /* Style the checkmark/indicator */
+  .container .checkmark:after {
+    left: 4px;
+    top: 0px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 1px 1px 0;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+  }
+
+  @media only screen and (max-width: 599px) {
+    .inputDiv {
+    width: 100% !important;
+    }
+  }
+
+  @media only screen and (min-width: 600px) {
+    .inputDiv {
+    width: 50% !important;
+    }
+  }

@@ -57,6 +57,19 @@ async function _createResource (url, payload = null, accessToken = null, headers
   }
 
   return new Promise(function (resolve, reject) {
+    // var proxyUrl = 'http://192.168.1.202:8889';
+    // var proxiedRequest = request.defaults({'proxy': proxyUrl});
+    // proxiedRequest.post( {url: url, body: payload, headers: headers, json: true}, function(error, response, body) {
+    //     var code = response.statusCode;
+    //     try {
+    //         var result = {code: code, body: body};
+    //         resolve(result);
+    //     } catch {
+    //         var result = {code: code, body: null};
+    //         resolve(result);
+    //     }
+    // });
+
     request.post({ url: url, body: payload, headers: headers, json: true }, function (error, response, body) {
       if (error) {
         console.log(error)
@@ -84,6 +97,12 @@ async function _deleteResource (url, accessToken = null, headers = null) {
   }
 
   return new Promise(function (resolve, reject) {
+    // var proxyUrl = 'http://192.168.1.202:8889';
+    // var proxiedRequest = request.defaults({'proxy': proxyUrl});
+    // proxiedRequest.delete({url: url, headers: headers}, function(error, response, body) {
+    //     resolve(response.statusCode);
+    // });
+
     request.delete({ url: url, headers: headers }, function (error, response, body) {
       if (error) {
         console.log(error)
