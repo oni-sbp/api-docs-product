@@ -67,6 +67,7 @@ async function parse (path, rootDirectory, examplesPath, params) {
       params.headers = null
       params.query_string = null
       params.curl = null
+      params.pyBody = null
     }
   }
 

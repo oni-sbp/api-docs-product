@@ -1,5 +1,6 @@
 sample_timeout: 100
 debug: False
+ignore_body_examples: True
 api_url: '$TESTING_API_URL'
 access_token: '$AUTH_TOKEN'
 substitutions:
@@ -56,10 +57,17 @@ before_sample:
       subs: {}
 
 allow_non_json_responses:
+  '/pet/{petId}':
+    'POST': True
+    'DELETE': True
+  '/store/order/{orderId}':
+    'DELETE': True
   '/user/{username}':
     'PUT': True
     'DELETE': True
   '/user/login':
+    'GET': True
+  '/user/logout':
     'GET': True
   '/user/createWithList':
     'POST': True
@@ -67,13 +75,6 @@ allow_non_json_responses:
     'POST': True
   '/user':
     'POST': True
-  '/pet/{petId}':
-    'POST': True
-    'DELETE': True
-  '/store/order/{orderId}':
-    'DELETE': True
-  '/user/logout':
-    'GET': True
 
 substitutions_before_sample:
   '/identities/v1':

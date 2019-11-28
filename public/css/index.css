@@ -1,0 +1,271 @@
+.headerBody{
+    background-color: #9073FF;
+}
+
+.mainBody{
+    background-color: black;
+}
+
+.temp{
+    background-color: #171C28;
+    color: white;
+}
+
+
+.step2{
+    visibility: visible;
+}
+
+.transparentBorder{
+    border:transparent;
+    border-style: groove;
+    padding-left: 10px;
+    padding-bottom: 10px;
+    padding-right: 10px;
+}
+
+.title{
+    text-align: center;
+    font-size: 40px;
+    color: white;
+    font-family: 'MS Reference Sans Serif';
+}
+
+.subTitle{
+    font-size:30px;
+    color: white;
+    font-family: 'MS Reference Sans Serif';
+}
+
+.btn-default {
+    border-radius: 40px;
+    transition: all 0.3s ease 0s;
+    font-family: 'Fira sans', sans-serif;
+}
+
+.validator {
+    display: none;
+    color:  #FF6CC0;
+    font-family: 'Fira sans', sans-serif;
+    font-size: 11px;
+}
+
+.warning {
+    color: #E0BD0A;
+    font-family: 'Fira sans', sans-serif;
+    font-size: 11px;
+}
+
+.inputText {
+  border: 0;
+  outline: 0;
+  background: transparent;
+  border-bottom: 1px solid white;
+  color: white;
+}
+
+.mainInfo{
+    color: white;
+    font-size: 30px;
+    /* text-align: center; */
+}
+
+.additionalInfo{
+    color: white;
+    font-size: 30px;
+}
+
+.inline-div{
+  display:inline;
+}
+
+.bodyAlign{
+  margin: 7mm;
+}
+
+.btnColor {
+    background-color:  #FB634D;
+    color: white
+}
+
+.btnColor:hover {
+  transition: all 0.4s ease 0s;
+  background-color: #DC4632;
+  color: white;
+  box-shadow: rgb(73, 55, 143) 0px 0px 0.4rem;
+}
+
+.upperNav {
+  position: relative;
+  top: 0px;
+  /* left: 50%; */
+  display: inline-block;
+  padding: 0.2em 3em;
+  text-align: right;
+  background: rgb(88, 62, 185) none repeat scroll 0% 0%;
+  clip-path: polygon(0% 0%, 100% 0%, 95% 100%, 5% 100%);
+}
+
+.upperNavItem {
+  color: white;
+  font-family: 'Fira sans', sans-serif;
+  margin-right: 3mm;
+  line-height: 1.125em;
+}
+.upperNavItem:hover {
+  text-shadow: rgba(240, 240, 240, 1) 0px 0px 2px;
+  color: white;
+  text-decoration: none;
+
+  outline: currentcolor none medium;
+}
+
+#ButtonExpand {
+  background-color: #9073FF;
+  color: white;
+  transition: all 0.4s ease 0s;
+}
+
+#ButtonExpand:hover {
+  background-color: rgb(97, 72, 194);
+  color: white;
+}
+
+input[type="file"] {
+  display: none;
+}
+
+.custom-file-upload {
+    padding: 6px 12px;
+    cursor: pointer;
+    background-color: #9073FF;
+    float: right;
+    margin-right: 25%;
+    color: white;
+    /* margin-top: 20px; */
+}
+
+.custom-file-upload:hover {
+    background-color: rgb(97, 72, 194);
+    color: white;
+}
+
+.new-line-div {
+    clear: both;
+    vertical-align: bottom;
+    width: 100%;
+    height: 25px;
+}
+
+.icon-image {
+    margin-bottom: 6px;
+    margin-top: 6px;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.icon-image-left {
+    margin-bottom: 6px;
+    margin-top: 6px;
+    margin-left: 10px;
+    margin-right: 10px;
+    float: left;
+}
+
+.icon-image-right {
+    margin-bottom: 6px;
+    margin-top: 6px;
+    margin-left: 10px;
+    margin-right: 10px;
+    float: right;
+}
+
+.filename-input {
+    width: 50%;
+    outline: none;
+    border: 0;
+    background-color: inherit;
+    color: white;
+}
+
+.filename-div {
+    display: -ms-flexbox; /* IE10 */
+    display: flex;
+    width: 75%;
+    /* margin-bottom: 15px; */
+    align-content: center;
+    background-color: black;
+    border-radius: 1mm;
+    height: 26px;
+}
+
+.filename-div-after {
+    display: -ms-flexbox; /* IE10 */
+    display: flex;
+    width: 75%;
+    /* margin-bottom: 15px; */
+    align-content: center;
+    background-color: rgb(158, 141, 226);
+    border-radius: 1mm;
+    height: 26px;
+}
+
+input[type="radio"] {
+    /* remove standard background appearance */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    /* create custom radiobutton appearance */
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    padding: 1px;
+    /* background-color only for content */
+    background-clip: content-box;
+    border: 1px solid #bbbbbb;
+    background-color: #171C28;
+    border-radius: 50%;
+
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-left: 5px;
+    margin-right: 10px;
+}
+
+input[type="radio"]:checked {
+    background-color: #9073FF;
+}
+
+input[type="checkbox"] {
+    /* remove standard background appearance */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    /* create custom radiobutton appearance */
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    padding: 1px;
+    /* background-color only for content */
+    background-clip: content-box;
+    border: 1px solid #bbbbbb;
+    background-color: #171C28;
+    border-radius: 3px;
+
+    margin-bottom: auto;
+    margin-top: auto;
+    margin-left: 5px;
+    margin-right: 10px;
+}
+
+input[type="checkbox"]:checked {
+    background-color: #9073FF;
+}
+
+.flex {
+    align-items: center;
+}
+
+.radio-div{
+      width: 100px;
+}

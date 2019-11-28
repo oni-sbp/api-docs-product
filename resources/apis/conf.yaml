@@ -1,4 +1,4 @@
-sample_timeout: 10
+sample_timeout: 20
 debug: False
 api_url: '$TESTING_API_URL'
 access_token: '$AUTH_TOKEN'

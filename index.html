@@ -1,68 +1,297 @@
 <head>
+  <title>
+    API Docs 2.0
+  </title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+    crossorigin="anonymous"></script>
+  <link rel="stylesheet" type="text/css" href="css/index.css">
   <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+  <script src="https://code.jquery.com/jquery-1.12.4.min.js">
+  </script>
+  <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
+  <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
   <script>
-    function onInputTypeChange(radio) {
-      if(radio.value === "file") {
-        document.getElementById("file").style.display = "block"; 
-        document.getElementById("archive").style.display = "none"; 
-        document.getElementById("url").style.display = "none"; 
-      } else if(radio.value === "archive") {
-        document.getElementById("file").style.display = "none"; 
-        document.getElementById("archive").style.display = "block"; 
-        document.getElementById("url").style.display = "none"; 
-      } else if(radio.value === "url") {
-        document.getElementById("file").style.display = "none"; 
-        document.getElementById("archive").style.display = "none"; 
-        document.getElementById("url").style.display = "block"; 
+    function isValidationReady(fileName) {
+      return true;
+      console.log('sdasdas')
+      $.ajax({
+        url:'/readyLogFile',
+        data: {
+          file: fileName
+        },
+        success: function(data){
+          alert('success!')
+        }
+      })
+
+      return false;
+    }
+    function validateForm() {
+      var x = document.forms["submitForm"]["url"].value;
+      var y = document.forms["submitForm"]["file"].value;
+
+      if (!x && !y) {
+        document.getElementById("validatorFile").style.display = "block";
+        return false;
+      }
+    }
+    function removeValidator() {
+      document.getElementById("validatorFile").style.display = "none";
+    }
+    function myFunction() {
+      var x = document.getElementById("ButtonExpand");
+      var y = document.getElementById("firstSubmitButton");
+      if (x.innerHTML === "Expand") {
+        x.innerHTML = "Collapse";
+        y.style.display = "none";
+      } else {
+        x.innerHTML = "Expand";
+        y.style.display = "block";
       }
     }
 
-    {% comment %} function  onAuthenticationTypeChange(radio) {
-      if(radio.value === "bearer" || radio.value === "basic") {
-       document.getElementById("auth_token").removeAttribute("disabled");
-      } else if(radio.value === "none") {
-        document.getElementById("auth_token").setAttribute("disabled", true);
-      }
-    } {% endcomment %}
+    function writeFileName(el) {
+      var split1 = el.value.split('/');
+      var split2 = split1[split1.length - 1].split('\\');
+      $("#FileName").val(split2[split2.length - 1]);
+      document.getElementById("FileAfter").style.display = "block"
+      document.getElementById("FileInitial").style.display = "none"
+    }
+
+    function callChooseFile(button) {
+      $(button).click();
+    }
+
+    function cancelFile() {
+      document.forms["submitForm"]["file"].value = null;
+      document.getElementById("FileAfter").style.display = "none"
+      document.getElementById("FileInitial").style.display = "block"
+      $("#FileName").val("");
+    }
+
+    function writeConfigFileName(el) {
+      var split1 = el.value.split('/');
+      var split2 = split1[split1.length - 1].split('\\');
+      $("#ConfigFileName").val(split2[split2.length - 1]);
+      document.getElementById("ConfigAfter").style.display = "block"
+      document.getElementById("ConfigInitial").style.display = "none"
+    }
+
+    function cancelConfigFile() {
+      document.forms["submitForm"]["config"].value = null;
+      document.getElementById("ConfigAfter").style.display = "none"
+      document.getElementById("ConfigInitial").style.display = "block"
+      $("#ConfigFileName").val("");
+    }
   </script>
 </head>
 
-<div style=" margin-right: auto; margin-left: auto;  width: 500;">
-  <form action="fileupload" method="post" enctype="multipart/form-data">
-    <div style=" width: 500; border: black; border-style: groove ; padding-left: 10; padding-bottom: 10;">
-      <center><h3>Input files<br></h3></center>
-      Load a file or archive: <input type="file" name="file" tabindex="1" /> <br><br>
-      Or insert URL: <input type="input" name="url" style="width:75%"> <br>
-    </div>
-    <br>
-    <div style=" width: 500; border: black; border-style: groove ; padding-left: 10; padding-bottom: 10;">
-      <center><h3>Configuration file<br></h3></center>
-      Config file: <input type="file" name="config" tabindex="1"><br><br>
-      Or insert URL: <input type="input" name="config_url" style="width:75%"> <br>
-    </div>
-    <br>
-    <div style=" width: 100%; padding-left: 10; padding-bottom: 10;">
-      Host: <input type="text" name="host"><br><br>
-      Scheme: 
-      <input type="radio" name="scheme" value="https"> https
-      <input type="radio" name="scheme" value="http"> http<br><br>
+<body class="mainBody">
+  <div class="top headerBody">
+    <center>
+      <nav class="upperNav">
+        <a href="https://platformoftrust.net/" class="upperNavItem">Platform of Trust</a>
+        <a href="https://developer.oftrust.net/" class="upperNavItem">Developer portal</a>
+        <a href="https://docs.oftrust.net//" class="upperNavItem">Docs of Trust</a>
+      </nav>
+    </center>
+    <div class="inline-div"><img src="resources/icon-platform-of-trust.png" alt=""> </div>
+    <div class="inline-div"></div>
+    <div class="inline-div float-right" style="padding-right: 3%">
+      <a href="https://platformoftrust.net/online-meeting" class="">
+        <button class="btn btn-default btnColor ">Book an online meeting</button>
+        <!-- <img src="resources/book-online-meeting.png" alt="" class="float-right"> -->
+      </a> </div>
 
-      Authentication type:
-      <input type="radio" name="authentication" onclick="onAuthenticationTypeChange(this);" value="none" checked> None
-      <input type="radio" name="authentication" onclick="onAuthenticationTypeChange(this);" value="basic"> Basic
-      <input type="radio" name="authentication" onclick="onAuthenticationTypeChange(this);" value="bearer"> Bearer<br><br>
-      AUTH_TOKEN: <input id="auth_token" type="text" name="auth_token" style="width:75%"><br><br>
-      Generate samples for:<br>
-        &nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" checked name="python">Python</input><br>
-        &nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" checked name="unirest.node">Unirest.node</input><br>
-        &nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" checked name="curl">curl</input><br>
-        &nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" checked name="2xx-response">2xx-response</input><br><br>
-        
-      <input type="checkbox" name="validate" title="Test"> Test <br><br>
-      Keyword: <input type="text" name="keyword"><br><br>
-
-      <input type="submit" value="Submit">
+    <div class="inline-div">
+      <center>
+        <span class="title"> API Docs 2.0</span>
+      </center>
     </div>
-  </form>
-  
-</div>
+    <center>
+      <div class="subTitle">Fast and reliable code example generation for your API documentation</div>
+    </center>
+  </div>
+  <div>
+    <br>
+    <div style=" margin-right: auto; margin-left: auto;  width: 1000;">
+      <div class="mainInfo">Provide API spec file</div>
+    </div>
+    <div style=" margin-right: auto; margin-left: auto;  width: 1000;">
+      <form action="fileupload" method="post" name="submitForm" enctype="multipart/form-data"
+        onsubmit="return validateForm()">
+        <div class="temp transparentBorder center-block" style=" width: 1000;">
+          <div class="bodyAlign">
+            <h4><b>Upload API spec file</b></h4><br>
+            <div class="inline-div float-left" style="width:50%">Load a file or archive:<br>
+              <div id="validatorFile" class="validator">*No File or URL Selected</div>
+              <div id="validatorSize" class="warning">*2 MB maximum file size</div>
+
+              <div id="FileInitial" class="filename-div" onclick="callChooseFile('#FileUploadLabel')">
+                <img src="resources/document icon-14.png" height="14" width="14" class="icon-image" />
+                <input type="text" class="input-field filename-input" placeholder="No file selected" readonly
+                  onclick="callChooseFile('#FileUploadLabel')">
+              </div>
+
+              <div id="FileAfter" class="filename-div-after" style="display: none;">
+                <img src="resources/pot icons-16.png" height="14" width="14" class="icon-image-left" />
+                <input type="text" class="input-field filename-input" id="FileName" placeholder="No file selected"
+                  readonly onclick="callChooseFile('#FileUploadLabel')">
+                <img src="resources/pot icons-20.png" height="14" width="14" class="icon-image-right"
+                  onclick="cancelFile();" />
+              </div>
+              <br>
+              <label id="FileUploadLabel" for="FileUpload" class="btn btn-default custom-file-upload">
+                Choose file
+              </label>
+              <input id="FileUpload" type="file" name="file" onchange="writeFileName(this); removeValidator();" />
+            </div>
+
+            <div class="inline-div float-left" style="width:50%">
+              <br>
+              <input type="input" class="inputText" name="url" onchange="removeValidator()" style="width:66%"
+                placeholder="Or insert URL:">
+            </div>
+            <div class="new-line-div">
+              <center>
+                <br>
+                <input type="submit" id="firstSubmitButton" class="btn btn-default btnColor"
+                  value="Generate Code Examples">
+              </center>
+            </div>
+            <div class="new-line-div">
+              <button type="button" id="ButtonExpand" class="btn center" type="button" data-toggle="collapse"
+                data-target="#collapseExample" onclick="myFunction()">Expand</button>
+            </div>
+          </div>
+        </div>
+
+        <br>
+
+        <div class="collapse" id="collapseExample" style=" width: 1000;">
+          <div class="additionalInfo">Additional options </div>
+          <div class="temp transparentBorder ">
+            <div class="bodyAlign">
+              <h4><b>Configure Optional settings</b></h4>
+              
+              <br>
+
+              <div class="inline-div float-left" style="width:50%"> Config file: 
+                <div id="validatorSizeConfig" class="warning">*2 MB maximum file size</div> <br>
+                
+                <div id="ConfigInitial" class="filename-div" onclick="callChooseFile('#ConfigUploadLabel')">
+                  <img src="resources/document icon-14.png" height="14" width="14" class="icon-image" />
+                  <input type="text" class="input-field filename-input" placeholder="No file selected" readonly
+                    onclick="callChooseFile('#ConfigUploadLabel')">
+                </div>
+
+                <div id="ConfigAfter" class="filename-div-after" style="display: none;">
+                  <img src="resources/pot icons-16.png" height="14" width="14" class="icon-image-left" />
+                  <input type="text" class="input-field filename-input" id="ConfigFileName" placeholder="No file selected"
+                    readonly onclick="callChooseFile('#ConfigUploadLabel')">
+                  <img src="resources/pot icons-20.png" height="14" width="14" class="icon-image-right"
+                    onclick="cancelConfigFile();" />
+                </div>
+
+                <br>
+
+                <label id="ConfigUploadLabel" for="ConfigUpload" class="btn btn-default custom-file-upload">
+                  Choose file
+                </label>
+                <input id="ConfigUpload" type="file" name="config" onchange="writeConfigFileName(this);" />
+              </div>
+
+              <div class="inline-div float-left" style="width:50%"> 
+                <input type="input" class="inputText" name="config_url" style="width:66%" placeholder="Or insert URL:"> 
+              </div>
+
+              <div class="new-line-div"></div>
+
+              <div style=" width: 100%;">
+                <input type="text" class="inputText" name="host" placeholder="Validation API:"><br><br>
+                Scheme: <br>
+                <div class="flex inline-div float-left radio-div">
+                  <input id="scheme1" type="radio" value="https" name="scheme" checked/>
+                  <label for="scheme1">HTTPS</label>
+                </div>
+                <div class="flex inline-div float-left radio-div">
+                  <input id="scheme2" type="radio" value="http" name="scheme" />
+                  <label for="scheme2">HTTP</label>
+                </div>
+
+                <br><br>
+
+                Authentication type: <br>
+                <div class="flex inline-div float-left radio-div">
+                  <input id="auth1" type="radio" value="none" name="authentication" checked />
+                  <label for="auth1">None</label>
+                </div>
+                <div class="flex inline-div float-left radio-div">
+                  <input id="auth2" type="radio" value="basic" name="authentication" />
+                  <label for="auth2">Basic</label>
+                </div>
+                <div class="flex inline-div float-left radio-div">
+                  <input id="auth3" type="radio" value="Basic" name="authentication" />
+                  <label for="auth2">Bearer</label>
+                </div>
+
+                <br><br>
+
+                <input id="auth_token" type="text" class="inputText" name="auth_token" placeholder="AUTH_TOKEN:"
+                  style="width:33%">
+
+                <br><br>
+
+                Generate samples for:<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                <div class="flex">
+                  <input id="tech1" type="checkbox" checked name="python" />
+                  <label for="tech1">Python</label><br>
+                </div>
+                <div class="flex">
+                  <input id="tech2" type="checkbox" checked name="unirest.node" />
+                  <label for="tech2">Unirest.node</label><br>
+                </div>
+                <div class="flex">
+                  <input id="tech3" type="checkbox" checked name="curl" />
+                  <label for="tech3">cURL</label><br>
+                </div>
+                <div class="flex">
+                  <input id="tech4" type="checkbox" checked name="2xx-response" />
+                  <label for="tech4">2xx-response</label><br>
+                </div>
+
+                <br>
+
+                <input class="inputText" type="text" name="keyword" placeholder="Keyword:">
+
+                <br><br>
+
+                <div class="flex">
+                  <label for="test">Test</label>
+                  <input id="test" type="checkbox" name="validate" />
+                </div>
+                <center>
+                  <input type="submit" class="btn btn-default btnColor" value="Generate Code Examples">
+                </center>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</body>

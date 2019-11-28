@@ -58,6 +58,10 @@ async function parse (path, rootDirectory, examplesPath, params) {
     var endPoint = api.paths[uri]
     params.uri = uri
 
+    if(uri === '/pet/findByTags') {
+      continue ///////////////////////
+    }
+
     for (var operation in endPoint) {
       if (operation !== 'parameters') {
         params.request_method = operation
@@ -73,6 +77,7 @@ async function parse (path, rootDirectory, examplesPath, params) {
         var bodyValue = getBody(endPoint[operation])
         if (bodyValue) {
           params.body = bodyValue
+          params.pyBody = bodyValue
         }
 
         setHeaders(endPoint[operation], contentType, params)
@@ -88,6 +93,8 @@ async function parse (path, rootDirectory, examplesPath, params) {
         params.body = null
         params.headers = null
         params.query_string = null
+        params.pyBody = null
+
       }
     }
   }

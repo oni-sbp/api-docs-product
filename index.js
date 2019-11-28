@@ -4,11 +4,14 @@ const archiver = require('archiver')
 const info = require('./info')
 const express = require('express')
 const app = express()
-const port = 80
+const port = 8080
 const validator = require('./validation/code-validator')
 const Guid = require('guid')
 const generator = require('./generation/code-generator')
 const constants = require('./constants')
+
+var fileReady = {};
+
 try {
   fs.remove(constants.ARCHIVES_FOLDER).then(() => {
     fs.mkdir(constants.ARCHIVES_FOLDER).catch((err) => {
@@ -38,6 +41,7 @@ try {
 } catch (err) {
   console.log(err)
 }
+app.use(express.static('public'))
 
 app.post('/fileupload', (req, res) => {
   var form = new formidable.IncomingForm()
@@ -60,33 +64,41 @@ app.post('/fileupload', (req, res) => {
         info.logFileStream = fs.createWriteStream(constants.LOG_FILES_FOLDER + validationLogFile, { flags: 'w' })
         fields.samplespath = samplesPath
 
-        fs.readFile('index.html', function (err, data) {
-          if (!err) {
-            res.writeHead(200, { 'Content-Type': 'text/html' })
-            res.write(data)
-          }
-        })
+        var archive = archiver('zip')
+        archive.directory(samplesPath, 'samples')
+
+        var archiveFileName = 'archive_' + Guid.create() + '.zip'
+        var archiveFile = fs.createWriteStream(constants.ARCHIVES_FOLDER + archiveFileName, { flags: 'w' })
+        archive.pipe(archiveFile)
+        archive.finalize()
+
+        
+
+        if (fields.validate === 'on') {
+          fileReady[validationLogFile] = false;
+        }
 
         validator.validateGeneratedSamples(fields, files).then(() => {
-          var archive = archiver('zip')
-          archive.directory(samplesPath, 'samples')
-
-          var archiveFileName = 'archive_' + Guid.create() + '.zip'
-          var archiveFile = fs.createWriteStream(constants.ARCHIVES_FOLDER + archiveFileName, { flags: 'w' })
-          archive.pipe(archiveFile)
-          archive.finalize()
-
-          var data = '<p><a download href="/logfile?logfile=' + logFileName + '">Generation Log File</a></p>\n'
-          if (fields.validate === 'on') {
-            data += '<p><a download href="/logfile?logfile=' + validationLogFile + '">Validation Log File</a></p>\n'
-          }
-          data += '<p><a download href="/archive?archive=' + archiveFileName + '">Archive with generated samples</a></p>\n'
-
-          res.write(data)
-          res.end()
+          fileReady[validationLogFile] = true;
 
           archiveFile.on('close', () => {
             fs.removeSync(samplesPath)
+          })
+
+          fs.readFile('index.html', function (err, data) {
+            if (!err) {
+              data += '<p><a download href="/logfile?logfile=' + logFileName + '">Generation Log File</a></p>\n'
+              if (fields.validate === 'on') {
+                data += '<p><a download href="/logfile?logfile=' + validationLogFile + '" onclick="isValidationReady()">Validation Log File</a></p>\n'
+              }
+              data += '<p><a download href="/archive?archive=' + archiveFileName + '">Archive with generated samples</a></p>\n'
+  
+              res.writeHead(200, { 'Content-Type': 'text/html', 'Content-Length': data.length })
+              res.write(data)
+            }
+  
+            res.write(data)
+            res.end()
           })
 
           setTimeout(function () {
@@ -199,6 +211,12 @@ app.get('/validation', (req, res) => {
     res.write(data)
     res.end()
   })
+})
+
+app.get('/readyLogFile', (req, res) => {
+  console.log(req);
+
+  //res.send({ready: readFile[req.]});
 })
 
 app.listen(port)

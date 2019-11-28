@@ -6,8 +6,8 @@ User=root
 Group=root
 Restart=always
 KillSignal=SIGQUIT
-WorkingDirectory=path-to-code
-ExecStart=path-to-node path-to-code/index.js
+WorkingDirectory=/home/ubuntu/PoT-CodeGen/api-docs-product
+ExecStart=/usr/bin/node /home/ubuntu/PoT-CodeGen/api-docs-product/index.js
 
 [Install]
 WantedBy=multi-user.target

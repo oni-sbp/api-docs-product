@@ -22,8 +22,8 @@ class TestSession {
   async run () {
     var reporter = new Reporter()
     var samplesByLang = {
-      'unirest.node': [],
       python: [],
+      'unirest.node': [],
       curl: []
     }
 
