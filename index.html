@@ -53,12 +53,20 @@
     function myFunction() {
       var x = document.getElementById("ButtonExpand");
       var y = document.getElementById("firstSubmitButton");
+      
+      var down = document.getElementById("down-arrow");
+      var up = document.getElementById("up-arrow");
+      
       if (x.innerHTML === "Expand") {
         x.innerHTML = "Collapse";
-        y.style.display = "none";
+        y.style.display = "block";
+        down.style.display = "none";
+        up.style.display = "block"
       } else {
         x.innerHTML = "Expand";
-        y.style.display = "block";
+        y.style.display = "none";
+        down.style.display = "block";
+        up.style.display = "none"
       }
     }
 
@@ -68,6 +76,17 @@
       $("#FileName").val(split2[split2.length - 1]);
       document.getElementById("FileAfter").style.display = "block"
       document.getElementById("FileInitial").style.display = "none"
+
+      var parts = split2[split2.length - 1].split('.');
+      var extension = parts[parts.length - 1];
+
+      var acceptedExtensions = ['raml', 'json', 'yaml', 'zip']
+
+      if(!acceptedExtensions.includes(extension)) {
+        document.getElementById("validatorFileExtension").style.display = "block";
+      } else {
+        document.getElementById("validatorFileExtension").style.display = "none";
+      }
     }
 
     function callChooseFile(button) {
@@ -79,6 +98,8 @@
       document.getElementById("FileAfter").style.display = "none"
       document.getElementById("FileInitial").style.display = "block"
       $("#FileName").val("");
+      document.getElementById("validatorFileExtension").style.display = "none";
+
     }
 
     function writeConfigFileName(el) {
@@ -87,6 +108,17 @@
       $("#ConfigFileName").val(split2[split2.length - 1]);
       document.getElementById("ConfigAfter").style.display = "block"
       document.getElementById("ConfigInitial").style.display = "none"
+
+      var parts = split2[split2.length - 1].split('.');
+      var extension = parts[parts.length - 1];
+
+      var acceptedExtensions = ['yaml']
+
+      if(!acceptedExtensions.includes(extension)) {
+        document.getElementById("validatorExtension").style.display = "block";
+      } else {
+        document.getElementById("validatorExtension").style.display = "none";
+      }
     }
 
     function cancelConfigFile() {
@@ -94,6 +126,7 @@
       document.getElementById("ConfigAfter").style.display = "none"
       document.getElementById("ConfigInitial").style.display = "block"
       $("#ConfigFileName").val("");
+      document.getElementById("validatorExtension").style.display = "none";
     }
   </script>
 </head>
@@ -134,8 +167,10 @@
           <div class="bodyAlign">
             <h4><b>Upload API spec file</b></h4><br>
             <div class="inline-div float-left inputDiv" style="width:50%; min-width:250px ;">Load a file or archive:<br>
-              <div id="validatorFile" class="validator">*No File or URL Selected</div>
               <div id="validatorSize" class="warning">*2 MB maximum file size</div>
+              <div id="warningAcceptedFiles" class="warning">*Accepted files: raml, yaml, json, zip</div>
+              <div id="validatorFileExtension" class="validator">*Unsupported file</div>
+              <div id="validatorFile" class="validator">*No File or URL Selected</div>
               <div id="FileInitial" class="filename-div" onclick="callChooseFile('#FileUploadLabel')">
                 <img src="resources/document icon-14.png" height="14" width="14" class="icon-image" />
                 <input type="text" class="input-field filename-input" placeholder="No file selected" readonly
@@ -169,8 +204,18 @@
             <br>
             <br>
             <div class="new-line-div">
-              <button type="button" id="ButtonExpand" class="btn center" type="button" data-toggle="collapse"
-                data-target="#collapseExample" onclick="myFunction()">Expand</button>
+              <button type="button" id="ButtonExpand" style="display: none;" class="btn center" type="button"
+                 ></button>
+              <a onclick="myFunction()" href="" style="color: #9073FF;" data-toggle="collapse" data-target="#collapseExample">
+                Additional options
+                <!-- <div class="inline-div">
+                  <img src="public/resources/baseline_arrow_downward_white_18dp.png" id="down-arrow" />
+                </div>
+                <div class="inline-div">
+                  <img src="public/resources/baseline_arrow_upward_white_18dp.png" id="up-arrow" />
+                </div> -->
+                
+              </a>
             </div>
           </div>
         </div>
@@ -181,7 +226,9 @@
             <div class="bodyAlign">
               <h4><b>Configure Optional settings</b></h4>
               <div class="inline-div float-left inputDiv" style="width:50%; min-width:250px;"> Config file:
-                <div id="validatorSizeConfig" class="warning">*2 MB maximum file size</div> <br>
+                <div id="validatorSizeConfig" class="warning">*2 MB maximum file size</div> 
+                <div id="validatorSizeConfig2" class="warning">*Accepted files: yaml</div> 
+                <div id="validatorExtension" class="validator">*Unsupported file</div>
                 <div id="ConfigInitial" class="filename-div" onclick="callChooseFile('#ConfigUploadLabel')">
                   <img src="resources/document icon-14.png" height="14" width="14" class="icon-image" />
                   <input type="text" class="input-field filename-input" placeholder="No file selected" readonly
