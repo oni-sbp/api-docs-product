@@ -57,15 +57,6 @@ app.post('/fileupload', (req, res) => {
     var validationLogFile = 'log_' + Guid.create() + '.txt'
     info.logFileStream = fs.createWriteStream(constants.LOG_FILES_FOLDER + logFileName, { flags: 'w' })
 
-    fs.readFile('index.html', function (err, data) {
-      if (!err) {
-        res.writeHead(200, { 'Content-Type': 'text/html' })
-        res.write(data)
-      }
-
-    })
-    
-
     generator.generateSamples(fields, files).then((samplesPath) => {
       if (samplesPath === '') {
         req.app.locals.errorMessage = 'API specification not found'
@@ -88,14 +79,23 @@ app.post('/fileupload', (req, res) => {
 
         validator.validateGeneratedSamples(fields, files).then(() => {
 
-          data = '<div id="logs"><center><p><a download href="/logfile?logfile=' + logFileName + '" class="link">Generation Log File</a></p>\n'
+		fs.readFile('index.html', function (err, data) {
+			  if (!err) {
+				res.writeHead(200, { 'Content-Type': 'text/html' })
+				
+				data += '<div id="logs"><center><p><a download href="/logfile?logfile=' + logFileName + '" class="link">Generation Log File</a></p>\n'
           if (fields.validate === 'on') {
             data += '<p><a download href="/logfile?logfile=' + validationLogFile + '" class="link" onclick="isValidationReady()">Validation Log File</a></p>\n'
           }
           data += '<p><a download href="/archive?archive=' + archiveFileName + '" class="link">Archive with generated samples</a><center></div>\n'
+				
+				res.write(data)			
+				 
+			  }
+			  
+			  res.end()
 
-          res.write(data)
-          res.end()
+			})
 
           fileReady[validationLogFile] = true;
 
