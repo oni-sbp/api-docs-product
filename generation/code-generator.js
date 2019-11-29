@@ -74,9 +74,9 @@ async function generateSamples (fields, files) {
     await fileParser.parse(allFiles[fileIndex], rootDirectory, examplePath, host, scheme)
   }
 
-  var arg = "python build.py --a pot"
+  var arg = "python3 build.py --a pot"
   if(path.endsWith('swagger.json')) {
-    arg = "python build.py --a petstore"
+    arg = "python3 build.py --a petstore"
   } 
   runShellCommand(arg, 20, process.cwd() + '/docs/raml2markdown');
   runShellCommand('bundle exec middleman build', 20, process.cwd() + '/docs');
