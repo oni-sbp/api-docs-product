@@ -23,123 +23,132 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css"
     integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
-<script>
-  function isValidationReady(fileName) {
-    return true;
-    console.log('sdasdas')
-    $.ajax({
-      url: '/readyLogFile',
-      data: {
-        file: fileName
-      },
-      success: function (data) {
-        alert('success!')
-      }
-    })
 
-    return false;
-  }
+  <script>
+    function isValidationReady(fileName) {
+      return true;
+      console.log('sdasdas')
+      $.ajax({
+        url: '/readyLogFile',
+        data: {
+          file: fileName
+        },
+        success: function (data) {
+          alert('success!')
+        }
+      })
 
-  function validateForm() {
-    var x = document.forms["submitForm"]["url"].value;
-    var y = document.forms["submitForm"]["file"].value;
-
-    if (!x && !y) {
-      document.getElementById("validatorFile").style.display = "block";
       return false;
     }
 
-    document.getElementById("logs").style.display = "none";
-
-  }
-  function removeValidator() {
-    document.getElementById("validatorFile").style.display = "none";
-  }
-  function myFunction() {
-    var x = document.getElementById("ButtonExpand");
-    var y = document.getElementById("firstSubmitButton");
-
-    var down = document.getElementById("arrowDown");
-    var up = document.getElementById("arrowUp");
-    var addit = document.getElementById("additional-options-text");
-
-    if (x.innerHTML === "Expand") {
-      x.innerHTML = "Collapse";
-      y.style.display = "block";
-      addit.innerHTML = "Show Additional Options";
-      up.style.display = "none";
-      down.style.display = "inline";
-    } else {
-      x.innerHTML = "Expand";
-      y.style.display = "none";
-      addit.innerHTML = "Hide Additional Options";
-      up.style.display = "inline";
-      down.style.display = "none";
+    function validateForm() {
+      var x = document.forms["submitForm"]["url"].value;
+      var y = document.forms["submitForm"]["file"].value;
+      if (!x && !y) {
+        document.getElementById("validatorFile").style.display = "block";
+        return false;
+      }
+      document.getElementById("waitingContainer").style.display = "block";
+      document.getElementById("logs").style.display = "none";
     }
-  }
 
-  function writeFileName(el) {
-    var split1 = el.value.split('/');
-    var split2 = split1[split1.length - 1].split('\\');
-    $("#FileName").val(split2[split2.length - 1]);
-    document.getElementById("FileAfter").style.display = "block"
-    document.getElementById("FileInitial").style.display = "none"
+    function removeValidator() {
+      document.getElementById("validatorFile").style.display = "none";
+    }
+    function myFunction() {
+      var x = document.getElementById("ButtonExpand");
+      var y = document.getElementById("firstSubmitButton");
 
-    var parts = split2[split2.length - 1].split('.');
-    var extension = parts[parts.length - 1];
+      var down = document.getElementById("arrowDown");
+      var up = document.getElementById("arrowUp");
+      var addit = document.getElementById("additional-options-text");
 
-    var acceptedExtensions = ['raml', 'json', 'yaml', 'zip']
+      if (x.innerHTML === "Expand") {
+        x.innerHTML = "Collapse";
+        y.style.display = "block";
+        addit.innerHTML = "Show Additional Options";
+        up.style.display = "none";
+        down.style.display = "inline";
+      } else {
+        x.innerHTML = "Expand";
+        y.style.display = "none";
+        addit.innerHTML = "Hide Additional Options";
+        up.style.display = "inline";
+        down.style.display = "none";
+      }
+    }
 
-    if (!acceptedExtensions.includes(extension)) {
-      document.getElementById("validatorFileExtension").style.display = "block";
-    } else {
+    function writeFileName(el) {
+      var split1 = el.value.split('/');
+      var split2 = split1[split1.length - 1].split('\\');
+      $("#FileName").val(split2[split2.length - 1]);
+      document.getElementById("FileAfter").style.display = "block"
+      document.getElementById("FileInitial").style.display = "none"
+
+      var parts = split2[split2.length - 1].split('.');
+      var extension = parts[parts.length - 1];
+
+      var acceptedExtensions = ['raml', 'json', 'yaml', 'zip']
+
+      if (!acceptedExtensions.includes(extension)) {
+        document.getElementById("validatorFileExtension").style.display = "block";
+      } else {
+        document.getElementById("validatorFileExtension").style.display = "none";
+      }
+    }
+
+    function callChooseFile(button) {
+      $(button).click();
+    }
+
+    function cancelFile() {
+      document.forms["submitForm"]["file"].value = null;
+      document.getElementById("FileAfter").style.display = "none"
+      document.getElementById("FileInitial").style.display = "block"
+      $("#FileName").val("");
       document.getElementById("validatorFileExtension").style.display = "none";
+
     }
-  }
 
-  function callChooseFile(button) {
-    $(button).click();
-  }
+    function writeConfigFileName(el) {
+      var split1 = el.value.split('/');
+      var split2 = split1[split1.length - 1].split('\\');
+      $("#ConfigFileName").val(split2[split2.length - 1]);
+      document.getElementById("ConfigAfter").style.display = "block"
+      document.getElementById("ConfigInitial").style.display = "none"
 
-  function cancelFile() {
-    document.forms["submitForm"]["file"].value = null;
-    document.getElementById("FileAfter").style.display = "none"
-    document.getElementById("FileInitial").style.display = "block"
-    $("#FileName").val("");
-    document.getElementById("validatorFileExtension").style.display = "none";
+      var parts = split2[split2.length - 1].split('.');
+      var extension = parts[parts.length - 1];
 
-  }
+      var acceptedExtensions = ['yaml']
 
-  function writeConfigFileName(el) {
-    var split1 = el.value.split('/');
-    var split2 = split1[split1.length - 1].split('\\');
-    $("#ConfigFileName").val(split2[split2.length - 1]);
-    document.getElementById("ConfigAfter").style.display = "block"
-    document.getElementById("ConfigInitial").style.display = "none"
+      if (!acceptedExtensions.includes(extension)) {
+        document.getElementById("validatorExtension").style.display = "block";
+      } else {
+        document.getElementById("validatorExtension").style.display = "none";
+      }
+    }
 
-    var parts = split2[split2.length - 1].split('.');
-    var extension = parts[parts.length - 1];
-
-    var acceptedExtensions = ['yaml']
-
-    if (!acceptedExtensions.includes(extension)) {
-      document.getElementById("validatorExtension").style.display = "block";
-    } else {
+    function cancelConfigFile() {
+      document.forms["submitForm"]["config"].value = null;
+      document.getElementById("ConfigAfter").style.display = "none"
+      document.getElementById("ConfigInitial").style.display = "block"
+      $("#ConfigFileName").val("");
       document.getElementById("validatorExtension").style.display = "none";
     }
-  }
-
-  function cancelConfigFile() {
-    document.forms["submitForm"]["config"].value = null;
-    document.getElementById("ConfigAfter").style.display = "none"
-    document.getElementById("ConfigInitial").style.display = "block"
-    $("#ConfigFileName").val("");
-    document.getElementById("validatorExtension").style.display = "none";
-  }
-</script>
+  </script>
 </head>
 
 <body class="mainBody">
+  <div id="waitingContainer" style="display: none;">
+    <div class="overlay">
+    </div>
+    <div class="shadow">
+      <center>
+        <div class="loader logo"></div>
+      </center>
+    </div>
+  </div>
   <div class="top headerBody">
     <center>
       <nav class="upperNav">
@@ -219,7 +228,6 @@
                 <span id="additional-options-text">Show Additional Options</span>
                 <i class="fas fa-angle-up imageColor" id="arrowUp" style="display: none;"></i>
                 <i class="fas fa-angle-down imageColor" id="arrowDown"></i>
-
                 <!-- <div class="inline-div">
                   <img src="public/resources/baseline_arrow_downward_white_18dp.png"  />
                 </div>
