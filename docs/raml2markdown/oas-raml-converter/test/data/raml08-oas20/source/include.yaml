@@ -1,7 +1,0 @@
-#%RAML 0.8
-title: Pagination API
-
-traits:
-  - !include ../../libraries/traits.yaml
-  - otherTrait:
-      description: just another trait

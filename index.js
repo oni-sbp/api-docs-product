@@ -79,26 +79,23 @@ app.post('/fileupload', (req, res) => {
 
         validator.validateGeneratedSamples(fields, files).then(() => {
 
-          fs.readFile('index.html', function (err, data) {
-            if (!err) {
-              res.writeHead(200, { 'Content-Type': 'text/html' })
+		fs.readFile('index.html', function (err, data) {
+			  if (!err) {
+				res.writeHead(200, { 'Content-Type': 'text/html' })
+				
+				data += '<div id="logs"><center><p><a download href="/logfile?logfile=' + logFileName + '" class="link">Generation Log File</a></p>\n'
+          if (fields.validate === 'on') {
+            data += '<p><a download href="/logfile?logfile=' + validationLogFile + '" class="link" onclick="isValidationReady()">Validation Log File</a></p>\n'
+          }
+          data += '<p><a download href="/archive?archive=' + archiveFileName + '" class="link">Archive with generated samples</a><center></div>\n'
+				
+				res.write(data)			
+				 
+			  }
+			  
+			  res.end()
 
-              data += '<div id="logs"><center><p><a download href="/logfile?logfile=' + logFileName + '" class="link">Generation Log File</a></p>\n'
-              if (fields.validate === 'on') {
-                data += '<p><a download href="/logfile?logfile=' + validationLogFile + '" class="link" onclick="isValidationReady()">Validation Log File</a></p>\n'
-              }
-              data += '<p style="color: #9073FF;">Generated examples:</p>'
-              data += '<p><a download href="/archive?archive=' + archiveFileName + '" class="link">Download</a><center>'
-
-              data += '<p><a target="_blank" href="/docsOfTrust' + '" class="link">View</a><center><div>\n'
-
-              res.write(data)
-
-            }
-
-            res.end()
-
-          })
+			})
 
           fileReady[validationLogFile] = true;
 
@@ -219,22 +216,9 @@ app.get('/validation', (req, res) => {
 })
 
 app.get('/readyLogFile', (req, res) => {
-  console.log(req)
+  console.log(req);
 
   //res.send({ready: readFile[req.]});
-})
-
-app.get('/docsOfTrust', (req, res) => {
-  fs.readFile('./docs/build/index.html', function (err, data) {
-    if (err) {
-      req.app.locals.errorMessage = 'Page not found'
-      res.redirect('/ErrorPage')
-    }
-
-    res.writeHead(200, { 'Content-Type': 'text/html', 'Content-Length': data.length })
-    res.write(data)
-    res.end()
-  })
 })
 
 app.listen(port)
