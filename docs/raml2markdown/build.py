@@ -40,7 +40,7 @@ def petstore_to_slate(apiname):
     print("File: "+apiname+".md delete failed. MD formatted file not found!")
 
   # Convert from OpenAPISpec to Slate md
-  local_swagger_to_slate = ".\\node_modules\\.bin\\swagger-to-slate"
+  local_swagger_to_slate = "./node_modules/.bin/swagger-to-slate"
   swagger_to_slate = local_swagger_to_slate if os.path.exists(local_swagger_to_slate) else "swagger-to-slate"
   slatecmd = swagger_to_slate + " -i ./OAS/" + apiname + ".json -o ./slate/" + apiname + ".md"
   failure = os.system(slatecmd)
@@ -77,7 +77,7 @@ def api_raml_to_slate(apiname):
     print("RAML -> OpenAPISpec failed. Trying next in array.")
   else:
   # Convert from OpenAPISpec to Slate md
-    local_swagger_to_slate = ".\\node_modules\\.bin\\swagger-to-slate"
+    local_swagger_to_slate = "./node_modules/.bin/swagger-to-slate"
     swagger_to_slate = local_swagger_to_slate if os.path.exists(local_swagger_to_slate) else "swagger-to-slate"
     slatecmd = swagger_to_slate + " -i ./OAS/" + apiname + ".json -o ./slate/" + apiname + ".md"
     failure = os.system(slatecmd)
@@ -386,7 +386,7 @@ if args.a == "petstore":
 concatenate_files("../../resources/Generated examples")
 
 # Build deployable content as html
-make_html()
+#make_html()
 
 # copy the RAMLs and OAS spec files to build
 copy_specs_to_build()
