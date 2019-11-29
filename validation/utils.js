@@ -9,7 +9,7 @@ function runShellCommand (args, timeout = null, cwd = null) {
   var exitCode = 0
   var stdout = ''
   var stderr = ''
-
+	console.log(args, cwd)
   try {
     stdout = execSync(args, { timeout: timeout * 1000, cwd: cwd, stdio: 'pipe' }, (error, stdout, stderr) => {
       if (error) {
@@ -24,6 +24,7 @@ function runShellCommand (args, timeout = null, cwd = null) {
     exitCode = error.status
     stderr = error.stderr.toString()
   }
+	console.log(stdout.toString())
 
   return new SystemCmdResult(exitCode, stdout.toString(), stderr)
 }
