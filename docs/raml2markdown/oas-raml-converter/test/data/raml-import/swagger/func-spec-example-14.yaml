@@ -1,0 +1,12 @@
+swagger: '2.0'
+info:
+  version: '1'
+  title: example
+paths: {}
+definitions:
+  userPicture:
+    type: string
+    maxLength: 307200
+  customFile:
+    type: string
+    maxLength: 1048576

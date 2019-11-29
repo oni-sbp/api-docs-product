@@ -1,0 +1,21 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "",
+        "title": "Test",
+        "description": ""
+    },
+    "paths": {},
+    "parameters": {
+        "trait:foo:limit": {
+            "name": "limit",
+            "in": "query",
+            "type": "string"
+        },
+        "trait:foo:auth": {
+            "name": "auth",
+            "in": "header",
+            "type": "string"
+        }
+    }
+}

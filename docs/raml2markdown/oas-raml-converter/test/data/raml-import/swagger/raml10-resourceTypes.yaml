@@ -1,0 +1,29 @@
+swagger: '2.0'
+info:
+  version: v1
+  title: Example API
+paths:
+  /users:
+    post:
+      operationId: POST_users
+      description: Create a new user
+      parameters:
+        - $ref: '#/parameters/trait:secured:access_token'
+      responses:
+        default:
+          description: ''
+    get:
+      operationId: GET_users
+      description: 'Get all users, optionally filtered'
+      parameters:
+        - $ref: '#/parameters/trait:secured:access_token'
+      responses:
+        default:
+          description: ''
+parameters:
+  'trait:secured:access_token':
+    name: access_token
+    in: header
+    description: Access Token
+    required: true
+    type: string

@@ -1,0 +1,70 @@
+swagger: '2.0'
+info:
+  version: ''
+  title: API with Examples
+paths:
+  /organisation:
+    get:
+      operationId: GET_organisation
+      description: Returns an organisation entity.
+      produces:
+        - application/json
+      responses:
+        '201':
+          description: ''
+          examples:
+            application/json:
+              acme:
+                name: Acme
+              softwareCorp:
+                name: Software Corp
+                address: 35 Central Street
+                value: Gold
+          schema:
+            $ref: '#/definitions/Org'
+    post:
+      operationId: POST_organisation
+      consumes:
+        - application/json
+      parameters:
+        - name: UserID
+          in: header
+          description: the identifier for the user that posts a new organisation
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/Org'
+            example:
+              name: Doe Enterprise
+              value: Silver
+      responses:
+        default:
+          description: ''
+definitions:
+  User:
+    type: object
+    example:
+      name: Bob
+      lastname: Marley
+    properties:
+      name:
+        type: string
+      lastname:
+        type: string
+    required:
+      - name
+      - lastname
+  Org:
+    type: object
+    properties:
+      name:
+        type: string
+      address:
+        type: string
+      value:
+        type: string
+    required:
+      - name

@@ -1,0 +1,26 @@
+swagger: '2.0'
+info:
+  version: ''
+  title: Illustrating annotations
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /groups:
+    x-annotation-experimental:
+    x-annotation-feedbackRequested: black friday!
+  /users:
+    get:
+      operationId: GET_users
+      responses:
+        '200':
+          description: ''
+      x-annotation-deprecated:
+      x-annotation-experimental:
+      x-annotation-feedbackRequested: Feedback committed!
+    x-annotation-testHarness: usersTest
+    x-annotation-badge: tested.gif
+    x-annotation-clearanceLevel:
+      level: high
+      signature: 230-ghtwvfrs1itr

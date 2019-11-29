@@ -1,0 +1,84 @@
+{
+  "name": "oas-raml-converter",
+  "version": "1.1.43",
+  "description": "This package helps to convert between different API specifications. Supports OAS (Swagger 2), RAML 0.8, RAML 1.0.",
+  "main": "lib/index.js",
+  "files": [
+    "lib/",
+    "src/",
+    ".babelrc"
+  ],
+  "scripts": {
+    "test": "mocha --compilers js:babel-register && npm run eslint",
+    "start": "node ./lib/bin/converter.js",
+    "build": "babel src -d lib && flow-copy-source -v src lib",
+    "build-and-publish": "rm -rf lib && npm install && npm test && npm run build && npm version patch && npm publish",
+    "eslint": "eslint ./src ./test",
+    "coverage": "babel-node ./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec",
+    "coveralls": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
+    "flow": "flow",
+    "babel-node": "babel-node",
+    "flow-copy-source": "flow-copy-source src lib"
+  },
+  "bin": {
+    "oas-raml-converter": "./lib/bin/converter.js",
+    "raml-parser": "./lib/bin/raml-parser.js",
+    "oas-parser": "./lib/bin/oas-parser.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mulesoft/oas-raml-converter.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mulesoft/oas-raml-converter/issues"
+  },
+  "homepage": "https://mulesoft.github.io/oas-raml-converter",
+  "dependencies": {
+    "js-yaml": "3.x.x",
+    "json-schema-compatibility": "1.x.x",
+    "lodash": "4.x.x",
+    "oas-raml-converter-model": "0.0.18",
+    "raml-1-parser": "~1.1.50",
+    "request": "2.88.0",
+    "swagger-parser": "5.0.5",
+    "xml2js": "~0.4.19"
+  },
+  "devDependencies": {
+    "babel-cli": "~6.26.0",
+    "babel-eslint": "^7.2.3",
+    "babel-preset-flow": "^6.23.0",
+    "babel-preset-latest": "^6.16.0",
+    "babel-register": "~6.26.0",
+    "browser-request": "^0.3.3",
+    "chai": "^3.5.0",
+    "chai-fuzzy": "1.x.x",
+    "chai-string": "^1.2.0",
+    "commander": "^2.9.0",
+    "coveralls": "^2.11.15",
+    "eslint": "^3.12.2",
+    "eslint-plugin-promise": "^3.4.0",
+    "eslint-plugin-standard": "^2.0.1",
+    "flow-bin": "^0.49.1",
+    "flow-copy-source": "^1.2.0",
+    "istanbul": "^1.0.0-alpha.2",
+    "mocha": "^2.4.5",
+    "serializer.ts": "0.0.12",
+    "slugify": "^1.0.2"
+  },
+  "browser": {
+    "request": "browser-request"
+  },
+  "browserify": {
+    "transform": [
+      "browserify-global-shim"
+    ]
+  },
+  "browserify-global-shim": {
+    "raml-1-parser": "RAML.Parser"
+  },
+  "directories": {
+    "example": "example",
+    "test": "test"
+  }
+}

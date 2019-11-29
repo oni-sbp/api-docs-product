@@ -1,0 +1,45 @@
+swagger: '2.0'
+info:
+  version: ''
+  title: traits example
+paths:
+  /items:
+    get:
+      operationId: GET_items
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/trait:accessToken:token'
+        - $ref: '#/parameters/trait:imageable:imageType'
+      responses:
+        '200':
+          $ref: '#/responses/trait:hasFound:200'
+parameters:
+  'trait:imageable:imageType':
+    name: imageType
+    in: query
+    description: 'Comma,separated list just like in example. One alone may be present'
+    type: string
+    default: SmallImage
+  'trait:accessToken:token':
+    name: token
+    in: header
+    description: access token
+    required: true
+    type: string
+responses:
+  'trait:hasFound:200':
+    description: ''
+    schema:
+      $ref: '#/definitions/Item'
+definitions:
+  Item:
+    type: object
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    required:
+      - id
+      - name

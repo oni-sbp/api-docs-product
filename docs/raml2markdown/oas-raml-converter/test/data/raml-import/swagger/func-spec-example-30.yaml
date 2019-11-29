@@ -1,0 +1,26 @@
+swagger: '2.0'
+info:
+  version: ''
+  title: GitHub API
+paths:
+  /users:
+    get:
+      operationId: GET_users
+      description: Get a list of users
+      parameters:
+        - name: page
+          in: query
+          description: Specify the page that you want to retrieve
+          required: true
+          type: integer
+        - name: per_page
+          in: query
+          description: Specify the amount of items that will be retrieved per page
+          required: true
+          type: integer
+          default: 30
+          minimum: 10
+          maximum: 200
+      responses:
+        default:
+          description: ''

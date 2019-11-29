@@ -1,0 +1,150 @@
+#%RAML 1.0
+title: Swagger petstore
+version: 1.0.0
+baseUri: 'http://localhost:3000/'
+mediaType: application/json
+protocols:
+  - HTTP
+  - HTTPS
+description: A sample API
+/pets/{petName}:
+    /photos:
+      post:
+        displayName: addPetPhoto
+        description: Upload a new pet photo
+        body:
+          multipart/form-data:
+            properties:
+              id:
+                description: The photo ID (generated automatically)
+                type: string
+                required: false
+              label:
+                description: A label for the photo
+                type: string
+              description:
+                description: An optional description of the photo
+                type: string
+                required: false
+              photo:
+                description: The pet photo
+                type: string
+        responses:
+          '400':
+            body:
+              application/json:
+                properties:
+                  id:
+                    type: integer
+                    format: int32
+                    description: The auto-generated photo ID
+                  label:
+                    type: string
+                    required: false
+                  description:
+                    type: string
+                    required: false
+                  photo:
+                    description: 'Information about the photo (size, file name, etc.)'
+                    required: false
+            description: Returns the photo information
+    uriParameters:
+      petName:
+        description: name for the pet
+        type: string
+    patch:
+      displayName: updatePet
+      description: Updates a pet by name
+      body:
+        application/json:
+          type: pet
+          (oas-body-name): body
+          required: false
+      responses:
+        '400':
+          body:
+            application/json:
+              type: pet
+          description: Returns the updated pet data
+    delete:
+      displayName: deletePet
+      description: Deletes a single pet based on the name supplied
+      responses:
+        '400':
+          body:
+            application/json:
+              type: pet
+          description: Returns the pet that was deleted
+    get:
+      displayName: findPetByName
+      description: Returns a pet by name
+      responses:
+        '400':
+          body:
+            application/json:
+              type: pet
+          description: Returns the pet data
+types:
+  pet:
+    type: object
+    properties:
+      name:
+        type: string
+        minLength: 4
+        pattern: '^[a-zA-Z0-9- ]+$'
+      age:
+        type: integer
+        required: false
+      dob:
+        type: date-only
+        required: false
+      type:
+        type: string
+        enum:
+          - cat
+          - dog
+          - bird
+      address:
+        type: address
+        required: false
+      vet:
+        type: veterinarian
+        required: false
+      tags:
+        type: array
+        uniqueItems: true
+        items:
+          type: string
+          minLength: 1
+        required: false
+  veterinarian:
+    type: object
+    properties:
+      name:
+        type: string
+        minLength: 1
+      address:
+        type: address
+        required: false
+  address:
+    type: object
+    properties:
+      street:
+        type: string
+        minLength: 1
+      city:
+        type: string
+        minLength: 1
+      state:
+        type: string
+        minLength: 2
+        maxLength: 2
+        pattern: '^[A-Z]+$'
+      zipcode:
+        type: integer
+        minimum: 10000
+        maximum: 99999
+annotationTypes:
+  oas-body-name:
+    type: string
+    allowedTargets: TypeDeclaration

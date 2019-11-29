@@ -1,0 +1,143 @@
+#%RAML 1.0
+title: Swagger Petstore
+version: 1.0.0
+baseUri: 'http://localhost:3000/api'
+mediaType: application/json
+protocols:
+  - HTTP
+description: This is a sample server Petstore.
+(oas-externalDocs):
+  description: Find more information here
+  url: 'http://swagger.io'
+(oas-info):
+  contact:
+    name: apiteam@swagger.io
+  termsOfService: 'http://helloreverb.com/terms/'
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+securitySchemes:
+  petstore_auth:
+    type: OAuth 2.0
+    settings:
+      authorizationUri: 'http://swagger.io/api/oauth/dialog'
+      accessTokenUri: ''
+      authorizationGrants:
+        - implicit
+      scopes:
+        - 'write:users'
+        - 'read:users'
+  internalApiKey:
+    type: Pass Through
+    describedBy:
+      headers:
+        api_key:
+          type: string
+    description: Api Key Authentication
+/users:
+  get:
+    description: Get basic information about a user.
+    (oas-summary): my method summary
+    responses:
+      '200':
+        body:
+          application/json:
+            type: object
+            properties:
+              data:
+                type: User
+        description: The user object
+    securedBy:
+      - internalApiKey
+      - petstore_auth:
+          scopes:
+            - 'read:users'
+    (oas-tags):
+      - get_method
+    (oas-deprecated): true
+    (oas-externalDocs):
+      description: Find more information here
+      url: 'http://swagger.io'
+types:
+  User:
+    type: object
+    discriminator: username
+    properties:
+      id_int:
+        type: integer
+        format: int32
+        required: false
+      id_long:
+        type: integer
+        format: int64
+        required: false
+      id_float:
+        type: number
+        format: float
+        required: false
+      id_double:
+        type: number
+        format: double
+        required: false
+      username:
+        type: string
+      username_byte:
+        type: string
+        (oas-format): byte
+        required: false
+      username_binary:
+        type: string
+        (oas-format): binary
+        required: false
+      username_boolean:
+        type: boolean
+        required: false
+      username_date:
+        type: date-only
+        required: false
+      username_datetime:
+        type: datetime
+        required: false
+      user_password:
+        type: string
+        (oas-format): password
+        required: false
+      //:
+        type: string
+    example:
+      username: xyz
+      user_password: zyx
+annotationTypes:
+  oas-format:
+    type: 'string'
+    allowedTargets: TypeDeclaration
+  oas-deprecated:
+    type: boolean
+    allowedTargets: Method
+  oas-summary:
+    type: string
+    allowedTargets: Method
+  oas-tags:
+    type: string[]
+    allowedTargets: Method
+  oas-externalDocs:
+    properties:
+      description?: string
+      url: string
+    allowedTargets:
+      - API
+      - Method
+      - TypeDeclaration
+  oas-info:
+    properties:
+      termsOfService?: string
+      contact?:
+        properties:
+          name?: string
+          url?: string
+          email?: string
+      license?:
+        properties:
+          name?: string
+          url?: string
+    allowedTargets: API

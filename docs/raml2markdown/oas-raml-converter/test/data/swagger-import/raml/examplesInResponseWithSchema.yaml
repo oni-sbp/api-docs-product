@@ -1,0 +1,209 @@
+#%RAML 1.0
+title: Simple API
+version: 0.0.0
+mediaType: application/json
+annotationTypes:
+  oas-format:
+    allowedTargets: TypeDeclaration
+    type: string
+  oas-readOnly:
+    allowedTargets: TypeDeclaration
+    type: boolean
+/:
+  get:
+    responses:
+      '200':
+        body:
+          application/json:
+            type: Person
+            example:
+              username: john1234
+        description: History information for the given user
+types:
+  Person:
+    properties:
+      firstName:
+        type: string
+        required: false
+      lastName:
+        type: string
+        required: false
+      username:
+        type: string
+        pattern: '[a-z0-9]{8,64}'
+        minLength: 8
+        maxLength: 64
+      dateOfBirth:
+        type: date-only
+        required: false
+      lastTimeOnline:
+        type: datetime
+        (oas-readOnly): true
+        required: false
+      avatarBase64PNG:
+        type: string
+        (oas-format): byte
+        required: false
+      shortProp:
+        type: integer
+        format: int32
+        required: false
+      longProp:
+        type: integer
+        format: int64
+        required: false
+      floatProp:
+        type: number
+        format: float
+        required: false
+      doubleProp:
+        type: number
+        format: double
+        required: false
+      stringProp:
+        type: string
+        required: false
+      byteProp:
+        type: string
+        (oas-format): byte
+        required: false
+      binaryProp:
+        type: string
+        (oas-format): binary
+        required: false
+      boolProp:
+        type: boolean
+        required: false
+      dateProp:
+        type: date-only
+        required: false
+      dateTimeProp:
+        type: datetime
+        required: false
+      passwordProp:
+        type: string
+        (oas-format): password
+        required: false
+      spokenLanguages:
+        type: SpokenLanguages
+        required: false
+  SpokenLanguages:
+    properties:
+      //:
+        type: string
+  Persons:
+    properties:
+      items:
+        type: array
+        minItems: 10
+        maxItems: 100
+        uniqueItems: true
+        items:
+          type: Person
+  ErrorMessage:
+    properties:
+      longMessage:
+        type: string
+      shortMessage:
+        type: string
+  MultilingualErrorMessage:
+    properties:
+      defaultLanguage:
+        type: ErrorMessage
+      //:
+        type: ErrorMessage
+  Error:
+    properties:
+      code:
+        type: string
+        enum:
+          - DBERR
+          - NTERR
+          - UNERR
+      message:
+        type: MultilingualErrorMessage
+  CollectingItem:
+    discriminator: itemType
+    properties:
+      itemType:
+        type: string
+        enum:
+          - Vinyl
+          - VHS
+      imageId:
+        type: string
+        required: false
+      maxPrice:
+        type: number
+        format: double
+        minimum: 0
+        maximum: 10000
+        required: false
+    example:
+      itemType: VHS
+      maxPrice: 1
+  Vinyl:
+    properties:
+      albumName:
+        type: string
+      artist:
+        type: string
+    example:
+      itemType: Vinyl
+      albumName: Help!
+      artist: The Beatles
+    type: CollectingItem
+  VHS:
+    properties:
+      movieTitle:
+        type: string
+      director:
+        type: string
+        required: false
+    type: CollectingItem
+  PagedPersonsV1:
+    properties:
+      items:
+        type: array
+        items:
+          type: Person
+      totalItems:
+        type: integer
+      totalPages:
+        type: integer
+      pageSize:
+        type: integer
+      currentPage:
+        type: integer
+  PagedPersonsV2:
+    properties:
+      items:
+        type: array
+        items:
+          type: Person
+      paging:
+        type: Paging
+  Paging:
+    properties:
+      totalItems:
+        type: integer
+      totalPages:
+        type: integer
+      pageSize:
+        type: integer
+      currentPage:
+        type: integer
+  PagedPersons:
+    type:
+      - Persons
+      - Paging
+  PagedCollectingItems:
+    properties:
+      items:
+        type: array
+        minItems: 10
+        maxItems: 100
+        uniqueItems: true
+        items:
+          type: CollectingItem
+    type: Paging

@@ -1,0 +1,46 @@
+swagger: '2.0'
+info:
+  version: ''
+  title: Example of request bodies
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /users:
+    post:
+      operationId: POST_users
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/User'
+      responses:
+        default:
+          description: ''
+  /groups:
+    post:
+      operationId: POST_groups
+      consumes:
+        - text/xml
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+      responses:
+        default:
+          description: ''
+definitions:
+  User:
+    type: object
+    properties:
+      firstName:
+        type: string
+      lastName:
+        type: string
+    required:
+      - firstName
+      - lastName

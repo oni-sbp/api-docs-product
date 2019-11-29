@@ -1,0 +1,149 @@
+#%RAML 1.0
+title: complex types example
+version: 1
+
+types:
+  FirstType:
+    type: object
+    description: something
+    properties:
+      title: string
+      n: number
+    example:
+      title: "First"
+      n: 1
+  SecondType:
+    type: object
+    description: something
+    properties:
+      title: string
+      n: number
+    example:
+      strict: false
+      value:
+        title: "Second"
+        n: 2
+  ThirdType:
+    type: object
+    description: something
+    properties:
+      title: string
+      n: number
+    examples:
+      a:
+        title: "Third a"
+        n: 3
+      b:
+        title: "Third b"
+        n: 3
+  FourthType:
+    type: object
+    description: something
+    properties:
+      title: string
+      n: number
+    examples:
+      a:
+        strict: false
+        value:
+          title: "Fourth a"
+          n: 4
+      b:
+        strict: true
+        value:
+          title: "Fourth b"
+          n: 4
+/something:
+  get:
+    description: get something
+    responses:
+      200:
+        body:
+          application/json:
+            type: FirstType
+            example:
+              title: get example
+              n: 500
+    queryParameters:
+      param:
+        type: string
+        example: param example
+  post:
+    headers:
+      someId:
+        description: some id
+        type: FirstType
+        example:
+          title: some title
+          n: 10
+    body:
+      application/json:
+        type: SecondType
+        examples:
+          aaa:
+            title: some other title
+            n: 20
+          bbb:
+            title: some other titles
+            n: 200
+/else:
+  post:
+    headers:
+      elseId:
+        description: else id
+        type: ThirdType
+        examples:
+          aaa:
+            strict: false
+            value:
+              title: else other title
+              n: 30
+          bbb:
+            strict: true
+            value:
+              title: else other titles
+              n: 300
+    body:
+      application/json:
+        type: FourthType
+        example:
+          strict: false
+          value:
+            title: else title
+            n: 40
+traits:
+  colors:
+    queryParameters:
+      red:
+        description: red
+        type: string
+        required: false
+        example: this is a red example
+      yellow:
+        description: yellow
+        type: FirstType
+        required: false
+        example:
+          title: Yellow
+          n: 3000
+    headers:
+      blue:
+        description: blue
+        type: string
+        example: this is a blue example
+      green:
+        description: green
+        type: FirstType
+        examples:
+          g1:
+            title: green 1
+            n: 1000
+          g2:
+            title: green 2
+            n: 2000
+    responses:
+      201:
+        headers:
+          orange:
+            required: true
+            example: this is an orange example
