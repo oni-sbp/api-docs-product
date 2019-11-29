@@ -21,129 +21,124 @@
   <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css"
+    integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
 
-  <script>  
-    function isValidationReady(fileName) {
-      return true;
-      console.log('sdasdas')
-      $.ajax({
-        url:'/readyLogFile',
-        data: {
-          file: fileName
-        },
-        success: function(data){
-          alert('success!')
-        }
-      })
+</head>
+<script>
+  function isValidationReady(fileName) {
+    return true;
+    console.log('sdasdas')
+    $.ajax({
+      url: '/readyLogFile',
+      data: {
+        file: fileName
+      },
+      success: function (data) {
+        alert('success!')
+      }
+    })
 
+    return false;
+  }
+
+  function validateForm() {
+    var x = document.forms["submitForm"]["url"].value;
+    var y = document.forms["submitForm"]["file"].value;
+
+    if (!x && !y) {
+      document.getElementById("validatorFile").style.display = "block";
       return false;
     }
-    function validateForm() {
-      var x = document.forms["submitForm"]["url"].value;
-      var y = document.forms["submitForm"]["file"].value;
 
-      if (!x && !y) {
-        document.getElementById("validatorFile").style.display = "block";
-        return false;
-      }
-	  
-	  document.getElementById("logs").style.display = "none";
-	  
-	  var z = document.getElementById("firstSubmitButton");
-	  z.disabled = true;
-      // add spinner to button
-      z.innerHTML ='<span class="spinner-grow text-secondary" role="status">Loading...</span>';
-	  
-	  var w = document.getElementById("secondSubmitButton");
-	  w.disabled = true;
-      // add spinner to button
-      w.innerHTML ='<span class="spinner-grow text-secondary" role="status">Loading...</span>';
+    document.getElementById("logs").style.display = "none";
+
+  }
+  function removeValidator() {
+    document.getElementById("validatorFile").style.display = "none";
+  }
+  function myFunction() {
+    var x = document.getElementById("ButtonExpand");
+    var y = document.getElementById("firstSubmitButton");
+
+    var down = document.getElementById("arrowDown");
+    var up = document.getElementById("arrowUp");
+    var addit = document.getElementById("additional-options-text");
+
+    if (x.innerHTML === "Expand") {
+      x.innerHTML = "Collapse";
+      y.style.display = "block";
+      addit.innerHTML = "Show Additional Options";
+      up.style.display = "none";
+      down.style.display = "inline";
+    } else {
+      x.innerHTML = "Expand";
+      y.style.display = "none";
+      addit.innerHTML = "Hide Additional Options";
+      up.style.display = "inline";
+      down.style.display = "none";
     }
-    function removeValidator() {
-      document.getElementById("validatorFile").style.display = "none";
-    }
-    function myFunction() {
-      var x = document.getElementById("ButtonExpand");
-      var y = document.getElementById("firstSubmitButton");
-      
-      var down = document.getElementById("down-arrow");
-      var up = document.getElementById("up-arrow");
-	  var addit = document.getElementById("additional-options-text");
-      
-      if (x.innerHTML === "Expand") {
-        x.innerHTML = "Collapse";
-        y.style.display = "block";
-        //down.style.display = "none";
-        //up.style.display = "block"
-		addit.innerHTML = "Show Additional Options";
-      } else {
-        x.innerHTML = "Expand";
-        y.style.display = "none";
-        //down.style.display = "block";
-        //up.style.display = "none"
-		addit.innerHTML = "Hide Additional Options";
-      }
-    }
+  }
 
-    function writeFileName(el) {
-      var split1 = el.value.split('/');
-      var split2 = split1[split1.length - 1].split('\\');
-      $("#FileName").val(split2[split2.length - 1]);
-      document.getElementById("FileAfter").style.display = "block"
-      document.getElementById("FileInitial").style.display = "none"
+  function writeFileName(el) {
+    var split1 = el.value.split('/');
+    var split2 = split1[split1.length - 1].split('\\');
+    $("#FileName").val(split2[split2.length - 1]);
+    document.getElementById("FileAfter").style.display = "block"
+    document.getElementById("FileInitial").style.display = "none"
 
-      var parts = split2[split2.length - 1].split('.');
-      var extension = parts[parts.length - 1];
+    var parts = split2[split2.length - 1].split('.');
+    var extension = parts[parts.length - 1];
 
-      var acceptedExtensions = ['raml', 'json', 'yaml', 'zip']
+    var acceptedExtensions = ['raml', 'json', 'yaml', 'zip']
 
-      if(!acceptedExtensions.includes(extension)) {
-        document.getElementById("validatorFileExtension").style.display = "block";
-      } else {
-        document.getElementById("validatorFileExtension").style.display = "none";
-      }
-    }
-
-    function callChooseFile(button) {
-      $(button).click();
-    }
-
-    function cancelFile() {
-      document.forms["submitForm"]["file"].value = null;
-      document.getElementById("FileAfter").style.display = "none"
-      document.getElementById("FileInitial").style.display = "block"
-      $("#FileName").val("");
+    if (!acceptedExtensions.includes(extension)) {
+      document.getElementById("validatorFileExtension").style.display = "block";
+    } else {
       document.getElementById("validatorFileExtension").style.display = "none";
-
     }
+  }
 
-    function writeConfigFileName(el) {
-      var split1 = el.value.split('/');
-      var split2 = split1[split1.length - 1].split('\\');
-      $("#ConfigFileName").val(split2[split2.length - 1]);
-      document.getElementById("ConfigAfter").style.display = "block"
-      document.getElementById("ConfigInitial").style.display = "none"
+  function callChooseFile(button) {
+    $(button).click();
+  }
 
-      var parts = split2[split2.length - 1].split('.');
-      var extension = parts[parts.length - 1];
+  function cancelFile() {
+    document.forms["submitForm"]["file"].value = null;
+    document.getElementById("FileAfter").style.display = "none"
+    document.getElementById("FileInitial").style.display = "block"
+    $("#FileName").val("");
+    document.getElementById("validatorFileExtension").style.display = "none";
 
-      var acceptedExtensions = ['yaml']
+  }
 
-      if(!acceptedExtensions.includes(extension)) {
-        document.getElementById("validatorExtension").style.display = "block";
-      } else {
-        document.getElementById("validatorExtension").style.display = "none";
-      }
-    }
+  function writeConfigFileName(el) {
+    var split1 = el.value.split('/');
+    var split2 = split1[split1.length - 1].split('\\');
+    $("#ConfigFileName").val(split2[split2.length - 1]);
+    document.getElementById("ConfigAfter").style.display = "block"
+    document.getElementById("ConfigInitial").style.display = "none"
 
-    function cancelConfigFile() {
-      document.forms["submitForm"]["config"].value = null;
-      document.getElementById("ConfigAfter").style.display = "none"
-      document.getElementById("ConfigInitial").style.display = "block"
-      $("#ConfigFileName").val("");
+    var parts = split2[split2.length - 1].split('.');
+    var extension = parts[parts.length - 1];
+
+    var acceptedExtensions = ['yaml']
+
+    if (!acceptedExtensions.includes(extension)) {
+      document.getElementById("validatorExtension").style.display = "block";
+    } else {
       document.getElementById("validatorExtension").style.display = "none";
     }
-  </script>
+  }
+
+  function cancelConfigFile() {
+    document.forms["submitForm"]["config"].value = null;
+    document.getElementById("ConfigAfter").style.display = "none"
+    document.getElementById("ConfigInitial").style.display = "block"
+    $("#ConfigFileName").val("");
+    document.getElementById("validatorExtension").style.display = "none";
+  }
+</script>
 </head>
 
 <body class="mainBody">
@@ -201,6 +196,7 @@
               <br>
               <label id="FileUploadLabel" for="FileUpload" class="btn btn-default custom-file-upload">
                 Choose file
+
               </label>
               <input id="FileUpload" type="file" name="file" onchange="writeFileName(this); removeValidator();" />
             </div>
@@ -219,17 +215,20 @@
             <br>
             <br>
             <div class="new-line-div">
-              <button type="button" id="ButtonExpand" style="display: none;" class="btn center" type="button"
-                 ></button>
-              <a onclick="myFunction()" href="" style="color: #9073FF;" data-toggle="collapse" data-target="#collapseExample">
+              <button type="button" id="ButtonExpand" style="display: none;" class="btn center" type="button"></button>
+              <a onclick="myFunction()" href="" style="color: #9073FF;" data-toggle="collapse"
+                data-target="#collapseExample">
                 <span id="additional-options-text">Show Additional Options</span>
+                <i class="fas fa-angle-up imageColor" id="arrowUp" style="display: none;"></i>
+                <i class="fas fa-angle-down imageColor" id="arrowDown"></i>
+
                 <!-- <div class="inline-div">
                   <img src="public/resources/baseline_arrow_downward_white_18dp.png"  />
                 </div>
                 <div class="inline-div">
                   <img src="public/resources/baseline_arrow_upward_white_18dp.png" id="up-arrow" />
                 </div> -->
-				</a>
+              </a>
             </div>
           </div>
         </div>
@@ -239,9 +238,11 @@
           <div class="temp transparentBorder ">
             <div class="bodyAlign">
               <h4><b>Configure Optional settings</b></h4>
+
+
               <div class="inline-div float-left inputDiv" style="width:50%; min-width:250px;"> Config file:
-                <div id="validatorSizeConfig" class="warning">*2 MB maximum file size</div> 
-                <div id="validatorSizeConfig2" class="warning">*Accepted files: yaml</div> 
+                <div id="validatorSizeConfig" class="warning">*2 MB maximum file size</div>
+                <div id="validatorSizeConfig2" class="warning">*Accepted files: yaml</div>
                 <div id="validatorExtension" class="validator">*Unsupported file</div>
                 <div id="ConfigInitial" class="filename-div" onclick="callChooseFile('#ConfigUploadLabel')">
                   <img src="resources/document icon-14.png" height="14" width="14" class="icon-image" />
@@ -335,7 +336,8 @@
                   </div>
                 </div>
                 <center>
-                  <input type="submit" id="secondSubmitButton" class="btn btn-default btnColor" value="Generate Code Examples">
+                  <input type="submit" id="secondSubmitButton" class="btn btn-default btnColor"
+                    value="Generate Code Examples">
                 </center>
               </div>
             </div>

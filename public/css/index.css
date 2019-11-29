@@ -15,6 +15,10 @@
     visibility: visible;
 }
 
+.imageColor{
+  color: #9073FF;
+}
+
 .transparentBorder{
     border:transparent;
     border-style: groove;
