@@ -17,6 +17,7 @@ function runShellCommand (args, timeout = null, cwd = null) {
       }
     })
   } catch (error) {
+	  console.log(error);
     if (error.signal === 'SIGTERM') {
       throw errors.ExecutionTimeout
     }

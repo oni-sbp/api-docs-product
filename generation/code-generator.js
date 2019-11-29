@@ -80,7 +80,7 @@ async function generateSamples (fields, files) {
   } 
   runShellCommand(arg, 20, process.cwd() + '/docs/raml2markdown');
   runShellCommand('bundle exec middleman build', 20, process.cwd() + '/docs');
-
+	console.log('-'.repeat(100));
   return examplesFullPath
 }
 
