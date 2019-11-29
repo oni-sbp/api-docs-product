@@ -1,0 +1,38 @@
+swagger: '2.0'
+info:
+  version: '1'
+  title: type example
+paths: {}
+definitions:
+  ResourceLink:
+    type: object
+    description: a description
+    properties:
+      href:
+        type: string
+      rel:
+        enum:
+          - self
+          - next
+          - prev
+        type: string
+      method:
+        default: get
+        type: string
+    required:
+      - href
+      - rel
+  ImageLink:
+    type: object
+    properties:
+      href:
+        type: string
+      rel:
+        enum:
+          - SmallImage
+          - MediumImage
+          - LargeImage
+        type: string
+    required:
+      - href
+      - rel

@@ -1,0 +1,17 @@
+#%RAML 1.0
+title: References to external files examples
+version: 1.0.0
+types:
+  Person:
+    type: object
+    properties:
+      name:
+        type: string
+      address:
+        type: !include ../../types/Address.yaml
+        required: false
+      age:
+        minimum: 0
+        type: integer
+        format: int32
+        required: false

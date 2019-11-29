@@ -1,0 +1,53 @@
+swagger: '2.0'
+info:
+  version: 1.0.0
+  title: Swagger Petstore
+host: 'localhost:3000'
+basePath: /api
+schemes:
+  - http
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /users:
+    get:
+      operationId: GET_users
+      responses:
+        '200':
+          description: The user object
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/User'
+            required:
+              - data
+definitions:
+  User:
+    type: object
+    properties:
+      username:
+        type: string
+    required:
+      - username
+  Manager:
+    type: object
+    properties:
+      managerId:
+        type: string
+    required:
+      - managerId
+  Employee:
+    allOf:
+      - $ref: '#/definitions/User'
+      - $ref: '#/definitions/Manager'
+  SuperUser:
+    allOf:
+      - $ref: '#/definitions/User'
+      - type: object
+        properties:
+          superuser:
+            type: boolean
+        required:
+          - superuser

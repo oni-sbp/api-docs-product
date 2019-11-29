@@ -1,0 +1,71 @@
+#%RAML 1.0
+title: Billing Engine Process APIs
+version: v1
+baseUri: /invoiceengineprocessapi
+description: Billing Engine Process APIs
+(oas-info):
+  termsOfService: None
+/:
+  get:
+    responses:
+      '200':
+        description: OK
+types:
+  ServiceResponse:
+    type: object
+    properties:
+      success:
+        type: boolean
+        (oas-readOnly): true
+      message:
+        type: string
+        (oas-readOnly): true
+      error:
+        type: string
+        (oas-readOnly): true
+      responseObject:
+        type: string
+        (oas-readOnly): true
+      warning:
+        type: string
+        (oas-readOnly): true
+  InvoiceAdjustmentDTO:
+    type: object
+    properties:
+      invoiceNumber:
+        type: string
+  ServiceResponse2:
+    type: object
+    properties:
+      success:
+        type: boolean
+        (oas-readOnly): true
+      message:
+        type: string
+        (oas-readOnly): true
+      error:
+        type: string
+        (oas-readOnly): true
+      responseObject:
+        (oas-readOnly): true
+        type: InvoiceAdjustmentDTO
+      warning:
+        type: string
+        (oas-readOnly): true
+annotationTypes:
+  oas-info:
+    properties:
+      termsOfService?: string
+      contact?:
+        properties:
+          name?: string
+          url?: string
+          email?: string
+      license?:
+        properties:
+          name?: string
+          url?: string
+    allowedTargets: API
+  oas-readOnly:
+    allowedTargets: TypeDeclaration
+    type: boolean

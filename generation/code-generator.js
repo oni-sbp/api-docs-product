@@ -6,6 +6,7 @@ const reporter = require('../reporter.js')
 const constants = require('../constants')
 const utils = require('../utils')
 const Config = require('../conf/conf').Config
+const runShellCommand = require('../validation/utils').runShellCommand;
 
 async function generateSamples (fields, files) {
   var path
@@ -72,6 +73,12 @@ async function generateSamples (fields, files) {
 
     await fileParser.parse(allFiles[fileIndex], rootDirectory, examplePath, host, scheme)
   }
+
+  var arg = "python build.py --a pot"
+  if(path.endsWith('swagger.json')) {
+    arg = "python build.py --a petstore"
+  } 
+  runShellCommand(arg, 20, process.cwd() + '/docs/raml2markdown');
 
   return examplesFullPath
 }

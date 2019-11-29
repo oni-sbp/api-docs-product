@@ -1,0 +1,102 @@
+#%RAML 1.0
+title: Simple API
+version: 0.0.0
+(oas-tags-definition):
+  - name: Users
+  - name: Relationships
+    description: |
+      Relationships are expressed using the following terms:
+
+      **outgoing_status**: Your relationship to the user. Can be "follows",
+        "requested", "none".
+      **incoming_status**: A user's relationship to you. Can be "followed_by",
+        "requested_by", "blocked_by_you", "none".
+  - name: Media
+    description: |
+      At this time, uploading via the API is not possible. We made a conscious
+      choice not to add this for the following reasons:
+
+      * Instagram is about your life on the go – we hope to encourage photos
+        from within the app.
+      * We want to fight spam & low quality photos. Once we allow uploading
+        from other sources, it's harder to control what comes into the Instagram
+        ecosystem. All this being said, we're working on ways to ensure users
+        have a consistent and high-quality experience on our platform.
+  - name: Commnts
+  - name: Likes
+  - name: Tags
+  - name: Location
+  - name: Subscribtions
+annotationTypes:
+  oas-tags-definition:
+    type: array
+    items:
+      properties:
+        name: string
+        description?: string
+        externalDocs?:
+          properties:
+            url: string
+            description?: string
+    allowedTargets: API
+  oas-tags:
+    type: string[]
+    allowedTargets: Method
+  oas-deprecated:
+    type: boolean
+    allowedTargets: Method
+  oas-summary:
+    type: string
+    allowedTargets: Method
+  oas-externalDocs:
+    properties:
+      description?: string
+      url: string
+    allowedTargets:
+      - API
+      - Method
+      - TypeDeclaration
+  custom: any
+/users:
+  get:
+    (oas-summary): Users
+    responses:
+      '200':
+        description: OK
+    (oas-tags):
+      - Location
+/media/{media-id}:
+    uriParameters:
+      media-id:
+        description: The media ID
+        type: integer
+    get:
+      description: |
+        Get information about a media object.
+        The returned type key will allow you to differentiate between `image`
+        and `video` media.
+
+        Note: if you authenticate with an OAuth Token, you will receive the
+        `user_has_liked` key which quickly tells you whether the current user
+        has liked this media item.
+      (oas-summary): Get info about a media object.
+      responses:
+        '200':
+          description: OK
+      (oas-tags):
+        - Media
+      (oas-deprecated): true
+      (oas-externalDocs):
+        url: 'https://swagger.io/about'
+/:
+  get:
+    (oas-summary): Get
+    responses:
+      '200':
+        description: OK
+    (oas-tags):
+      - Location
+    (oas-externalDocs):
+      description: find more info here
+      url: 'https://swagger.io/about'
+(custom): Hi

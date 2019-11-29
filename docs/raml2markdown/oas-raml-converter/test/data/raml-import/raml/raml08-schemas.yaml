@@ -1,0 +1,62 @@
+#%RAML 0.8
+title: Box
+version: 2.0
+baseUri: https://api.box.com/{version}/
+mediaType: application/json
+schemas:
+  - NewTask: |
+      {
+        "$schema": "http://json-schema.org/draft-03/schema",
+        "type": "object",
+        "properties": {
+          "action": {
+            "description": "The action the task assignee will be prompted to do. Must be 'review'.",
+            "type": [ "review" ]
+          },
+          "due_at": {
+            "description": "The day at which this task is due.",
+            "type": "timestamp"
+          },
+          "type": {
+            "required": false,
+            "type": "string"
+          },
+          "expires_at": {
+            "required": false,
+            "type": "null"
+          },
+          "empty_array": {
+            "description": "An empty array",
+            "type": []
+          },
+          "assignees": {
+            "description": "An array of assignees",
+            "type": "array",
+            "items": []
+          },
+          "actions": {
+            "description": "An array of actions",
+            "type": "array"
+          }
+        },
+        "required": [ "action" ]
+      }
+  - Col: |
+      {
+        "$schema": "http://json-schema.org/draft-03/schema",
+        "required": false,
+        "type": "object",
+        "properties": {
+          "type": {
+            "required": true,
+            "type": "string"
+          },
+          "id": {
+            "required": false,
+            "type": "string"
+          }
+        }
+      }
+documentation:
+  - title: Headline
+    content: The Box Content API

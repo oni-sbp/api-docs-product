@@ -1,0 +1,22 @@
+swagger: '2.0'
+info:
+  version: v1
+  title: SalesForce
+paths:
+  /users:
+    get:
+      operationId: GET_users
+      description: List Available REST API Versions
+      produces:
+        - application/xml
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/versions-xml'
+schemes:
+  - https
+x-basePath: '{domain}/services/data'
+definitions:
+  versions-xml:
+    type: object

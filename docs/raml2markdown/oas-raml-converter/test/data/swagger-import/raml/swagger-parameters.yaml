@@ -1,0 +1,84 @@
+#%RAML 1.0
+title: Simple API
+version: 0.0.0
+mediaType: application/json
+annotationTypes:
+  oas-body-name:
+    type: string
+    allowedTargets: TypeDeclaration
+/param_formdata:
+  post:
+    body:
+      multipart/form-data:
+        properties:
+          username:
+            description: The person's username
+            type: string
+    responses:
+      '200':
+        description: History information for the given user
+        body:
+          application/json:
+            type: Person
+/param_body:
+  post:
+    body:
+      application/json:
+        (oas-body-name): person
+        type: Person
+        required: false
+        description: person to add to the system
+    responses:
+      '200':
+        description: History information for the given user
+        body:
+          application/json:
+            type: Person
+/param_header:
+  get:
+    headers:
+      token:
+        description: token description
+        type: string
+    responses:
+      '200':
+        description: History information for the given user
+        headers:
+          token-response:
+            description: token response description
+            type: string
+        body:
+          application/json:
+            type: Person
+/param_query:
+  get:
+    queryParameters:
+      pageNumber:
+        description: Page number
+        required: false
+        type: integer
+    responses:
+      '200':
+        description: History information for the given user
+        body:
+          application/json:
+            type: Person
+/param_path/{username}:
+    uriParameters:
+      username:
+        description: The person's username
+        type: string
+    get:
+      responses:
+        '200':
+          description: History information for the given user
+          body:
+            application/json:
+              type: Person
+types:
+  Person:
+    properties:
+      firstName:
+        type: string
+      lastName:
+        type: string

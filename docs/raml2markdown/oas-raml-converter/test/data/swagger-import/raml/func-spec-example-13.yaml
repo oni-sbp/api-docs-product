@@ -1,0 +1,30 @@
+#%RAML 1.0
+title: Security tryout
+version: 1.0.0
+description: Tries out different security
+              configurations
+securitySchemes:
+  basicAuth:
+    type: Basic Authentication
+    description: HTTP Basic Authentication.
+             Works over `HTTP` and `HTTPS`
+/getBasicAuth:
+  get:
+    responses:
+      '200':
+        description: 'Basic Auth. Will send `Authenticated` if authentication is succesful, otherwise it will send `Unauthorized`'
+    queryParameters:
+      count:
+        description: Count of media to return.
+        type: integer
+        required: false
+      max_id:
+        description: Return media earlier than this max_id.s
+        type: integer
+        required: false
+      min_id:
+        description: Return media later than this min_id.
+        type: integer
+        required: false
+    securedBy:
+      - basicAuth

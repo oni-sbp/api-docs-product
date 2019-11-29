@@ -1,0 +1,73 @@
+swagger: '2.0'
+info:
+  version: '1'
+  title: complex types example
+paths: {}
+definitions:
+  Cat:
+    type: object
+    description: a cat
+    properties:
+      name:
+        type: object
+      race:
+        oneOf:
+          - type: nil
+          - type: string
+    required:
+      - name
+      - race
+  Dog:
+    type: object
+    description: a dog
+    properties:
+      name:
+        type: object
+        properties:
+          intValue:
+            type: object
+          boolValue:
+            oneOf:
+              - type: nil
+              - type: boolean
+        required:
+          - intValue
+          - boolValue
+      race:
+        oneOf:
+          - type: nil
+          - type: string
+      intProp:
+        type: array
+        items:
+          type: integer
+      strProp:
+        type: array
+        items:
+          type: object
+    required:
+      - name
+      - race
+      - intProp
+      - strProp
+  CatDog:
+    allOf:
+      - $ref: '#/definitions/Cat'
+      - $ref: '#/definitions/Dog'
+  Pet:
+    oneOf:
+      - $ref: '#/definitions/Cat'
+      - $ref: '#/definitions/Dog'
+  PetCatDog:
+    allOf:
+      - $ref: '#/definitions/Pet'
+      - type: object
+  PropertyDog:
+    type: object
+    properties:
+      dogcat:
+        allOf:
+          - $ref: '#/definitions/Dog'
+          - $ref: '#/definitions/Cat'
+    required:
+      - dogcat

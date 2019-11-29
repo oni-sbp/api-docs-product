@@ -1,0 +1,20 @@
+swagger: '2.0'
+info:
+  version: ''
+  title: traits example
+paths:
+  /items:
+    get:
+      operationId: GET_items
+      parameters:
+        - $ref: '#/parameters/trait:imageable:imageType'
+      responses:
+        default:
+          description: ''
+parameters:
+  'trait:imageable:imageType':
+    name: imageType
+    in: query
+    description: 'Comma , separated list just like in example. One alone may be present'
+    type: string
+    default: SmallImage

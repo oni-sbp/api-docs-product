@@ -1,0 +1,17 @@
+#%RAML 1.0
+title: My API With Types
+
+types:
+  Person: !include ../../types/Person.json
+  Person2: |
+    {
+      "$schema": "http://json-schema.org/draft-04/schema#",
+      "type": "object",
+      "description": "Person details",
+      "properties": {
+        "firstName": { "type": "string" },
+        "lastName": { "type": "string" },
+        "nationality": { "type": "string" }
+      },
+      "required": [ "firstName", "lastName" ]
+    }

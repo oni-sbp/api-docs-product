@@ -1,0 +1,34 @@
+{
+  "@context": "https://schema.org/",
+  "@type": "collection",
+  "ItemList": [
+    {
+      "@context": "https://standards.lifeengine.io/v1/Context/Message/",
+      "@type": "Message",
+      "toIdentity": "0920a84a-1548-4644-b95d-e3f80e1b9ca6",
+      "subject": "Go to the grocery store",
+      "content": "Remember to buy milk!",
+      "cc": [
+        "323bde80-4cc2-472e-bb77-e6a3e95a1253",
+        "0827e9c3-9664-479f-b0ec-956a35d72e4b"
+      ],
+      "createdAt": "2019-01-10T12:00:00Z",
+      "updatedAt": "2019-01-10T12:00:00Z",
+      "createdBy": "58422496-5796-4c47-a4a1-88768ea94ea6"
+    },
+    {
+      "@context": "https://standards.lifeengine.io/v1/Context/Message/",
+      "@type": "Message",
+      "toIdentity": "0920a84a-1548-4644-b95d-e3f80e1b9ca6",
+      "subject": "You forgot the milk",
+      "content": "...",
+      "cc": [
+        "323bde80-4cc2-472e-bb77-e6a3e95a1253",
+        "0827e9c3-9664-479f-b0ec-956a35d72e4b"
+      ],
+      "createdAt": "2019-01-10T12:00:00Z",
+      "updatedAt": "2019-01-10T12:00:00Z",
+      "createdBy": "58422496-5796-4c47-a4a1-88768ea94ea6"
+    }
+  ]
+}

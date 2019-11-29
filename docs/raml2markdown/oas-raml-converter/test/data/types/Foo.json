@@ -1,0 +1,10 @@
+{
+  "type": "object",
+  "description": "Foo details",
+  "properties": {
+    "id": { "type": "integer" },
+    "name": { "type": "string" },
+    "ownerName": { "type": "string" }
+  },
+  "required": [ "id", "name" ]
+}

@@ -1,0 +1,430 @@
+#%RAML 1.0
+title: Simple API
+version: 1.1.0
+baseUri: 'https://simple.api/openapi101'
+mediaType:
+  - application/json
+  - application/x-yaml
+protocols:
+  - HTTPS
+description: |
+  A simple API to learn how to write OpenAPI Specification.
+  This file uses almost every single aspect of the [Open API Specification](https://openapis.org/).
+  This API will use JSON.
+  JSON looks like this:
+
+  ```JSON
+  {
+    "key": "value",
+    "anotherKey": "anotherValue"
+  }
+  ```
+(oas-externalDocs):
+  description: |
+    **Complete** documentation describing how to use this API
+  url: 'http://doc.simple.api/'
+(oas-info):
+  contact:
+    name: John Doe
+    url: 'http://simple.api/contact'
+    email: contact@simple.api
+  termsOfService: 'http://simple.api/terms-of-service'
+  license:
+    name: Apache-2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0'
+/persons:
+  '/{username}':
+    uriParameters:
+      username:
+        description: The person's username
+        type: string
+    get:
+      displayName: readPerson
+      description: Returns a single person for its username.
+      (oas-summary): Gets a person
+      (oas-responses-default):
+        description: A totally unexpected response
+        headers:
+          X-Rate-Limit-Remaining:
+            type: integer
+            description: How many calls consumer can do
+          X-Rate-Limit-Reset:
+            type: datetime
+            description: When rate limit will be reset
+        (oas-global-response-definition): TotallyUnexpectedResponse
+      responses:
+        '200':
+          body:
+            application/json:
+              type: Person
+            application/x-yaml:
+              type: Person
+          description: A Person
+          headers:
+            X-Rate-Limit-Remaining:
+              type: integer
+              description: How many calls consumer can do
+            X-Rate-Limit-Reset:
+              type: datetime
+              description: When rate limit will be reset
+        '404':
+          description: Person does not exist.
+          headers:
+            X-Rate-Limit-Remaining:
+              type: integer
+              description: How many calls consumer can do
+            X-Rate-Limit-Reset:
+              type: datetime
+              description: When rate limit will be reset
+          (oas-global-response-definition): PersonDoesNotExistResponse
+        '500':
+          body:
+            application/json:
+              type: Error
+            application/x-yaml:
+              type: Error
+          description: An unexpected error occured.
+          headers:
+            X-Rate-Limit-Remaining:
+              type: integer
+              description: How many calls consumer can do
+            X-Rate-Limit-Reset:
+              type: datetime
+              description: When rate limit will be reset
+          (oas-global-response-definition): Standard500ErrorResponse
+    is:
+      - userAgent
+  post:
+    displayName: createUser
+    description: Adds a new person to the persons list.
+    (oas-summary): Creates a person
+    body:
+      application/json:
+        type: Person
+        (oas-body-name): person
+        description: The person to create.
+      application/x-yaml:
+        type: Person
+        (oas-body-name): person
+        description: The person to create.
+    (oas-responses-default):
+      description: A totally unexpected response
+      headers:
+        X-Rate-Limit-Remaining:
+          type: integer
+          description: How many calls consumer can do
+        X-Rate-Limit-Reset:
+          type: datetime
+          description: When rate limit will be reset
+      (oas-global-response-definition): TotallyUnexpectedResponse
+    responses:
+      '204':
+        description: Person succesfully created.
+        headers:
+          X-Rate-Limit-Remaining:
+            type: integer
+            description: How many calls consumer can do
+          X-Rate-Limit-Reset:
+            type: datetime
+            description: When rate limit will be reset
+      '400':
+        description: Person couldn't have been created.
+        headers:
+          X-Rate-Limit-Remaining:
+            type: integer
+            description: How many calls consumer can do
+          X-Rate-Limit-Reset:
+            type: datetime
+            description: When rate limit will be reset
+      '500':
+        body:
+          application/json:
+            type: Error
+          application/x-yaml:
+            type: Error
+        description: An unexpected error occured.
+        headers:
+          X-Rate-Limit-Remaining:
+            type: integer
+            description: How many calls consumer can do
+          X-Rate-Limit-Reset:
+            type: datetime
+            description: When rate limit will be reset
+        (oas-global-response-definition): Standard500ErrorResponse
+  is:
+    - userAgent
+  get:
+    displayName: searchUsers
+    description: Returns a list containing all persons. The list supports paging.
+    (oas-summary): Gets some persons
+    is:
+      - pageSize
+      - pageNumber
+      - includeNonVerifiedUsers
+      - sortPersons
+    (oas-responses-default):
+      description: A totally unexpected response
+      headers:
+        X-Rate-Limit-Remaining:
+          type: integer
+          description: How many calls consumer can do
+        X-Rate-Limit-Reset:
+          type: datetime
+          description: When rate limit will be reset
+      (oas-global-response-definition): TotallyUnexpectedResponse
+    responses:
+      '200':
+        body:
+          application/json:
+            type: Persons
+          application/x-yaml:
+            type: Persons
+        description: A list of Person
+        headers:
+          X-Rate-Limit-Remaining:
+            type: integer
+            description: How many calls consumer can do
+          X-Rate-Limit-Reset:
+            type: datetime
+            description: When rate limit will be reset
+      '500':
+        body:
+          application/json:
+            type: Error
+          application/x-yaml:
+            type: Error
+        description: An unexpected error occured.
+        headers:
+          X-Rate-Limit-Remaining:
+            type: integer
+            description: How many calls consumer can do
+          X-Rate-Limit-Reset:
+            type: datetime
+            description: When rate limit will be reset
+        (oas-global-response-definition): Standard500ErrorResponse
+    (oas-tags):
+      - Persons
+types:
+  Person:
+    description: A person which can be the user itself or one of his friend
+    properties:
+      firstName:
+        description: first name
+        type: string
+        example: John
+        required: false
+      lastName:
+        description: last name
+        type: string
+        example: Doe
+        required: false
+      username:
+        description: Username used to connect to the service
+        type: string
+        pattern: '[a-z0-9]{8,64}'
+        minLength: 8
+        maxLength: 64
+        example: john1doe6
+      id:
+        type: string
+        (oas-format): byte
+        (oas-maximum): 255
+        (oas-minimum): 1
+        required: false
+    (oas-schema-title): Human
+  Persons:
+    description: A list of users or friends
+    properties:
+      items:
+        description: Array containg the list
+        type: array
+        minItems: 1
+        maxItems: 100
+        uniqueItems: true
+        items:
+          type: Person
+        example:
+          - firstName: Robert
+            lastName: Doe
+            username: robdo1234
+          - firstName: Jane
+            lastName: Doe
+            username: jdoe12345
+    (oas-schema-title): Humans
+  ErrorMessage:
+    description: An error message with a long and a short description
+    properties:
+      longMessage:
+        description: A long error description
+        type: string
+      shortMessage:
+        description: A short error description
+        type: string
+    (oas-schema-title): MultiDeviceErrorMessage
+  MultilingualErrorMessage:
+    description: An multilingual error message (hashmap) with a long and a short description
+    properties:
+      defaultLanguage:
+        type: ErrorMessage
+      //:
+        type: ErrorMessage
+    (oas-schema-title): MultiLingualMultiDeviceErrorMessage
+    example:
+      defaultLanguage:
+        longMessage: We're deeply sorry but an error occured
+        shortMessage: Error
+      fr:
+        longMessage: Nous sommes désolé mais une erreur est survenu
+        shortMessage: Erreur
+  Error:
+    description: Give full information about the problem
+    properties:
+      code:
+        description: A human readable code (death to numeric error codes!)
+        type: string
+        enum:
+          - DBERR
+          - NTERR
+          - UNERR
+        example: UNERR
+      message:
+        type: MultilingualErrorMessage
+    (oas-schema-title): MultiLingualMultiDeviceError
+traits:
+  pageSize:
+    queryParameters:
+      pageSize:
+        type: integer
+        description: Number of persons returned
+        format: int32
+        minimum: 0
+        (oas-exclusiveMinimum): true
+        maximum: 100
+        (oas-exclusiveMaximum): false
+        default: 20
+        multipleOf: 10
+        required: false
+  pageNumber:
+    queryParameters:
+      pageNumber:
+        type: integer
+        required: false
+        description: Page number
+        default: 1
+  includeNonVerifiedUsers:
+    queryParameters:
+      includeNonVerifiedUsers:
+        type: boolean
+        description: Result will not include non verified user by default if this parameter is not provided
+        default: false
+        required: false
+        (oas-allowEmptyValue): true
+  sortPersons:
+    queryParameters:
+      sort:
+        type: array
+        description: Result will be sorted by lastTimeOnline descending and username ascending by default if this parameter is not provided
+        uniqueItems: true
+        minItems: 1
+        maxItems: 3
+        required: false
+        (oas-collectionFormat): pipes
+        default:
+          - '-lastTimeOnline'
+          - +username
+        items:
+          type: string
+          pattern: '[-+](username|lastTimeOnline|firstname|lastname)'
+  userAgent:
+    headers:
+      User-Agent:
+        type: string
+        description: All API consumers MUST provide a user agent
+(oas-responses):
+  Standard500ErrorResponse:
+    body:
+      type: Error
+    description: An unexpected error occured.
+    headers:
+      X-Rate-Limit-Remaining:
+        type: integer
+        description: How many calls consumer can do
+      X-Rate-Limit-Reset:
+        type: datetime
+        description: When rate limit will be reset
+  PersonDoesNotExistResponse:
+    description: Person does not exist.
+    headers:
+      X-Rate-Limit-Remaining:
+        type: integer
+        description: How many calls consumer can do
+      X-Rate-Limit-Reset:
+        type: datetime
+        description: When rate limit will be reset
+  TotallyUnexpectedResponse:
+    description: A totally unexpected response
+    headers:
+      X-Rate-Limit-Remaining:
+        type: integer
+        description: How many calls consumer can do
+      X-Rate-Limit-Reset:
+        type: datetime
+        description: When rate limit will be reset
+annotationTypes:
+  oas-allowEmptyValue:
+    type: boolean
+  oas-collectionFormat:
+    type: string
+  oas-exclusiveMaximum:
+    type: boolean
+  oas-exclusiveMinimum:
+    type: boolean
+  oas-responses: any
+  oas-tags:
+    type: string[]
+    allowedTargets: Method
+  oas-summary:
+    type: string
+    allowedTargets: Method
+  oas-externalDocs:
+    properties:
+      description?: string
+      url: string
+    allowedTargets:
+      - API
+      - Method
+      - TypeDeclaration
+  oas-info:
+    properties:
+      termsOfService?: string
+      contact?:
+        properties:
+          name?: string
+          url?: string
+          email?: string
+      license?:
+        properties:
+          name?: string
+          url?: string
+    allowedTargets: API
+  oas-schema-title:
+    type: string
+    allowedTargets: TypeDeclaration
+  oas-body-name:
+    type: string
+    allowedTargets: TypeDeclaration
+  oas-responses-default:
+    type: any
+    allowedTargets: Method
+  oas-global-response-definition:
+    type: any
+    allowedTargets: Response
+  oas-format:
+    allowedTargets: TypeDeclaration
+    type: string
+  oas-maximum:
+    allowedTargets: TypeDeclaration
+    type: number
+  oas-minimum:
+    allowedTargets: TypeDeclaration
+    type: number

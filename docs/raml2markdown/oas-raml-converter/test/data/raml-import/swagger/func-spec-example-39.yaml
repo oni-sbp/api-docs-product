@@ -1,0 +1,40 @@
+swagger: '2.0'
+info:
+  version: '1'
+  title: Álainn Cosmetics Mobile Orders API
+host: ec2-52-201-242-128.compute-1.amazonaws.com
+basePath: /mocks/1201bcdf-f1a0-4eb3-a002-4f6f817d44cc/api
+schemes:
+  - https
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  '/mobile-tokens/{mobileType}':
+    parameters:
+      - name: mobileType
+        in: path
+        required: true
+        type: string
+        enum:
+          - ios
+          - android
+    post:
+      operationId: POST_mobile-tokens-mobileType
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            example:
+              token: afdasfas23lkesf
+            properties:
+              token:
+                type: string
+            type: object
+            required:
+              - token
+      responses:
+        default:
+          description: ''

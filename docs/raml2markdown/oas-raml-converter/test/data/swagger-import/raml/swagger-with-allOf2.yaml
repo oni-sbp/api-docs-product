@@ -1,0 +1,46 @@
+#%RAML 1.0
+title: Simple API
+version: 0.0.0
+/:
+  get:
+    responses:
+      '200':
+        description: OK
+types:
+  CollectingItem:
+    discriminator: itemType
+    properties:
+      itemType:
+        type: string
+        enum:
+          - Vinyl
+          - VHS
+      imageId:
+        type: string
+        required: false
+      maxPrice:
+        type: number
+        format: double
+        minimum: 0
+        maximum: 10000
+        required: false
+  Paging:
+    properties:
+      totalItems:
+        type: integer
+      totalPages:
+        type: integer
+      pageSize:
+        type: integer
+      currentPage:
+        type: integer
+  PagedCollectingItems:
+    properties:
+      items:
+        type: array
+        minItems: 10
+        maxItems: 100
+        uniqueItems: true
+        items:
+          type: CollectingItem
+    type: Paging
