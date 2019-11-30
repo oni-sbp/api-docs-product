@@ -339,7 +339,7 @@ def copy_specs_to_build():
   try:
     os.makedirs(path)
   except OSError:
-    print("Creation of the directory %s failed" % path + OSError.toString())
+    print("Creation of the directory %s failed" % path)
   else:
     print("Successfully created the directory %s" % path)
     # Copy oas spec file to build release as well
