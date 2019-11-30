@@ -79,7 +79,7 @@ async function generateSamples (fields, files) {
     arg = "python3 build.py --a petstore"
   } 
   runShellCommand(arg, 20, process.cwd() + '/docs/raml2markdown');
-  runShellCommand('export PATH="/usr/share/rvm/gems/ruby-2.4.2/bin:/usr/share/rvm/gems/ruby-2.4.2@global/bin:/usr/share/rvm/rubies/ruby-2.4.2/bin:$PATH" bundle exec middleman build', 20, process.cwd() + '/docs');
+  runShellCommand('export PATH="/usr/share/rvm/gems/ruby-2.4.2/bin:/usr/share/rvm/gems/ruby-2.4.2@global/bin:/usr/share/rvm/rubies/ruby-2.4.2/bin:$PATH" && bundle exec middleman build', 20, process.cwd() + '/docs');
 	console.log('-'.repeat(100));
   return examplesFullPath
 }
