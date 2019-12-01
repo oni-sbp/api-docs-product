@@ -90,7 +90,7 @@ app.post('/fileupload', (req, res) => {
               data += '<p style="color: #9073FF;">Generated examples:</p>'
               data += '<ul><li><a download href="/archive?archive=' + archiveFileName + '" class="link">Download</a></li>'
 
-              data += '<li><a target="_blank" href="/docsOfTrust' + '" class="link">View</a></li></ul></center></div>\n'
+              data += '<li><a target="_blank" href="/docsOfTrust' + '" class="link">View</a></li></ul><div>\n'
 
               res.write(data)
 
