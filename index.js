@@ -88,9 +88,9 @@ app.post('/fileupload', (req, res) => {
                 data += '<p><a download href="/logfile?logfile=' + validationLogFile + '" class="link" onclick="isValidationReady()">Validation Log File</a></p>\n'
               }
               data += '<p style="color: #9073FF;">Generated examples:</p>'
-              data += '<ul><li><a download href="/archive?archive=' + archiveFileName + '" class="link">Download</a></li>'
+              data += '<p><a download href="/archive?archive=' + archiveFileName + '" class="link">Download</a><center>'
 
-              data += '<li><p><a target="_blank" href="/docsOfTrust' + '" class="link">View</a></li></ul><div>\n'
+              data += '<p><a target="_blank" href="/docsOfTrust' + '" class="link">View</a><center><div>\n'
 
               res.write(data)
 
