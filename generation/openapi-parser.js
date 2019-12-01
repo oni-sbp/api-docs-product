@@ -58,7 +58,7 @@ async function parse (path, rootDirectory, examplesPath, params) {
     var endPoint = api.paths[uri]
     params.uri = uri
 
-    if(uri === '/pet/findByTags' || uri === 'pet/uploadImage') {
+    if(uri === '/pet/findByTags' || uri === '/pet/{petId}/uploadImage') {
       continue ///////////////////////
     }
 
