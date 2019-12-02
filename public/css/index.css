@@ -37,9 +37,9 @@
 }
 
 .subTitle{
-    font-size:30px;
+    font-size:60px;
     color: white;
-    font-family: 'MS Reference Sans Serif';
+    font-family: 'Times New Roman';
 }
 
 .btn-default {
@@ -151,11 +151,17 @@ input[type="file"] {
     color: white;
 }
 
-.new-line-div {
+.empty-new-line-div {
     clear: both;
     vertical-align: bottom;
     width: 100%;
-    height: 25px;
+    height: 0px;
+}
+.new-line-div {
+  clear: both;
+  vertical-align: bottom;
+  width: 100%;
+  height: 25px;
 }
 
 .icon-image {
