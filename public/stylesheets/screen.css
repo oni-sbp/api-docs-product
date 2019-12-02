@@ -475,8 +475,9 @@ body {
 }
 
 .toc-wrapper .logo {
+	padding: 10%;
 	display: block;
-	max-width: 100%;
+	max-width: 80%;
 	margin-bottom: 0px
 }
 
