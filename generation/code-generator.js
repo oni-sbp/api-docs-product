@@ -8,7 +8,8 @@ const utils = require('../utils')
 const Config = require('../conf/conf').Config
 const runShellCommand = require('../validation/utils').runShellCommand;
 
-async function generateSamples (fields, files) {
+async function generateSamples(fields, files, request) {
+  const firstTimerStart = Date.now()
   var path
   if (files.file.size !== 0) {
     // I received a file or archive
@@ -24,37 +25,33 @@ async function generateSamples (fields, files) {
     return ''
   }
 
+  if (allFiles[0].endsWith('.raml')) {
+    request.type = 'raml'
+  } else {
+    request.type = 'swagger'
+  }
+
   var host = fields.host
   var scheme = fields.scheme
 
-  info.setLanguages(fields)
-
-  if (!fs.existsSync(constants.GENERATED_EXAMPLES_FOLDER)) {
-    fs.mkdirSync(constants.GENERATED_EXAMPLES_FOLDER)
-  } else {
-    try {
-      fs.removeSync(constants.GENERATED_EXAMPLES_FOLDER)
-      fs.mkdirSync(constants.GENERATED_EXAMPLES_FOLDER)
-    } catch (err) {
-      console.log(err)
-    }
-  }
+  request.setLanguages(fields)
 
   if (fields.authentication !== 'none') {
     if (fields.authentication === 'basic') {
-      info.authentication = 'Basic'
+      request.authentication = 'Basic'
     } else if (fields.authentication === 'bearer') {
-      info.authentication = 'Bearer'
+      request.authentication = 'Bearer'
     }
   } else {
-    info.authentication = 'None'
+    request.authentication = 'None'
   }
   var rootDirectory = process.cwd()
-  var examplesFullPath = constants.GENERATED_EXAMPLES_FOLDER
+  var examplesFullPath = request.getGeneratedSamplesFolder()
 
-  var configFile = await utils.getConfigFile(fields, files)
-  info.conf = new Config()
-  info.conf.loadConfigFile(configFile)
+  var configFile = await utils.getConfigFile(fields, files, request)
+  request.conf = new Config()
+  request.conf.loadConfigFile(request, configFile)
+  var apiNames = []
 
   for (var fileIndex in allFiles) {
     var folder = allFiles[fileIndex].replace(path, '')
@@ -63,7 +60,7 @@ async function generateSamples (fields, files) {
 
     for (var part in folderParts) {
       if (folderParts[part]) {
-        examplePath += folderParts[part] + pathLib.sep
+        examplePath += folderParts[part] + '/'
 
         if (!fs.existsSync(examplePath)) {
           fs.mkdirSync(examplePath)
@@ -71,20 +68,70 @@ async function generateSamples (fields, files) {
       }
     }
 
-    await fileParser.parse(allFiles[fileIndex], rootDirectory, examplePath, host, scheme)
+    apiNames.push(await fileParser.parse(allFiles[fileIndex], rootDirectory, examplePath, host, scheme, request))
   }
 
-  var arg = "python3 build.py --a pot"
-  if(path.endsWith('swagger.json')) {
-    arg = "python3 build.py --a petstore"
-  } 
-  runShellCommand(arg, 20, process.cwd() + '/docs/raml2markdown');
-  runShellCommand('export PATH="/usr/share/rvm/gems/ruby-2.4.2/bin:/usr/share/rvm/gems/ruby-2.4.2@global/bin:/usr/share/rvm/rubies/ruby-2.4.2/bin:$PATH" && bundle exec middleman build', 20, process.cwd() + '/docs');
-	console.log('-'.repeat(100));
+  const firstTimerEnd = Date.now()
+  request.generateExamplesTime = ((firstTimerEnd - firstTimerStart) / 1000).toString() + ' s'
+  const secondTimerStart = Date.now()
+  generateDocs(request, allFiles, apiNames, path)
+  const secondTimerEnd = Date.now()
+  request.generateDocsTime = ((secondTimerEnd - secondTimerStart) / 1000).toString() + ' s'
   return examplesFullPath
 }
 
-function getAllFiles (path) {
+function generateDocs(request, allFiles, apiNames, path) {
+  var examplesFullPath = request.getGeneratedSamplesFolder()
+
+  for (var fileIndex in allFiles) {
+    if (apiNames[fileIndex]) {
+      var folder = allFiles[fileIndex].replace(path, '')
+      var folderParts = folder.split(pathLib.sep)
+      var examplePath = examplesFullPath
+
+      for (var part in folderParts) {
+        if (folderParts[part]) {
+          examplePath += folderParts[part] + '/'
+        }
+      }
+
+      generateDocsForFile(request, allFiles[fileIndex], apiNames[fileIndex], examplePath)
+
+      break
+    }
+  }
+}
+
+function generateDocsForFile(request, path, apiName, examplesPath) {
+  path = path.replace(/\\/g, '/')
+  if (info.onWindows) {
+    var arg = 'python build.py --type ' + request.type + ' --path "' + path + '" --apiname "' + apiName + '" --requestfolder "' + request.getRequestFolder() + '" --examples "' + examplesPath + '"';
+
+    runShellCommand('mkdir "' + request.getDocsBuild() + '"', 20, process.cwd());
+    runShellCommand('mkdir "' + request.getDocsSource() + '"', 20, process.cwd());
+    runShellCommand('mkdir "' + request.getRequestFolder() + 'slate/"', 20, process.cwd());
+    runShellCommand('mkdir "' + request.getRequestFolder() + 'OAS/"', 20, process.cwd());
+
+    runShellCommand('XCOPY /E .\\docs\\source "' + request.getDocsSource() + '"', 20, process.cwd());
+
+    runShellCommand(arg, 20, process.cwd() + '/docs/raml2markdown');
+    runShellCommand('bundle exec middleman build --source "' + request.getDocsSource().replace(process.cwd().replace(/\\/g, '/'), '..') + '" --build-dir "' + request.getDocsBuild() + '"', 20, process.cwd() + '/docs');
+  } else {
+    var arg = 'python3 build.py --type ' + request.type + ' --path "' + path + '" --apiname "' + apiName + '" --requestfolder "' + request.getRequestFolder() + '" --examples "' + examplesPath + '"';
+
+    runShellCommand('mkdir "' + request.getDocsBuild() + '"', 20, process.cwd());
+    runShellCommand('mkdir "' + request.getDocsSource() + '"', 20, process.cwd());
+    runShellCommand('mkdir "' + request.getRequestFolder() + 'slate/"', 20, process.cwd());
+    runShellCommand('mkdir "' + request.getRequestFolder() + 'OAS/"', 20, process.cwd());
+
+    runShellCommand('cp  ./docs/source "' + request.getDocsSource() + '"', 20, process.cwd());
+
+    runShellCommand(arg, 20, process.cwd() + '/docs/raml2markdown');
+    runShellCommand('export PATH="/usr/share/rvm/gems/ruby-2.4.2/bin:/usr/share/rvm/gems/ruby-2.4.2@global/bin:/usr/share/rvm/rubies/ruby-2.4.2/bin:$PATH" && bundle exec middleman build --source "' + request.getDocsSource().replace(process.cwd().replace(/\\/g, '/'), '..') + '" --build-dir "' + request.getDocsBuild() + '"', 20, process.cwd() + '/docs');
+  }
+}
+
+function getAllFiles(path) {
   var files = {
     '.raml': [],
     '.yaml': [],
@@ -95,7 +142,7 @@ function getAllFiles (path) {
   try {
     stat = fs.statSync(path)
   } catch (err) {
-    reporter.log(err)
+    console.log(err)
     return []
   }
 
@@ -112,7 +159,7 @@ function getAllFiles (path) {
   return files['.raml']
 }
 
-function recursiveSearch (currentDirectory, files) {
+function recursiveSearch(currentDirectory, files) {
   var list = fs.readdirSync(currentDirectory)
 
   list.forEach(function (file) {

@@ -46,8 +46,8 @@ function makeSampleNameFromPath (path) {
   return parents + endpoint
 }
 
-function sortCodeSamples (samples) {
-  var samplesTree = new utils.CodeSamplesTree()
+function sortCodeSamples (samples, request) {
+  var samplesTree = new utils.CodeSamplesTree(request)
 
   for (var sampleIndex in samples) {
     samplesTree.put(samples[sampleIndex])
@@ -72,7 +72,7 @@ function getFilesRecursively (path) {
         files.push(fullPath)
       }
     } catch (err) {
-      reporter.log(err)
+      console.log(err)
     }
   })
 
@@ -88,8 +88,8 @@ function validExtension (file, validExtensions) {
   return false
 }
 
-function loadCodeSamples (root, keyword = '') {
-  var languages = info.validationLanguages
+function loadCodeSamples (request, root, keyword = '') {
+  var languages = request.validationLanguages
   var samples = []
   var validExtensions = []
 
@@ -113,7 +113,7 @@ function loadCodeSamples (root, keyword = '') {
     }
   }
 
-  return sortCodeSamples(samples)
+  return sortCodeSamples(samples, request)
 }
 
 module.exports = {

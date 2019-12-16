@@ -2,24 +2,25 @@ const request = require('request')
 const debug = require('../../reporter').debug
 
 class Resource {
-  constructor (baseUrl) {
+  constructor (request, baseUrl) {
     this.baseUrl = baseUrl
     this._created = false
     this._deleted = false
+    this.request = request
   }
 
   async create (payload) {
-    debug('Creating ' + this.constructor.name)
+    debug(this.request, 'Creating ' + this.constructor.name)
     var result = await this._create(payload)
 
     var code = result.code
     var response = result.body
 
     if (this.idField()) {
-      debug('Success (' + code + '): ' + this.idField())
+      debug(this.request, 'Success (' + code + '): ' + this.idField())
     } else {
       var responseData = response || ''
-      debug('Status code: ' + code + ' ' + responseData)
+      debug(this.request, 'Status code: ' + code + ' ' + responseData)
     }
 
     this._created = true
@@ -27,7 +28,7 @@ class Resource {
   }
 
   async delete () {
-    debug('Removing ' + this.constructor.name + '<' + this.idField() + '>')
+    debug(this.request, 'Removing ' + this.constructor.name + '<' + this.idField() + '>')
     var response = await this._delete()
     this._deleted = true
     return response

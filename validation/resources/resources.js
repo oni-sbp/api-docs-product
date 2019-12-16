@@ -3,8 +3,9 @@ const Resource = resource.Resource
 const info = require('../../info')
 
 class Identity extends Resource {
-  constructor (baseUrl = 'https://' + info.conf.api_url + '/identities/v1') {
-    super(baseUrl)
+  constructor (request, baseUrl = null) {
+    baseUrl = baseUrl || 'https://' + request.conf.api_url + '/identities/v1'
+    super(request, baseUrl)
     this._idField = null
   }
 
@@ -13,7 +14,7 @@ class Identity extends Resource {
   }
 
   async _create (payload) {
-    var response = await resource._createResource(this.baseUrl, this.generatePayload(), info.conf.access_token)
+    var response = await resource._createResource(this.baseUrl, this.generatePayload(), this.request.conf.access_token)
 
     if (response.code < 400 && response.body) {
       this._idField = response.body['@id']
@@ -23,7 +24,7 @@ class Identity extends Resource {
   }
 
   async _delete () {
-    var result = await resource._deleteResource(this.baseUrl + '/' + this.idField(), info.conf.access_token)
+    var result = await resource._deleteResource(this.baseUrl + '/' + this.idField(), this.request.conf.access_token)
     return result
   }
 
@@ -40,8 +41,9 @@ class Identity extends Resource {
 }
 
 class DeleteProduct extends Resource {
-  constructor (baseUrl = 'https://' + info.conf.api_url + '/products/v1') {
-    super(baseUrl)
+  constructor (request, baseUrl = null) {
+    baseUrl = baseUrl || 'https://' + request.conf.api_url + '/products/v1'
+    super(request, baseUrl)
   }
 
   newResource () {
@@ -49,7 +51,7 @@ class DeleteProduct extends Resource {
   }
 
   async _create (payload) {
-    var code = await resource._deleteResource(this.baseUrl + '/' + this.idField(), info.conf.access_token)
+    var code = await resource._deleteResource(this.baseUrl + '/' + this.idField(), this.request.conf.access_token)
 
     return { code: code, body: null }
   }

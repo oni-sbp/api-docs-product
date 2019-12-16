@@ -7,28 +7,28 @@ const constants = require('../constants')
 
 var templates = {}
 
-function getTemplates (rootDirectory) {
+function getTemplates (rootDirectory, request) {
   if (Object.keys(templates).length === 0) {
-    for (var language in info.languages) {
-      var content = fs.readFileSync(rootDirectory + pathLib.sep + 'templates' + pathLib.sep + info.languages[language] + '.ejs', 'utf8')
-      templates[info.languages[language]] = content
+    for (var language in request.languages) {
+      var content = fs.readFileSync(rootDirectory + pathLib.sep + 'templates' + pathLib.sep + request.languages[language] + '.ejs', 'utf8')
+      templates[request.languages[language]] = content
     }
   }
 
   return templates
 }
 
-function writeExampleFiles (params, examplesPath, rootDirectory) {
-  var templates = getTemplates(rootDirectory)
-  reporter.log('Generating samples for endpoint: ' + params.uri + ', method: ' + params.request_method.toUpperCase())
-  for (var language in info.languages) {
+function writeExampleFiles (params, examplesPath, rootDirectory, request) {
+  var templates = getTemplates(rootDirectory, request)
+  reporter.log(request, 'Generating samples for endpoint: ' + params.uri + ', method: ' + params.request_method.toUpperCase())
+  for (var language in request.languages) {
     var folderName = examplesPath + params.uri.replace(/\//g, '_')
 
     if (!fs.existsSync(folderName)) {
       fs.mkdirSync(folderName)
     }
 
-    var folderMethodName = folderName + '/' + params.request_method.toUpperCase()
+    var folderMethodName = folderName + pathLib.sep + params.request_method.toUpperCase()
 
     if (!fs.existsSync(folderMethodName)) {
       fs.mkdirSync(folderMethodName)
@@ -36,9 +36,9 @@ function writeExampleFiles (params, examplesPath, rootDirectory) {
 
     params.rootDirectory = rootDirectory
 
-    var fileName = folderMethodName + '/' + info.languages[language] + info.extension[info.languages[language]]
-    fs.writeFileSync(fileName, ejs.render(templates[info.languages[language]], params))
-    reporter.log('\tGenerated sample: ' + fileName.replace(constants.GENERATED_EXAMPLES_FOLDER, ''))
+    var fileName = folderMethodName + pathLib.sep + request.languages[language] + info.extension[request.languages[language]]
+    fs.writeFileSync(fileName, ejs.render(templates[request.languages[language]], params))
+    reporter.log(request, '\tGenerated sample: ' + fileName.replace(request.getGeneratedSamplesFolder(), ''))
   }
 }
 

@@ -1,18 +1,28 @@
 const write = require('./write-templates')
+const pathUtility = require('path')
 const querystring = require('querystring')
 const SwaggerParser = require('swagger-parser')
 const ramlParser = require('./raml-parser')
 const info = require('../info')
 const reporter = require('../reporter')
 
-async function parse (path, rootDirectory, examplesPath, params) {
-  reporter.log('Parsing ' + path)
+async function parse (path, rootDirectory, examplesPath, params, request) {
+  reporter.log(request, 'Parsing ' + path)
   var api = await SwaggerParser.dereference(path).catch((error) => {
     console.log(error)
   })
 
   if (!api) {
-    return -1
+    return ""
+  }
+
+  var filename = pathUtility.parse(path).base
+  var title = filename.split('.')[0]
+  
+  if (api.info && api.info.title) {
+    title = api.info.title.replace('Swagger', '').trim()
+  } else {
+    reporter.log(request, 'This API specification does not have a title')
   }
 
   var contentType = null
@@ -74,17 +84,17 @@ async function parse (path, rootDirectory, examplesPath, params) {
           params.query_string = queryString
         }
 
-        var bodyValue = getBody(endPoint[operation])
+        var bodyValue = getBody(endPoint[operation], request)
         if (bodyValue) {
           params.body = bodyValue
           params.pyBody = bodyValue
         }
 
-        setHeaders(endPoint[operation], contentType, params)
+        setHeaders(endPoint[operation], contentType, params, request)
 
         ramlParser.setCurl(params)
 
-        write.writeExampleFiles(params, examplesPath, rootDirectory)
+        write.writeExampleFiles(params, examplesPath, rootDirectory, request)
         write.writeDebug(debug, params, examplesPath)
 
         params.desc = null
@@ -98,6 +108,8 @@ async function parse (path, rootDirectory, examplesPath, params) {
       }
     }
   }
+
+  return title
 }
 
 function getDebug (dict, debug) {
@@ -184,13 +196,13 @@ function getQueryString (operation) {
   return null
 }
 
-function getBody (operation) {
+function getBody (operation, request) {
   var hasBody = false
 
   if (operation.requestBody) {
     hasBody = true
 
-    if (info.conf.ignore_body_examples) {
+    if (request.conf.ignore_body_examples) {
       return JSON.stringify({})
     }
 
@@ -208,7 +220,7 @@ function getBody (operation) {
       if (parameter.in === 'body') {
         hasBody = true
 
-        if (info.conf.ignore_body_examples) {
+        if (request.conf.ignore_body_examples) {
           return JSON.stringify({})
         }
         example = getExample(parameter)
@@ -227,7 +239,7 @@ function getBody (operation) {
   return null
 }
 
-function setHeaders (operation, contentType, params) {
+function setHeaders (operation, contentType, params, request) {
   var headers = {}
 
   if (operation.parameters) {
@@ -250,8 +262,8 @@ function setHeaders (operation, contentType, params) {
     headers['Content-Type'] = contentType
   }
 
-  if (info.authentication !== 'None' && headers.Authorization === undefined) {
-    headers.Authorization = info.authentication + ' <ACCESS_TOKEN>'
+  if (request.authentication !== 'None' && headers.Authorization === undefined) {
+    headers.Authorization = request.authentication + ' <ACCESS_TOKEN>'
   }
 
   if (JSON.stringify(headers) !== JSON.stringify({})) {

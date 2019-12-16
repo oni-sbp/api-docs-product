@@ -5,7 +5,8 @@ const error = require('../errors')
 const path = require('path')
 
 class CodeRunner {
-  constructor () {
+  constructor (request) {
+    this.request = request
     this.tmpSamplePath = null
   }
 
@@ -128,18 +129,18 @@ class CodeRunner {
     try {
       cmdResult = this._runSample(this.tmpSamplePath)
     } catch (error) {
-      return new validationClasses.ApiTestResult({
+      return new validationClasses.ApiTestResult(this.request, {
         sample: sample,
         passed: false,
         reason: error,
-        duration: info.conf.sample_timeout
+        duration: this.request.conf.sample_timeout
       })
     }
 
     var duration = new Date() - startTime
 
     if (cmdResult.exitCode !== 0) {
-      return new validationClasses.ApiTestResult({
+      return new validationClasses.ApiTestResult(this.request, {
         sample: sample,
         passed: false,
         reason: error.NonZeroExitCode,
@@ -150,15 +151,15 @@ class CodeRunner {
 
     try {
       var allowNonJSONResponse = false
-      if (info.conf.allow_non_json_responses[sample.name] && info.conf.allow_non_json_responses[sample.name][sample.httpMethod]) {
-        allowNonJSONResponse = info.conf.allow_non_json_responses[sample.name][sample.httpMethod]
+      if (this.request.conf.allow_non_json_responses[sample.name] && this.request.conf.allow_non_json_responses[sample.name][sample.httpMethod]) {
+        allowNonJSONResponse = this.request.conf.allow_non_json_responses[sample.name][sample.httpMethod]
       }
 
       var parsedStdout = this._parseStdout(cmdResult.stdout, allowNonJSONResponse)
       jsonBody = parsedStdout.jsonBody
       statusCode = parsedStdout.statusCode
     } catch (error) {
-      return new validationClasses.ApiTestResult({
+      return new validationClasses.ApiTestResult(this.request, {
         sample: sample,
         passed: false,
         reason: error,
@@ -168,7 +169,7 @@ class CodeRunner {
     }
 
     if (statusCode >= 400) {
-      return new validationClasses.ApiTestResult({
+      return new validationClasses.ApiTestResult(this.request, {
         sample: sample,
         passed: false,
         reason: error.BadRequest,
@@ -179,7 +180,7 @@ class CodeRunner {
       })
     }
 
-    return new validationClasses.ApiTestResult({
+    return new validationClasses.ApiTestResult(this.request, {
       sample: sample,
       passed: true,
       reason: null,

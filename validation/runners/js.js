@@ -10,11 +10,11 @@ const util = require('util')
 const querystring = require('querystring')
 
 class NodeRunner extends CodeRunner {
-  constructor () {
-    super()
+  constructor (request) {
+    super(request)
 
     var tmpPath = tempDirectory
-    this._projectDirPath = tmpPath + pathLib.sep + info.conf.js_project_dir_name
+    this._projectDirPath = tmpPath + pathLib.sep + request.conf.js_project_dir_name
     this._nodeModulesPath = this._projectDirPath + pathLib.sep + 'node_modules'
     this._installNodeModulesIfNeeded()
   }
@@ -22,14 +22,14 @@ class NodeRunner extends CodeRunner {
   _installNodeModulesIfNeeded () {
     var packages = ['unirest']
 
-    if (info.conf.always_create_environments && fs.existsSync(this._projectDirPath)) {
-      debug('Removing ' + this._projectDirPath)
+    if (this.request.conf.always_create_environments && fs.existsSync(this._projectDirPath)) {
+      debug(this.request, 'Removing ' + this._projectDirPath)
       fs.removeSync(this._projectDirPath)
     }
     if (!fs.existsSync(this._projectDirPath)) {
       fs.mkdirSync(this._projectDirPath)
-      debug('Installing node modules to ' + this._projectDirPath)
-      utils.runShellCommand('npm install ' + packages.join(' '), info.conf.virtualenv_creation_timeout, this._projectDirPath)
+      debug(this.request, 'Installing node modules to ' + this._projectDirPath)
+      utils.runShellCommand('npm install ' + packages.join(' '), this.request.conf.virtualenv_creation_timeout, this._projectDirPath)
     }
   }
 

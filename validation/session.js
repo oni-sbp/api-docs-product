@@ -7,20 +7,21 @@ const info = require('../info')
 const Reporter = require('../reporter').Reporter
 
 class TestSession {
-  constructor (samples) {
+  constructor (request, samples) {
     this.runners = {
-      'unirest.node': new NodeRunner(),
-      python: new PythonRunner(),
-      curl: new CurlRunner()
+      'unirest.node': new NodeRunner(request),
+      python: new PythonRunner(request),
+      curl: new CurlRunner(request)
     }
 
     this.samples = samples
+    this.request = request
     this._testResultsMap = new TestExecutionResultMap()
-    this._resourceRegistry = new ResourceRegistry()
+    this._resourceRegistry = new ResourceRegistry(request)
   }
 
   async run () {
-    var reporter = new Reporter()
+    var reporter = new Reporter(this.request)
     var samplesByLang = {
       'unirest.node': [],
       python: [],
@@ -48,7 +49,7 @@ class TestSession {
   }
 
   async runApiTestsForLang (samples, lang) {
-    Reporter.showLanguageScopeRun(lang)
+    Reporter.showLanguageScopeRun(lang, this.request)
 
     var testResults = []
     var dataSubstitutions = {}
@@ -60,15 +61,15 @@ class TestSession {
       var substitutions = await this.getSubstitutions(sample, lang, dataSubstitutions, allSubstitutions, prerequisiteSubs)
       allSubstitutions = Object.assign(allSubstitutions, substitutions)
 
-      Reporter.showTestIsRunning(sample)
+      Reporter.showTestIsRunning(sample, this.request)
       var testResult = this.runners[lang].runSample(sample, substitutions)
 
-      this._testResultsMap.put(testResult, info.conf.resp_attr_replacements[sample.name], prerequisiteSubs)
+      this._testResultsMap.put(testResult, this.request.conf.resp_attr_replacements[sample.name], prerequisiteSubs)
       testResults.push(testResult)
 
       dataSubstitutions = Object.assign(dataSubstitutions, this.requestSubstitutions(sample))
       dataSubstitutions = Object.assign(dataSubstitutions, this.makeSubstitutions(testResult.jsonBody))
-      Reporter.showShortTestStatus(testResult)
+      Reporter.showShortTestStatus(testResult, this.request)
     }
 
     await this._resourceRegistry.cleanup()
@@ -78,7 +79,7 @@ class TestSession {
   async getSubstitutions (sample, lang, dataSubstitutions, allSubstitutions, prerequisiteSubs) {
     var beforeSampleSubstitutions = this.beforeSampleSubstitutions(sample, lang)
     var substitutions = this._testResultsMap.getParentBody(sample, true)
-    var confSubstitutions = info.conf.substitutions ? info.conf.substitutions : {}
+    var confSubstitutions = this.request.conf.substitutions ? this.request.conf.substitutions : {}
 
     substitutions = Object.assign(substitutions, allSubstitutions)
     substitutions = Object.assign(substitutions, dataSubstitutions)
@@ -90,13 +91,13 @@ class TestSession {
   }
 
   async extractPrerequisiteSubs (sample) {
-    if (!info.conf.before_sample[sample.name]) {
+    if (!this.request.conf.before_sample[sample.name]) {
       return {}
     }
 
     var prerequisiteSubs = {}
-    for (var paramIndex in info.conf.before_sample[sample.name]) {
-      var params = info.conf.before_sample[sample.name][paramIndex]
+    for (var paramIndex in this.request.conf.before_sample[sample.name]) {
+      var params = this.request.conf.before_sample[sample.name][paramIndex]
 
       if (params.method === sample.httpMethod) {
         var subs = await this._resourceRegistry.create(params.resource, params.subs)
@@ -108,9 +109,9 @@ class TestSession {
   }
 
   requestSubstitutions (sample) {
-    if (info.conf.substitutions_before_sample[sample.name]) {
-      for (var paramIndex in info.conf.substitutions_before_sample[sample.name]) {
-        var params = info.conf.substitutions_before_sample[sample.name][paramIndex]
+    if (this.request.conf.substitutions_before_sample[sample.name]) {
+      for (var paramIndex in this.request.conf.substitutions_before_sample[sample.name]) {
+        var params = this.request.conf.substitutions_before_sample[sample.name][paramIndex]
 
         if (params.method === sample.httpMethod && params.subs['{BODY}']) {
           var jsonBody = JSON.parse(params.subs['{BODY}'])
@@ -132,9 +133,9 @@ class TestSession {
   beforeSampleSubstitutions (sample, lang) {
     var substitutions = { '{BODY}': '{}' }
 
-    if (info.conf.substitutions_before_sample[sample.name]) {
-      for (var paramIndex in info.conf.substitutions_before_sample[sample.name]) {
-        var params = info.conf.substitutions_before_sample[sample.name][paramIndex]
+    if (this.request.conf.substitutions_before_sample[sample.name]) {
+      for (var paramIndex in this.request.conf.substitutions_before_sample[sample.name]) {
+        var params = this.request.conf.substitutions_before_sample[sample.name][paramIndex]
 
         if (params.method === sample.httpMethod) {
           substitutions = Object.assign(substitutions, params.subs)

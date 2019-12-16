@@ -5,41 +5,48 @@ const info = require('../info')
 const pathLib = require('path')
 const utils = require('../utils')
 
-async function validateGeneratedSamples (fields, files) {
+async function validateGeneratedSamples(fields, files, request) {
+  const timerStart = Date.now()
   if (fields.validate !== 'on') {
-    return 0
+    request.validationTime = '0s'
+    request.totalTests = 0
+    request.failedTests = 0
+
+    return
   }
 
-  var samplesPath = await makeValidationConfigurations(fields, files)
+  var samplesPath = await makeValidationConfigurations(fields, files, request)
 
-  var samples = loader.loadCodeSamples(samplesPath, fields.keyword)
-  var testSession = new TestSession(samples)
-  var failedTestsCount = await testSession.run()
+  var samples = loader.loadCodeSamples(request, samplesPath, fields.keyword)
+  var testSession = new TestSession(request, samples)
+  request.failedTests = await testSession.run()
+  const timerEnd = Date.now()
 
-  return failedTestsCount
+  request.validationTime = ((timerEnd - timerStart) / 1000).toString() + 's'
+  request.totalTests = samples.length
 }
 
-async function makeValidationConfigurations (fields, files) {
-  info.setLanguages(fields)
+async function makeValidationConfigurations(fields, files, request) {
+  request.setLanguages(fields)
 
   if (fields.authentication !== 'None') {
     if (fields.authentication === 'basic') {
-      info.authentication = 'Basic'
+      request.authentication = 'Basic'
     } else if (fields.authentication === 'bearer') {
-      info.authentication = 'Bearer'
+      request.authentication = 'Bearer'
     }
   } else {
-    info.authentication = 'None'
+    request.authentication = 'None'
   }
-  info.env.AUTH_TOKEN = fields.auth_token
+  request.env.AUTH_TOKEN = fields.auth_token
 
   if (fields.host !== '') {
-    info.env.TESTING_API_URL = fields.host
+    request.env.TESTING_API_URL = fields.host
   }
 
-  var configFile = await utils.getConfigFile(fields, files)
-  info.conf = new Config()
-  info.conf.loadConfigFile(configFile)
+  var configFile = await utils.getConfigFile(fields, files, request)
+  request.conf = new Config()
+  request.conf.loadConfigFile(request, configFile)
 
   var samplesPath = fields.samplespath
   if (!samplesPath.endsWith(pathLib.sep)) {

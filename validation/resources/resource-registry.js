@@ -1,25 +1,26 @@
 const resources = require('./resources')
 
-function newResource (name) {
+function newResource (request, name) {
   if (name === 'Identity') {
-    return new resources.Identity()
+    return new resources.Identity(request)
   }
 
   if (name === 'DeleteProduct') {
-    return new resources.DeleteProduct()
+    return new resources.DeleteProduct(request)
   }
 }
 
 class ResourceRegistry {
-  constructor () {
+  constructor (request) {
     this.resources = []
     this.allResources = {}
+    this.request = request
   }
 
   async create (name, substitutions) {
     var filteredBody = {}
 
-    var resource = newResource(name)
+    var resource = newResource(this.request, name)
     var response = await resource.create()
     var body = response.body ? response.body : {}
 

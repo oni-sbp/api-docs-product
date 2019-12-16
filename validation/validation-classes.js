@@ -17,7 +17,8 @@ class CodeSample {
 }
 
 class CodeSamplesTree {
-  constructor () {
+  constructor (request) {
+    this.request = request
     this.tree = {}
     this.defaultOrder = ['POST', 'GET', 'PUT', 'DELETE']
     this.nonDeleteMethods = ['POST', 'GET', 'PUT']
@@ -68,8 +69,8 @@ class CodeSamplesTree {
     }
 
     var methodsOrder = this.defaultOrder
-    if (info.conf.operations_order[endpointName]) {
-      methodsOrder = info.conf.operations_order[endpointName]
+    if (this.request.conf.operations_order[endpointName]) {
+      methodsOrder = this.request.conf.operations_order[endpointName]
     }
 
     var methodsRemained = []
@@ -111,15 +112,16 @@ class CodeSamplesTree {
 }
 
 class ApiTestResult {
-  constructor (params) {
+  constructor (request, params) {
+    this.request = request
     for (var option in params) {
       this[option] = params[option]
     }
   }
 
   ignored () {
-    if (!this.passed && info.conf.ignore_failures[this.sample.name]) {
-      var ignoredMethods = info.conf.ignore_failures[this.sample.name]
+    if (!this.passed && this.request.conf.ignore_failures[this.sample.name]) {
+      var ignoredMethods = this.request.conf.ignore_failures[this.sample.name]
 
       return ignoredMethods.includes(this.sample.httpMethod)
     }

@@ -1,46 +1,50 @@
 const color = require('node-colorify')
 const info = require('./info')
 
-function debug (message) {
+function debug (request, message) {
   console.log(color.colorItSync(message, { fColor: 'blue' }))
-  info.logFileStream.write(message + '\n')
+  request.logFileStream.write(message + '\n')
 }
 
-function log (message, noNewLine = false) {
+function log (request, message, noNewLine = false) {
   console.log(message.toString())
   if (!noNewLine) {
     message += '\n'
   }
-  info.logFileStream.write(message.toString())
+  request.logFileStream.write(message.toString())
 }
 
-function logRed (message) {
+function logRed (request, message) {
   console.log(color.colorItSync(message, { fColor: 'red' }))
-  info.logFileStream.write(message + '\n')
+  request.logFileStream.write(message + '\n')
 }
 
-function logGreen (message) {
+function logGreen (request, message) {
   console.log(color.colorItSync(message, { fColor: 'green' }))
-  info.logFileStream.write(message + '\n')
+  request.logFileStream.write(message + '\n')
 }
 
-function logYellow (message) {
+function logYellow (request, message) {
   console.log(color.colorItSync(message, { fColor: 'yellow' }))
-  info.logFileStream.write(message + '\n')
+  request.logFileStream.write(message + '\n')
 }
 
 class Reporter {
-  _explainNonZeroCode (testResult) {
+  constructor(request) {
+    this.request = request
+  }
+
+  _explainNonZeroCode (testResult, request) {
     if (!testResult.cmdResult) {
       return
     }
 
     var code = testResult.cmdResult.exitCode
-    log('Command returned non-zero exit code: ' + code)
-    Reporter._printStdoutAndStderr(testResult)
+    log(request, 'Command returned non-zero exit code: ' + code)
+    Reporter._printStdoutAndStderr(testResult, request)
   }
 
-  static _explainStdoutParsing (testResult) {
+  static _explainStdoutParsing (testResult, request) {
     if (!testResult.cmdResult) {
       return
     }
@@ -49,17 +53,17 @@ class Reporter {
     var stderr = testResult.cmdResult.stderr
 
     if (stdout.trim()) {
-      log('Incorrect sample output:\n' + stdout)
+      log(request, 'Incorrect sample output:\n' + stdout)
     } else {
-      log('No stdout captured')
+      log(request, 'No stdout captured')
 
       if (stderr) {
-        log('STDERR:\n' + stderr)
+        log(request, 'STDERR:\n' + stderr)
       }
     }
   }
 
-  static _printStdoutAndStderr (testResult) {
+  static _printStdoutAndStderr (testResult, request) {
     var stdoutDesc, stderrDesc
 
     if (testResult.cmdResult) {
@@ -73,37 +77,37 @@ class Reporter {
       stderrDesc = 'NO STDERR'
     }
 
-    log(stdoutDesc + '\n' + stderrDesc)
+    log(request, stdoutDesc + '\n' + stderrDesc)
   }
 
-  _explainBadRequest (testResult) {
-    log('Bad request: ' + testResult.statusCode)
-    Reporter._printStdoutAndStderr(testResult)
+  _explainBadRequest (testResult, request) {
+    log(request, 'Bad request: ' + testResult.statusCode)
+    Reporter._printStdoutAndStderr(testResult, request)
   }
 
-  static _explainTimeoutError (testResult) {
-    log('Timeout error: ' + info.conf.sample_timeout + 's')
+  static _explainTimeoutError (testResult, request) {
+    log(request, 'Timeout error: ' + request.conf.sample_timeout + 's')
   }
 
-  static _printSampleSourceCode (testResult) {
+  static _printSampleSourceCode (testResult, request) {
     var code = testResult.sourceCode
-    log('Sample source code (with substitutions):\n' + code)
+    log(request, 'Sample source code (with substitutions):\n' + code)
   }
 
-  static _explainConformingToSchema (testResult) {
+  static _explainConformingToSchema (testResult, request) {
     if (['python', 'unirest.node'].includes(testResult.sample.language())) {
-      log('Resulted JSON must contain "raw_body" and "code" fields')
+      log(request, 'Resulted JSON must contain "raw_body" and "code" fields')
     }
 
-    Reporter._explainStdoutParsing(testResult)
+    Reporter._explainStdoutParsing(testResult, request)
   }
 
-  static _explainUnknownReason (testResult) {
-    log('Unknown reason..')
+  static _explainUnknownReason (testResult, request) {
+    log(request, 'Unknown reason..')
   }
 
   _explainInDetails (testResult) {
-    if (testResult.passed && !info.conf.debug) {
+    if (testResult.passed || !this.request.conf.debug) {
       return
     }
 
@@ -120,30 +124,30 @@ class Reporter {
     }
 
     var divider = '='.repeat(20)
-    log(divider + ' Test: ' + testResult.sample.name + ' ' + divider)
-    log('Path: ' + testResult.sample.path)
-    log('Method: ' + testResult.sample.httpMethod)
-    log('Duration: ' + (testResult.duration / 1000).toFixed(1))
+    log(this.request, divider + ' Test: ' + testResult.sample.name + ' ' + divider)
+    log(this.request, 'Path: ' + testResult.sample.path)
+    log(this.request, 'Method: ' + testResult.sample.httpMethod)
+    log(this.request, 'Duration: ' + (testResult.duration / 1000).toFixed(1))
 
     if (!testResult.passed) {
-      errorReason(testResult)
+      errorReason(testResult, this.request)
     }
 
-    if (testResult.passed && info.conf.debug) {
-      Reporter._printStdoutAndStderr(testResult)
+    if (testResult.passed && this.request.conf.debug) {
+      Reporter._printStdoutAndStderr(testResult, this.request)
     }
 
-    Reporter._printSampleSourceCode(testResult)
-    log('')
+    Reporter._printSampleSourceCode(testResult, this.request)
+    log(this.request, '')
   }
 
-  static showShortTestStatus (testResult) {
+  static showShortTestStatus (testResult, request) {
     if (testResult.passed) {
-      logGreen('[PASSED]')
+      logGreen(request, '[PASSED]')
     } else if (testResult.ignored()) {
-      logYellow('[IGNORE]')
+      logYellow(request, '[IGNORE]')
     } else {
-      logRed('[FAILED]')
+      logRed(request, '[FAILED]')
     }
   }
 
@@ -154,7 +158,7 @@ class Reporter {
     var overallTime = 0.0
     var logFn = logGreen
 
-    log('')
+    log(this.request, '')
 
     for (var testResultIndex in testResults) {
       var testResult = testResults[testResultIndex]
@@ -174,13 +178,13 @@ class Reporter {
     }
 
     if (ignoredCount) {
-      log('== List of ignored tests ==')
+      log(this.request, '== List of ignored tests ==')
 
       for (testResultIndex in testResults) {
         testResult = testResults[testResultIndex]
 
         if (testResult.ignored()) {
-          log(testResult.sample.language() + ' - ' + testResult.sample.name + ' - ' + testResult.sample.httpMethod)
+          log(this.request, testResult.sample.language() + ' - ' + testResult.sample.name + ' - ' + testResult.sample.httpMethod)
         }
       }
     }
@@ -188,33 +192,33 @@ class Reporter {
     var conclusion = 'Test session passed'
     if (failedCount) {
       conclusion = 'Test session failed'
-      log('== List of failed tests ==')
+      log(this.request, '== List of failed tests ==')
 
       for (testResultIndex in testResults) {
         testResult = testResults[testResultIndex]
         if (testResult.failed()) {
-          log(testResult.sample.language() + ' - ' + testResult.sample.name + ' - ' + testResult.sample.httpMethod)
+          log(this.request, testResult.sample.language() + ' - ' + testResult.sample.name + ' - ' + testResult.sample.httpMethod)
         }
       }
     }
     overallTime /= 1000
-    log('Time spent: ' + overallTime.toFixed(1) + 's')
+    log(this.request, 'Time spent: ' + overallTime.toFixed(1) + 's')
     var description = testResults.length + ' total, ' + passedCount + ' passed, ' + failedCount + ' failed, ' + ignoredCount + ' ignored'
 
-    logFn('\n== ' + conclusion + ' ==\n' + description)
+    logFn(this.request, '\n== ' + conclusion + ' ==\n' + description)
   }
 
-  static showLanguageScopeRun (language) {
+  static showLanguageScopeRun (language, request) {
     var prettyName = {
       'unirest.node': 'JavaScript',
       python: 'Python',
       curl: 'cURL'
     }
 
-    log('======== ' + prettyName[language] + ' ========')
+    log(request, '======== ' + prettyName[language] + ' ========')
   }
 
-  static showTestIsRunning (sample) {
+  static showTestIsRunning (sample, request) {
     var message = sample.httpMethod + ': ' + sample.name
     var messageSpaces = sample.httpMethod.length < 6 ? ' '.repeat(6 - sample.httpMethod.length) : ''
     var terminalWidth = process.stdout.columns
@@ -223,7 +227,7 @@ class Reporter {
     var dotsCount = terminalWidth - message.length - spaces - statusLen - (6 - sample.httpMethod.length)
     var dots = (dotsCount > 0) ? '.'.repeat(dotsCount) : ''
 
-    log(messageSpaces + message + ' ' + dots + ' ', true)
+    log(request, messageSpaces + message + ' ' + dots + ' ', true)
   }
 }
 
