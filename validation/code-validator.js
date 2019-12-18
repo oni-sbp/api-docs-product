@@ -1,11 +1,10 @@
 const loader = require('./loader')
 const Config = require('../conf/conf').Config
 const TestSession = require('./session').TestSession
-const info = require('../info')
 const pathLib = require('path')
 const utils = require('../utils')
 
-async function validateGeneratedSamples(fields, files, request) {
+async function validateGeneratedSamples (fields, files, request) {
   const timerStart = Date.now()
   if (fields.validate !== 'on') {
     request.validationTime = '0s'
@@ -26,7 +25,7 @@ async function validateGeneratedSamples(fields, files, request) {
   request.totalTests = samples.length
 }
 
-async function makeValidationConfigurations(fields, files, request) {
+async function makeValidationConfigurations (fields, files, request) {
   request.setLanguages(fields)
 
   if (fields.authentication !== 'None') {

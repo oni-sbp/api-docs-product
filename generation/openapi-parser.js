@@ -3,7 +3,6 @@ const pathUtility = require('path')
 const querystring = require('querystring')
 const SwaggerParser = require('swagger-parser')
 const ramlParser = require('./raml-parser')
-const info = require('../info')
 const reporter = require('../reporter')
 
 async function parse (path, rootDirectory, examplesPath, params, request) {
@@ -13,12 +12,12 @@ async function parse (path, rootDirectory, examplesPath, params, request) {
   })
 
   if (!api) {
-    return ""
+    return ''
   }
 
   var filename = pathUtility.parse(path).base
   var title = filename.split('.')[0]
-  
+
   if (api.info && api.info.title) {
     title = api.info.title.replace('Swagger', '').trim()
   } else {
@@ -68,8 +67,8 @@ async function parse (path, rootDirectory, examplesPath, params, request) {
     var endPoint = api.paths[uri]
     params.uri = uri
 
-    if(uri === '/pet/findByTags' || uri === '/pet/{petId}/uploadImage') {
-      continue ///////////////////////
+    if (uri === '/pet/findByTags' || uri === '/pet/{petId}/uploadImage') {
+      continue /// ////////////////////
     }
 
     for (var operation in endPoint) {
@@ -104,7 +103,6 @@ async function parse (path, rootDirectory, examplesPath, params, request) {
         params.headers = null
         params.query_string = null
         params.pyBody = null
-
       }
     }
   }

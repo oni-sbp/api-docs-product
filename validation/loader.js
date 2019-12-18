@@ -2,7 +2,6 @@ const utils = require('./validation-classes')
 const fs = require('fs')
 const pathLib = require('path')
 const info = require('../info')
-const reporter = require('../reporter')
 
 function getHttpMethodFromPath (path) {
   var splittedPath = []

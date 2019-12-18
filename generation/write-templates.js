@@ -3,7 +3,6 @@ const info = require('../info')
 const ejs = require('ejs')
 const reporter = require('../reporter')
 const pathLib = require('path')
-const constants = require('../constants')
 
 var templates = {}
 

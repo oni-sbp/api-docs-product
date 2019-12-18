@@ -2,13 +2,11 @@ const fs = require('fs-extra')
 const info = require('../info')
 const fileParser = require('./file-parser')
 const pathLib = require('path')
-const reporter = require('../reporter.js')
-const constants = require('../constants')
 const utils = require('../utils')
 const Config = require('../conf/conf').Config
-const runShellCommand = require('../validation/utils').runShellCommand;
+const runShellCommand = require('../validation/utils').runShellCommand
 
-async function generateSamples(fields, files, request) {
+async function generateSamples (fields, files, request) {
   const firstTimerStart = Date.now()
   var path
   if (files.file.size !== 0) {
@@ -80,7 +78,7 @@ async function generateSamples(fields, files, request) {
   return examplesFullPath
 }
 
-function generateDocs(request, allFiles, apiNames, path) {
+function generateDocs (request, allFiles, apiNames, path) {
   var examplesFullPath = request.getGeneratedSamplesFolder()
 
   for (var fileIndex in allFiles) {
@@ -102,36 +100,36 @@ function generateDocs(request, allFiles, apiNames, path) {
   }
 }
 
-function generateDocsForFile(request, path, apiName, examplesPath) {
+function generateDocsForFile (request, path, apiName, examplesPath) {
   path = path.replace(/\\/g, '/')
   if (info.onWindows) {
-    var arg = 'python build.py --type ' + request.type + ' --path "' + path + '" --apiname "' + apiName + '" --requestfolder "' + request.getRequestFolder() + '" --examples "' + examplesPath + '"';
+    var arg = 'python build.py --type ' + request.type + ' --path "' + path + '" --apiname "' + apiName + '" --requestfolder "' + request.getRequestFolder() + '" --examples "' + examplesPath + '"'
 
-    runShellCommand('mkdir "' + request.getDocsBuild() + '"', 20, process.cwd());
-    runShellCommand('mkdir "' + request.getDocsSource() + '"', 20, process.cwd());
-    runShellCommand('mkdir "' + request.getRequestFolder() + 'slate/"', 20, process.cwd());
-    runShellCommand('mkdir "' + request.getRequestFolder() + 'OAS/"', 20, process.cwd());
+    runShellCommand('mkdir "' + request.getDocsBuild() + '"', 20, process.cwd())
+    runShellCommand('mkdir "' + request.getDocsSource() + '"', 20, process.cwd())
+    runShellCommand('mkdir "' + request.getRequestFolder() + 'slate/"', 20, process.cwd())
+    runShellCommand('mkdir "' + request.getRequestFolder() + 'OAS/"', 20, process.cwd())
 
-    runShellCommand('XCOPY /E .\\docs\\source "' + request.getDocsSource() + '"', 20, process.cwd());
+    runShellCommand('XCOPY /E .\\docs\\source "' + request.getDocsSource() + '"', 20, process.cwd())
 
-    runShellCommand(arg, 20, process.cwd() + '/docs/raml2markdown');
-    runShellCommand('bundle exec middleman build --source "' + request.getDocsSource().replace(process.cwd().replace(/\\/g, '/'), '..') + '" --build-dir "' + request.getDocsBuild() + '"', 20, process.cwd() + '/docs');
+    runShellCommand(arg, 20, process.cwd() + '/docs/raml2markdown')
+    runShellCommand('bundle exec middleman build --source "' + request.getDocsSource().replace(process.cwd().replace(/\\/g, '/'), '..') + '" --build-dir "' + request.getDocsBuild() + '"', 20, process.cwd() + '/docs')
   } else {
-    var arg = 'python3 build.py --type ' + request.type + ' --path "' + path + '" --apiname "' + apiName + '" --requestfolder "' + request.getRequestFolder() + '" --examples "' + examplesPath + '"';
+    arg = 'python3 build.py --type ' + request.type + ' --path "' + path + '" --apiname "' + apiName + '" --requestfolder "' + request.getRequestFolder() + '" --examples "' + examplesPath + '"'
 
-    runShellCommand('mkdir "' + request.getDocsBuild() + '"', 20, process.cwd());
-    runShellCommand('mkdir "' + request.getDocsSource() + '"', 20, process.cwd());
-    runShellCommand('mkdir "' + request.getRequestFolder() + 'slate/"', 20, process.cwd());
-    runShellCommand('mkdir "' + request.getRequestFolder() + 'OAS/"', 20, process.cwd());
+    runShellCommand('mkdir "' + request.getDocsBuild() + '"', 20, process.cwd())
+    runShellCommand('mkdir "' + request.getDocsSource() + '"', 20, process.cwd())
+    runShellCommand('mkdir "' + request.getRequestFolder() + 'slate/"', 20, process.cwd())
+    runShellCommand('mkdir "' + request.getRequestFolder() + 'OAS/"', 20, process.cwd())
 
     runShellCommand('cp -r ./docs/source "' + request.getRequestFolder() + '"', 20, process.cwd());
 
-    runShellCommand(arg, 20, process.cwd() + '/docs/raml2markdown');
-    runShellCommand('export PATH="/usr/share/rvm/gems/ruby-2.4.2/bin:/usr/share/rvm/gems/ruby-2.4.2@global/bin:/usr/share/rvm/rubies/ruby-2.4.2/bin:$PATH" && bundle exec middleman build --source "' + request.getDocsSource().replace(process.cwd().replace(/\\/g, '/'), '..') + '" --build-dir "' + request.getDocsBuild() + '"', 20, process.cwd() + '/docs');
+    runShellCommand(arg, 20, process.cwd() + '/docs/raml2markdown')
+    runShellCommand('export PATH="/usr/share/rvm/gems/ruby-2.4.2/bin:/usr/share/rvm/gems/ruby-2.4.2@global/bin:/usr/share/rvm/rubies/ruby-2.4.2/bin:$PATH" && bundle exec middleman build --source "' + request.getDocsSource().replace(process.cwd().replace(/\\/g, '/'), '..') + '" --build-dir "' + request.getDocsBuild() + '"', 20, process.cwd() + '/docs')
   }
 }
 
-function getAllFiles(path) {
+function getAllFiles (path) {
   var files = {
     '.raml': [],
     '.yaml': [],
@@ -159,7 +157,7 @@ function getAllFiles(path) {
   return files['.raml']
 }
 
-function recursiveSearch(currentDirectory, files) {
+function recursiveSearch (currentDirectory, files) {
   var list = fs.readdirSync(currentDirectory)
 
   list.forEach(function (file) {

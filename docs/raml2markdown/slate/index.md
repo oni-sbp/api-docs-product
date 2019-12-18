@@ -9,7 +9,7 @@ language_tabs:
    - javascript
 
 toc_footers: 
-   - <a href='https://developers.oftrust.net'>Developer Portal</a> 
+   - Powered by <a href='https://www.platformoftrust.net/services/api-engine'>API Engine</a> 
 
 includes: 
    - feedback

@@ -1,6 +1,5 @@
 const CodeRunner = require('./code').CodeRunner
 const tempDirectory = require('temp-dir')
-const info = require('../../info')
 const fs = require('fs-extra')
 const errors = require('../errors')
 const utils = require('../utils')

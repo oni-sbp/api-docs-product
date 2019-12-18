@@ -1,6 +1,5 @@
 const fs = require('fs')
 const validationClasses = require('../validation-classes')
-const info = require('../../info')
 const error = require('../errors')
 const path = require('path')
 

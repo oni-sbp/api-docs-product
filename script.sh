@@ -23,6 +23,8 @@ sudo service mongod status
 #sudo apt-get install ruby2.4 ruby2.4-dev
 #ruby2.4 -v
 
+# Install pip
+# apt install python-pip
 
 cd api-docs-product
 mkdir resources/Temp-Files
@@ -43,6 +45,7 @@ npm install
 # cd ..
 
 cp service/codegen.service /etc/systemd/system/codegen.service
+
 
 sudo systemctl enable codegen.service
 systemctl start codegen.service

@@ -8,11 +8,7 @@ const util = require('util')
 const querystring = require('querystring')
 
 class CurlRunner extends CodeRunner {
-  constructor(request) {
-    super(request)
-  }
-
-  prepareSample(path, substitutions = {}) {
+  prepareSample (path, substitutions = {}) {
     var tmpSamplePath = tempDirectory + pathLib.sep + 'curl'
     var sampleCode = fs.readFileSync(path, 'utf8')
     sampleCode = this.makeSubstitutionsForNullParams(sampleCode, substitutions)
@@ -22,7 +18,7 @@ class CurlRunner extends CodeRunner {
     return tmpSamplePath
   }
 
-  makeSubstitutionsForNullParams(code, substitutions) {
+  makeSubstitutionsForNullParams (code, substitutions) {
     // If we have a body but we don't have an example
     if (substitutions['{BODY}']) {
       code = code.replace('"{}"', '"' + substitutions['{BODY}'] + '"')
@@ -59,13 +55,13 @@ class CurlRunner extends CodeRunner {
     return code
   }
 
-  _runSample(samplePath) {
+  _runSample (samplePath) {
     var bashBin = '/bin/bash'
 
     return utils.runShellCommand(bashBin + ' ' + samplePath, this.request.conf.sample_timeout)
   }
 
-  _parseStdout(stdout, allowNonJSONResponse) {
+  _parseStdout (stdout, allowNonJSONResponse) {
     var statusCode = null
     var body = null
 

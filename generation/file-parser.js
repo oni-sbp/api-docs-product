@@ -17,7 +17,7 @@ async function parse (path, rootDirectory, examplesPath, host, scheme, request) 
   } else if (path.endsWith('.json') || path.endsWith('.yaml')) {
     return openAPIParser.parse(path, rootDirectory, examplesPath, params, request)
   } else {
-    return ""
+    return ''
   }
 }
 

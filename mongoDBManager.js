@@ -2,7 +2,7 @@ const mongo = require('mongodb').MongoClient
 const url = 'mongodb://localhost:27017'
 const DBName = 'Generation'
 
-function insertOne(collectionName, element) {
+function insertOne (collectionName, element) {
   mongo.connect(url, {
     useNewUrlParser: true,
     useUnifiedTopology: true
@@ -15,11 +15,11 @@ function insertOne(collectionName, element) {
 
     collection.insertOne(element, (_err, result) => {
       console.log(_err)
-    });
+    })
   })
 }
 
-async function getElementById(collectionName, id) {
+async function getElementById (collectionName, id) {
   return new Promise(function (resolve, reject) {
     mongo.connect(url, {
       useNewUrlParser: true,
@@ -33,7 +33,7 @@ async function getElementById(collectionName, id) {
 
       collection.find().toArray((_err, items) => {
         items.forEach(element => {
-          if (element.id == id) {
+          if (element.id === id) {
             resolve(element)
           }
         })
@@ -43,7 +43,7 @@ async function getElementById(collectionName, id) {
   })
 }
 
-async function getStatistics() {
+async function getStatistics () {
   return new Promise((resolve, reject) => {
     mongo.connect(url, {
       useNewUrlParser: true,

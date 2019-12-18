@@ -17,7 +17,7 @@ var fileNameEnding = {
 
 var httpMethods = ['POST', 'GET', 'PUT', 'DELETE']
 
-var onWindows = process.platform === 'win32';
+var onWindows = process.platform === 'win32'
 
 module.exports = {
   extension,

@@ -1,7 +1,6 @@
 const yaml = require('js-yaml')
 const fs = require('fs')
 const debug = require('../reporter').debug
-const info = require('../info')
 
 class Config {
   constructor (configData = {}) {

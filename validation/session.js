@@ -3,7 +3,6 @@ const CurlRunner = require('./runners/curl').CurlRunner
 const NodeRunner = require('./runners/js').NodeRunner
 const TestExecutionResultMap = require('./validation-classes').TestExecutionResultMap
 const ResourceRegistry = require('./resources/resource-registry').ResourceRegistry
-const info = require('../info')
 const Reporter = require('../reporter').Reporter
 
 class TestSession {

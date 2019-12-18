@@ -8,8 +8,6 @@ var port = 80
 const validator = require('./validation/code-validator')
 const generator = require('./generation/code-generator')
 const requestInfo = require('./RequestInfo')
-const mongo = require('mongodb').MongoClient
-const url = 'mongodb://localhost:27017'
 const mongoDBManager = require('./mongoDBManager')
 
 var fileReady = {}
@@ -26,7 +24,7 @@ app.post('/fileupload', (req, res) => {
     }
 
     requestInfo.createRequest().then((request) => {
-      request.createRequestFolder();
+      request.createRequestFolder()
       request.IP = req.connection.remoteAddress
 
       request.logFileStream = fs.createWriteStream(request.getGenerationLogFile(), { flags: 'w' })
@@ -50,7 +48,6 @@ app.post('/fileupload', (req, res) => {
             // fileReady[validationLogFile] = false
           }
           validator.validateGeneratedSamples(fields, files, request).then(() => {
-
             const newElement = {
               id: request.id,
               failedTests: request.failedTests,
@@ -69,7 +66,7 @@ app.post('/fileupload', (req, res) => {
                 res.writeHead(200, { 'Content-Type': 'text/html' })
 
                 data += '<div id="logs"><center><p style="color: #9073FF;">If you want to see the results later save next link: </p>'
-                data += '<p><a href="/results?requestID=' + request.id + '" class="link">http://codegen-demo.oftrust.net/results?requestID=' + request.id + '</a></p>'
+                data += '<p><a href="/results?requestID=' + request.id + '" class="link">' + req.headers.origin + '/results?requestID=' + request.id + '</a></p>'
                 data += '<p><a download href="/generationLogFile?requestID=' + request.id + '" class="link">Generation Log File</a></p>\n'
                 if (fields.validate === 'on') {
                   data += '<p><a download href="/validationLogFile?requestID=' + request.id + '" class="link" onclick="isValidationReady()">Validation Log File</a></p>\n'
@@ -82,15 +79,13 @@ app.post('/fileupload', (req, res) => {
               }
 
               res.end()
-
             })
 
-            fileReady[request.getValidationLogFile()] = true;
+            fileReady[request.getValidationLogFile()] = true
           })
         }
       })
-
-    });
+    })
   })
 })
 
@@ -114,14 +109,13 @@ app.get('/ErrorPage', (req, res) => {
   res.end()
 })
 
-
 app.route('/Statistics')
   .get(function (req, res) {
     mongoDBManager.getStatistics().then((stats) => {
       var TryCount = stats.TryCount
       var SuccessCount = stats.SuccessCount
       var FailedCount = stats.FailedCount
-      
+
       fs.readFile('statistics.html', function (err, data) {
         if (!err) {
           res.writeHead(200, { 'Content-Type': 'text/html' })
@@ -163,7 +157,6 @@ app.get('/generationLogFile', (req, res) => {
     }
   })
 })
-
 
 app.get('/validationLogFile', (req, res) => {
   requestInfo.createRequest(req.query.requestID).then((request) => {
@@ -213,7 +206,7 @@ app.get('/archive', (req, res) => {
 app.get('/readyLogFile', (req, res) => {
   console.log(req)
 
-  //res.send({ready: readFile[req.]});
+  // res.send({ready: readFile[req.]});
 })
 
 app.get('/docsOfTrust', (req, res) => {
@@ -248,14 +241,13 @@ app.get('/results', (req, res) => {
           res.redirect('/ErrorPage')
         } else {
           data = data.toString().replace(/\[REQUEST_ID\]/g, req.query.requestID)
-          if(request.totalTests == 0) {
+          if (request.totalTests === 0) {
             data = data.toString().replace('[VALIDATION]', 'none')
           } else {
             data = data.toString().replace('[VALIDATION]', 'block')
           }
 
-          if (request)
-            res.writeHead(200, { 'Content-Type': 'text/html', 'Content-Length': data.length })
+          if (request) { res.writeHead(200, { 'Content-Type': 'text/html', 'Content-Length': data.length }) }
           res.write(data)
           res.end()
         }

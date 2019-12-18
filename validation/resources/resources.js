@@ -1,6 +1,5 @@
 const resource = require('./resource')
 const Resource = resource.Resource
-const info = require('../../info')
 
 class Identity extends Resource {
   constructor (request, baseUrl = null) {

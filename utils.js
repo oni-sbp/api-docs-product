@@ -58,7 +58,7 @@ async function createTempSourceFileFromFile (file) {
 async function createTempSourceFileFromUrl (url) {
   var parts = url.split('/')
   var name = parts[parts.length - 1]
-  if (name == "") {
+  if (name === '') {
     name = parts[parts.length - 2]
   }
   var folderPath = constants.TEMP_FILES_FOLDER + 'Temp_File_' + Guid.create() + pathLib.sep

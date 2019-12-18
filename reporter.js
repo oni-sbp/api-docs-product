@@ -1,5 +1,4 @@
 const color = require('node-colorify')
-const info = require('./info')
 
 function debug (request, message) {
   console.log(color.colorItSync(message, { fColor: 'blue' }))
@@ -30,7 +29,7 @@ function logYellow (request, message) {
 }
 
 class Reporter {
-  constructor(request) {
+  constructor (request) {
     this.request = request
   }
 

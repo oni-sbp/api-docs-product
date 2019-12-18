@@ -3,7 +3,6 @@ const pathUtility = require('path')
 const querystring = require('querystring')
 const write = require('./write-templates')
 const pathLib = require('path')
-const info = require('../info')
 const reporter = require('../reporter')
 
 async function parse (path, rootDirectory, examplesPath, params, request) {
@@ -24,7 +23,7 @@ async function parse (path, rootDirectory, examplesPath, params, request) {
 
   var title = filename.split('.')[0]
   try {
-    var title = api.name.value()
+    title = api.name.value()
   } catch {
     reporter.log(request, 'This API specification does not have a title')
   }
