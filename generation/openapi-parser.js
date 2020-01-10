@@ -5,7 +5,7 @@ const SwaggerParser = require('swagger-parser')
 const ramlParser = require('./raml-parser')
 const reporter = require('../reporter')
 
-async function parse (path, rootDirectory, examplesPath, params, request) {
+async function parse(path, rootDirectory, examplesPath, params, request) {
   reporter.log(request, 'Parsing ' + path)
   var api = await SwaggerParser.dereference(path).catch((error) => {
     console.log(error)
@@ -87,6 +87,11 @@ async function parse (path, rootDirectory, examplesPath, params, request) {
         if (bodyValue) {
           params.body = bodyValue
           params.pyBody = bodyValue
+          params.javaBody = bodyValue
+          setBody(endPoint[operation], params)
+        } else {
+          params.pyBody = ''
+          params.javaBody = ''
         }
 
         setHeaders(endPoint[operation], contentType, params, request)
@@ -103,6 +108,8 @@ async function parse (path, rootDirectory, examplesPath, params, request) {
         params.headers = null
         params.query_string = null
         params.pyBody = null
+        params.javaHeaders = null
+
       }
     }
   }
@@ -110,7 +117,7 @@ async function parse (path, rootDirectory, examplesPath, params, request) {
   return title
 }
 
-function getDebug (dict, debug) {
+function getDebug(dict, debug) {
   for (var key in dict) {
     var data = dict[key]
 
@@ -146,9 +153,11 @@ function getDebug (dict, debug) {
       }
     }
   }
+
+
 }
 
-function get2xxResponse (operation) {
+function get2xxResponse(operation) {
   var noExample = { status: '', body: '' }
   if (operation.responses) {
     for (var response in operation.responses) {
@@ -169,7 +178,7 @@ function get2xxResponse (operation) {
   return noExample
 }
 
-function getQueryString (operation) {
+function getQueryString(operation) {
   var params = {}
   if (operation.parameters) {
     for (var parameterIndex in operation.parameters) {
@@ -194,7 +203,7 @@ function getQueryString (operation) {
   return null
 }
 
-function getBody (operation, request) {
+function getBody(operation, request) {
   var hasBody = false
 
   if (operation.requestBody) {
@@ -237,7 +246,39 @@ function getBody (operation, request) {
   return null
 }
 
-function setHeaders (operation, contentType, params, request) {
+function setBody(operation, params) {
+  if (params.body) {
+    params.pyBody = params.body
+    var checkBoolValue = params.pyBody.split('"')
+    for (var index = 0; index < checkBoolValue.length; index += 2) {
+      if (checkBoolValue[index].includes('true')) {
+        checkBoolValue[index] = checkBoolValue[index].split('true').join('True')
+      }
+      if (checkBoolValue[index].includes('false')) {
+        checkBoolValue[index] = checkBoolValue[index].split('false').join('False')
+      }
+    }
+    params.pyBody = checkBoolValue.join('"')
+    checkBoolValue = params.pyBody.split("'")
+    for (index = 0; index < checkBoolValue.length; index += 2) {
+      if (checkBoolValue[index].includes('true')) {
+        checkBoolValue[index] = checkBoolValue[index].split('true').join('True')
+      }
+      if (checkBoolValue[index].includes('false')) {
+        checkBoolValue[index] = checkBoolValue[index].split('false').join('False')
+      }
+    }
+    params.pyBody = checkBoolValue.join("'")
+    params.javaBody = params.body
+    params.javaBody = params.javaBody.split('"').join('\\"').split(/\r\n|\r|\n/).join('')
+    params.body = JSON.stringify({})
+    params.pyBody = JSON.stringify({})
+    params.javaBody = JSON.stringify({})
+  }
+}
+
+
+function setHeaders(operation, contentType, params, request) {
   var headers = {}
 
   if (operation.parameters) {
@@ -254,6 +295,7 @@ function setHeaders (operation, contentType, params, request) {
         }
       }
     }
+
   }
 
   if (contentType && !headers['Content-Type'] && params.body != null && JSON.stringify(params.body) !== JSON.stringify({})) {
@@ -266,10 +308,15 @@ function setHeaders (operation, contentType, params, request) {
 
   if (JSON.stringify(headers) !== JSON.stringify({})) {
     params.headers = JSON.stringify(headers, null, 4)
-  }
+    var toParseAsJavaHeader = params.headers.split('"')
+    params.javaHeaders = ''
+    for (var index = 1; index < toParseAsJavaHeader.length; index += 4) {
+      params.javaHeaders += '\t\t\t' + 'request.addHeader("' + toParseAsJavaHeader[index] + '", "' + toParseAsJavaHeader[index + 2] + '");\n'
+    }
+  } else { params.javaHeaders = '' }
 }
 
-function getExample (parameter) {
+function getExample(parameter) {
   if (parameter.content) {
     for (var type in parameter.content) {
       var example = getExample(parameter.content[type])

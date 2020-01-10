@@ -48,6 +48,10 @@
   "author": "",
   "license": "ISC",
   "standard": {
+    "ignore": [
+      "docs/",
+      "public/"
+    ],
     "globals": [
       "describe",
       "context",

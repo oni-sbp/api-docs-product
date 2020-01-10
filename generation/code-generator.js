@@ -122,7 +122,7 @@ function generateDocsForFile (request, path, apiName, examplesPath) {
     runShellCommand('mkdir "' + request.getRequestFolder() + 'slate/"', 20, process.cwd())
     runShellCommand('mkdir "' + request.getRequestFolder() + 'OAS/"', 20, process.cwd())
 
-    runShellCommand('cp -r ./docs/source "' + request.getRequestFolder() + '"', 20, process.cwd());
+    runShellCommand('cp -r ./docs/source "' + request.getRequestFolder() + '"', 20, process.cwd())
 
     runShellCommand(arg, 20, process.cwd() + '/docs/raml2markdown')
     runShellCommand('export PATH="/usr/share/rvm/gems/ruby-2.4.2/bin:/usr/share/rvm/gems/ruby-2.4.2@global/bin:/usr/share/rvm/rubies/ruby-2.4.2/bin:$PATH" && bundle exec middleman build --source "' + request.getDocsSource().replace(process.cwd().replace(/\\/g, '/'), '..') + '" --build-dir "' + request.getDocsBuild() + '"', 20, process.cwd() + '/docs')

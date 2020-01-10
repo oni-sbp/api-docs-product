@@ -1,0 +1,93 @@
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
+import java.io.IOException;
+
+public class Java {
+
+	private final CloseableHttpClient httpClient = HttpClients.createDefault();
+
+	public static void main(String[] args) throws Exception {
+
+		Java obj = new Java();
+		String path="<%= scheme %>://<%=server_name%><%=uri%><% if (locals.query_string) { %><%="?"%><%- query_string %>"<% } %>";
+
+		try {<% if(request_method == "post"){ %>
+			obj.sendPost(path);
+<% } %><% if(request_method == "get"){ %>
+			obj.sendGet(path);
+<% } %><% if(request_method == "put"){ %>
+			obj.sendPut(path);
+<% } %><% if(request_method == "delete"){ %>
+			obj.sendDelete(path);
+<% } %>		} catch (Exception e) {
+		e.printStackTrace();
+		}
+		obj.close();
+	}
+
+<% if(request_method == "post"){ %>
+	public void sendPost(String path) throws Exception {
+		HttpClient httpClient = HttpClientBuilder.create().build();
+		try {
+			HttpPost request = new HttpPost(path);
+<%- javaHeaders %><% if (locals.javaBody) { %>			StringEntity params =new StringEntity("<%- javaBody %>");
+			request.setEntity(params);
+ <% } %> 			HttpResponse response = httpClient.execute(request);
+			System.out.println(EntityUtils.toString(response.getEntity()));
+		}catch (Exception ex) {
+		} finally {
+		}
+	}
+<% } %><% if(request_method == "get"){ %>
+	public void sendGet(String path) throws Exception{
+		HttpClient httpClient = HttpClientBuilder.create().build();
+		try {
+			HttpGet request = new HttpGet(path);
+<%- javaHeaders %><% if (locals.javaBody) { %>			StringEntity params =new StringEntity("<%- javaBody %>");
+			request.setEntity(params);
+ <% } %>			HttpResponse response = httpClient.execute(request);
+			System.out.println(EntityUtils.toString(response.getEntity()));
+		}catch (Exception ex) {
+		} finally {
+		}
+	}
+<% } %><% if(request_method == "put"){ %>
+	public void sendPut(String path) throws Exception{
+		HttpClient httpClient = HttpClientBuilder.create().build();
+		try {
+		HttpPut request = new HttpPut(path);
+<%- javaHeaders %><% if (locals.javaBody) { %>			StringEntity params =new StringEntity("<%- javaBody %>");
+			request.setEntity(params);
+ <% } %>			HttpResponse response = httpClient.execute(request);
+			System.out.println(EntityUtils.toString(response.getEntity()));
+		}catch (Exception ex) {
+		} finally {
+		}
+	}
+<% } %><% if(request_method == "delete"){ %>
+	public void sendDelete(String path)throws Exception{
+		HttpClient httpClient = HttpClientBuilder.create().build();
+		try {
+			HttpDelete request = new HttpDelete(path);
+<%- javaHeaders %><% if (locals.javaBody) { %>			StringEntity params =new StringEntity("<%- javaBody %>");
+			request.setEntity(params);
+ <% } %>			HttpResponse response = httpClient.execute(request);
+			System.out.println(EntityUtils.toString(response.getEntity()));
+		}catch (Exception ex) {
+		} finally {
+		}
+	}
+<% } %>
+	public void close() throws IOException {
+		httpClient.close();
+	}
+}

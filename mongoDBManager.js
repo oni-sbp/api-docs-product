@@ -14,7 +14,9 @@ function insertOne (collectionName, element) {
     const collection = db.collection(collectionName)
 
     collection.insertOne(element, (_err, result) => {
-      console.log(_err)
+      if (_err) {
+        console.log(_err)
+      }
     })
   })
 }

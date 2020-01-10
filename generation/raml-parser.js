@@ -5,7 +5,7 @@ const write = require('./write-templates')
 const pathLib = require('path')
 const reporter = require('../reporter')
 
-async function parse (path, rootDirectory, examplesPath, params, request) {
+async function parse(path, rootDirectory, examplesPath, params, request) {
   reporter.log(request, 'Parsing ' + path)
 
   var directory = pathLib.dirname(path)
@@ -74,6 +74,8 @@ async function parse (path, rootDirectory, examplesPath, params, request) {
       params.query_string = null
       params.curl = null
       params.pyBody = null
+      params.javaBody = null
+      params.javaHeaders = null
     }
   }
 
@@ -82,7 +84,7 @@ async function parse (path, rootDirectory, examplesPath, params, request) {
   return title
 }
 
-function makeDebug (api) {
+function makeDebug(api) {
   var debug = {}
 
   for (var endpoint in api.endPoints) {
@@ -116,7 +118,7 @@ function makeDebug (api) {
   return debug
 }
 
-function getDebugFromParameter (parameter, debug) {
+function getDebugFromParameter(parameter, debug) {
   if (parameter.name.isNull || !parameter.schema) {
     return
   }
@@ -136,7 +138,7 @@ function getDebugFromParameter (parameter, debug) {
   }
 }
 
-function setHeaders (operation, contentType, params, request) {
+function setHeaders(operation, contentType, params, request) {
   var headers = {}
   if (operation.request) {
     for (var headerIndex in operation.request.headers) {
@@ -172,9 +174,14 @@ function setHeaders (operation, contentType, params, request) {
   if (JSON.stringify(headers) !== JSON.stringify({})) {
     params.headers = JSON.stringify(headers, null, 4)
   }
+  var toParseAsJavaHeader = params.headers.split('"')
+  params.javaHeaders = ''
+  for (var index = 1; index < toParseAsJavaHeader.length; index += 4) {
+    params.javaHeaders += '\t\t\t' + 'request.addHeader("' + toParseAsJavaHeader[index] + '", "' + toParseAsJavaHeader[index + 2] + '");\n'
+  }
 }
 
-function isJsonString (string) {
+function isJsonString(string) {
   try {
     JSON.parse(string)
   } catch (e) {
@@ -184,7 +191,7 @@ function isJsonString (string) {
   return true
 }
 
-function getQueryString (operation) {
+function getQueryString(operation) {
   var params = {}
   if (operation.request) {
     for (var parameterIndex in operation.request.queryParameters) {
@@ -217,7 +224,7 @@ function getQueryString (operation) {
   return null
 }
 
-function setBody (operation, params) {
+function setBody(operation, params) {
   if (operation.request) {
     for (var i = 0; i < operation.request.payloads.length; ++i) {
       if (operation.request.payloads[i].schema != null) {
@@ -247,6 +254,11 @@ function setBody (operation, params) {
               }
             }
             params.pyBody = checkBoolValue.join("'")
+            //  console.log(params.javaBody)
+            params.javaBody = params.body
+            params.javaBody = params.javaBody.split('"').join('\\"').split(/\r\n|\r|\n/).join('')
+
+            //  console.log(params.javaBody)
             return
           }
         }
@@ -256,11 +268,12 @@ function setBody (operation, params) {
     if (operation.request.payloads.length > 0) {
       params.body = JSON.stringify({})
       params.pyBody = JSON.stringify({})
+      params.javaBody = JSON.stringify({})
     }
   }
 }
 
-function get2xxResponse (operation) {
+function get2xxResponse(operation) {
   var noExample = { status: '', body: '' }
   for (var responseIndex in operation.responses) {
     var response = operation.responses[responseIndex]
@@ -289,7 +302,7 @@ function get2xxResponse (operation) {
   return noExample
 }
 
-function setCurl (params) {
+function setCurl(params) {
   var curl = 'curl -i -X ' + params.request_method.toUpperCase() + ' \\\n'
 
   if (params.headers) {
