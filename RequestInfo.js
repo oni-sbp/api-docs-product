@@ -6,7 +6,7 @@ const Guid = require('guid')
 const mongoDBManager = require('./mongoDBManager')
 const collectionName = 'Generation'
 
-async function getRequest (id) {
+async function getRequest(id) {
   return new Promise((resolve, reject) => {
     var request = new RequestInfo()
 
@@ -39,7 +39,7 @@ async function getRequest (id) {
   })
 }
 
-async function createRequest (id) {
+async function createRequest(id) {
   return new Promise((resolve, reject) => {
     var request = new RequestInfo()
 
@@ -57,7 +57,7 @@ async function createRequest (id) {
   })
 }
 
-async function createFalseRequest (id) {
+async function createFalseRequest(id) {
   return new Promise((resolve, reject) => {
     var request = new RequestInfo()
     request.id = id
@@ -65,7 +65,7 @@ async function createFalseRequest (id) {
   })
 }
 class RequestInfo {
-  createRequestFolder () {
+  createRequestFolder() {
     try {
       fs.mkdirSync(this.getRequestFolder())
     } catch (err) {
@@ -74,7 +74,7 @@ class RequestInfo {
     }
   }
 
-  getRequestFolder () {
+  getRequestFolder() {
     var fileName = constants.TEMP_FILES_FOLDER + 'request_' + this.id + '/'
     if (info.onWindows) {
       fileName = fileName.replace(/\\/g, '/')
@@ -83,19 +83,19 @@ class RequestInfo {
     return fileName
   }
 
-  getGenerationLogFile () {
+  getGenerationLogFile() {
     return this.getRequestFolder() + constants.GENERATION_LOG_FILE
   }
 
-  getValidationLogFile () {
+  getValidationLogFile() {
     return this.getRequestFolder() + constants.VALIDATION_LOG_FILE
   }
 
-  getArchive () {
+  getArchive() {
     return this.getRequestFolder() + constants.ARCHIVE_NAME
   }
 
-  getGeneratedSamplesFolder () {
+  getGeneratedSamplesFolder() {
     var folder = this.getRequestFolder() + constants.GENERATED_EXAMPLES_FOLDER
     try {
       if (!fs.existsSync(folder)) {
@@ -109,20 +109,20 @@ class RequestInfo {
     return folder
   }
 
-  getDocsPage () {
+  getDocsPage() {
     return this.getRequestFolder() + constants.DOCS_PAGE
   }
 
-  getDocsBuild () {
+  getDocsBuild() {
     return this.getRequestFolder() + constants.DOCS_BUILD
   }
 
-  getDocsSource () {
+  getDocsSource() {
     return this.getRequestFolder() + constants.DOCS_SOURCE
   }
 
-  setLanguages (fields) {
-    this.languages = ['slate', 'java']
+  setLanguages(fields) {
+    this.languages = ['slate']
 
     for (var language in info.acceptedLanguages) {
       if (fields[info.acceptedLanguages[language]] === 'true') {
@@ -137,7 +137,7 @@ class RequestInfo {
     this.validationLanguages = this.languages.filter(lang => info.acceptedValidationLanguages.indexOf(lang) !== -1)
   }
 
-  getElementForDB () {
+  getElementForDB() {
     return {
       id: this.id,
       failedTests: this.failedTests,
@@ -161,7 +161,7 @@ class RequestInfo {
   }
 }
 
-function getDate () {
+function getDate() {
   const ts = Date.now()
 
   const dateOb = new Date(ts)

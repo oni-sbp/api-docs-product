@@ -24,7 +24,7 @@
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css"
     integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
   <link rel="icon" href="images/favicon.png">
-  
+
   <!-- Global site tag (gtag.js) - Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=UA-155979999-1"></script>
   <script>
@@ -34,7 +34,7 @@
 
     gtag('config', 'UA-155979999-1');
   </script>
-  
+
   <!-- Hotjar Tracking Code for http://34.221.206.48 -->
   <script>
     (function (h, o, t, j, a, r) {
@@ -173,6 +173,7 @@
         formData.append('auth_token', $("input[name=auth_token]")[0].value);
         formData.append('python', $("input[name=python]")[0].checked);
         formData.append('unirest.node', $("input[name='unirest.node']")[0].checked);
+        formData.append('java', $("input[name='java']")[0].checked);
         formData.append('curl', $("input[name=curl]")[0].checked);
         formData.append('2xx-response', $("input[name=2xx-response]")[0].checked);
         formData.append('keyword', $("input[name=keyword]")[0].value);
@@ -487,6 +488,12 @@
                 <div class="flex">
                   <label class="container" for="tech4">2xx-response
                     <input id="tech4" type="checkbox" checked name="2xx-response" />
+                    <span class="checkmark"></span>
+                  </label>
+                </div>
+                <div class="flex">
+                  <label class="container" for="tech5"> Java
+                    <input id="tech5" type="checkbox" checked name="java" />
                     <span class="checkmark"></span>
                   </label>
                 </div>
