@@ -24,21 +24,22 @@
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css"
     integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
   <link rel="icon" href="images/favicon.png">
+  
   <!-- Global site tag (gtag.js) - Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-156024843-1"></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-155979999-1"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag() { dataLayer.push(arguments); }
     gtag('js', new Date());
 
-    gtag('config', 'UA-156024843-1');
+    gtag('config', 'UA-155979999-1');
   </script>
-
-  <!-- Hotjar Tracking Code for http://apiengine.oftrust.net/ -->
+  
+  <!-- Hotjar Tracking Code for http://34.221.206.48 -->
   <script>
     (function (h, o, t, j, a, r) {
       h.hj = h.hj || function () { (h.hj.q = h.hj.q || []).push(arguments) };
-      h._hjSettings = { hjid: 1638044, hjsv: 6 };
+      h._hjSettings = { hjid: 1637917, hjsv: 6 };
       a = o.getElementsByTagName('head')[0];
       r = o.createElement('script'); r.async = 1;
       r.src = t + h._hjSettings.hjid + j + h._hjSettings.hjsv;
@@ -47,25 +48,11 @@
   </script>
 
 
+
   <script>
     document.addEventListener("DOMContentLoaded", function (event) {
       window.scrollTo(0, document.body.scrollHeight);
     });
-
-    function isValidationReady(fileName) {
-      return true;
-      $.ajax({
-        url: '/readyLogFile',
-        data: {
-          file: fileName
-        },
-        success: function (data) {
-          alert('success!')
-        }
-      })
-
-      return false;
-    }
 
     function validateForm() {
       var x = document.forms["submitForm"]["url"].value;
@@ -75,12 +62,18 @@
         return false;
       }
       document.getElementById("waitingContainer").style.display = "block";
-      document.getElementById("logs").style.display = "none";
+
+      if (document.getElementById("logs")) {
+        document.getElementById("logs").style.display = "none";
+      }
+
+      return true;
     }
 
     function removeValidator() {
       document.getElementById("validatorFile").style.display = "none";
     }
+
     function myFunction() {
       var x = document.getElementById("ButtonExpand");
       var y = document.getElementById("firstSubmitButton");
@@ -162,10 +155,148 @@
       $("#ConfigFileName").val("");
       document.getElementById("validatorExtension").style.display = "none";
     }
+
+    $(function () {
+      $("#form").submit(function (e) {
+        e.preventDefault();
+
+        var form = $(this);
+        var url = form.attr('action');
+        var formData = new FormData();
+        formData.append('file', $("#FileUpload").get(0).files[0]);
+        formData.append('config', $("#ConfigUpload").get(0).files[0]);
+        formData.append('url', $("input[name=url]")[0].value);
+        formData.append('config_url', $("input[name=config_url]")[0].value);
+        formData.append('host', $("input[name=host]")[0].value);
+        formData.append('scheme', $("input[name=scheme]:checked")[0].value);
+        formData.append('authentication', $("input[name=authentication]:checked")[0].value);
+        formData.append('auth_token', $("input[name=auth_token]")[0].value);
+        formData.append('python', $("input[name=python]")[0].checked);
+        formData.append('unirest.node', $("input[name='unirest.node']")[0].checked);
+        formData.append('curl', $("input[name=curl]")[0].checked);
+        formData.append('2xx-response', $("input[name=2xx-response]")[0].checked);
+        formData.append('keyword', $("input[name=keyword]")[0].value);
+        formData.append('validate', $("input[name=validate]")[0].checked);
+
+        if (validateForm()) {
+          $.ajax({
+            type: "POST",
+            url: url,
+            enctype: 'multipart/form-data',
+            processData: false,
+            contentType: false,
+            data: formData,
+            success: function (data) {
+              console.log('initial response', data);
+
+              getSubmitLog(data.requestId, data.origin, data.validate, 0)
+            },
+            error: function () {
+              alert("Submission failed!");
+            }
+          });
+
+          $("#OpenModalButton").click();
+        }
+      })
+
+      function getSubmitLog(requestId, origin, validate, stage) {
+        var stages = [
+          'Processing submitted data',
+          'Generating samples',
+          'Generating docs',
+          'Generating archive',
+          'Installing prerequisites',
+          'Running samples for '
+        ]
+
+        var languages = [
+          'JavaScript',
+          'Python',
+          'cURL'
+        ]
+
+        $.ajax({
+          type: "GET",
+          url: "progress?requestId=" + requestId + "&stage=" + stage + "&validate=" + validate,
+          success: function (data) {
+            if (data.ready) {
+              window.location.href = '/readyindex?validate=' + validate + '&origin=' + origin + '&requestId=' + requestId;
+            } else {
+              // write log
+              console.log(data)
+              var textarea = $("#Console")
+              textarea.val(textarea.val() + data.newLog)
+              textarea.scrollTop(textarea[0].scrollHeight)
+
+              var stage = parseInt(data.stage)
+              var stageHeader = document.getElementById("Stage");
+
+              if (stage === 4) {
+                var fullLog = textarea.val()
+                var pos = -1
+                var max = -1
+
+                for (var langIndex in languages) {
+                  var position = fullLog.indexOf('======== ' + languages[langIndex] + ' ========')
+                  if (position > max) {
+                    max = position
+                    pos = langIndex
+                  }
+                }
+
+                if (validate) {
+                  if (pos == -1) {
+                    stageHeader.innerHTML = stages[4]
+                  } else {
+                    stageHeader.innerHTML = stages[5] + languages[pos]
+                  }
+                }
+              } else {
+                stageHeader.innerHTML = stages[stage]
+              }
+
+              setTimeout(function () {
+                getSubmitLog(requestId, origin, validate, stage)
+              }, 500)
+            }
+          }
+        })
+      }
+
+
+
+    })
   </script>
 </head>
 
 <body class="mainBody">
+  <!-- Trigger the modal with a button -->
+  <button id="OpenModalButton" style="display:none;" type="button" class="btn btn-info btn-lg" data-toggle="modal"
+    data-target="#LogModal">Open Modal</button>
+
+  <!-- Modal -->
+  <div id="LogModal" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false"
+    style="max-width: 2550px!important;">
+    <div class="modal-dialog">
+
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">
+            <div id="Stage" style="display: inline-block;"></div>
+            <div style="display: inline-block;" class="spinner-border"></div>
+          </h4>
+        </div>
+        <div class="modal-body">
+          <textarea id="Console" spellcheck="false" disabled></textarea>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
   <div id="waitingContainer" style="display: none;">
     <div class="overlay">
     </div>
@@ -208,7 +339,7 @@
       <div class="mainInfo">Provide API spec file</div>
     </div>
     <div style=" margin-right: auto; margin-left: auto;  max-width: 1000;">
-      <form action="fileupload" method="post" name="submitForm" enctype="multipart/form-data"
+      <form id="form" action="fileupload" method="post" name="submitForm" enctype="multipart/form-data"
         onsubmit="return validateForm()">
         <div class="temp transparentBorder center-block" style=" max-width: 1000;">
           <div class="bodyAlign">
@@ -325,7 +456,7 @@
                   <label for="auth2">Basic</label>
                 </div>
                 <div class="flex inline-div float-left radio-div">
-                  <input id="auth3" type="radio" value="Basic" name="authentication" />
+                  <input id="auth3" type="radio" value="bearer" name="authentication" />
                   <label for="auth2">Bearer</label>
                 </div>
                 <br><br>

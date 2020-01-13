@@ -88,6 +88,7 @@ function validExtension (file, validExtensions) {
 }
 
 function loadCodeSamples (request, root, keyword = '') {
+  console.log(request.validationLanguages)
   var languages = request.validationLanguages
   var samples = []
   var validExtensions = []

@@ -22,11 +22,21 @@ var httpMethods = ['POST', 'GET', 'PUT', 'DELETE']
 
 var onWindows = process.platform === 'win32'
 
+var requestReady = {}
+var generationLogPosition = {}
+var validationLogPosition = {}
+
+var started = {}
+
 module.exports = {
   extension,
   acceptedLanguages,
   acceptedValidationLanguages,
   fileNameEnding,
   httpMethods,
-  onWindows
+  onWindows,
+  requestReady,
+  validationLogPosition,
+  generationLogPosition,
+  started
 }

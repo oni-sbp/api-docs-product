@@ -6,15 +6,14 @@ const Guid = require('guid')
 const mongoDBManager = require('./mongoDBManager')
 const collectionName = 'Generation'
 
-async function createRequest(id) {
+async function getRequest (id) {
   return new Promise((resolve, reject) => {
     var request = new RequestInfo()
-    if (id) {
-      mongoDBManager.getElementById(collectionName, id).then((element) => {
-        if (!element) {
-          resolve(null)
-        }
 
+    mongoDBManager.getElementById(collectionName, id).then((element) => {
+      if (!element) {
+        resolve(null)
+      } else {
         request.id = element.id
         request.failedTests = element.failedTests
         request.totalTests = element.totalTests
@@ -23,24 +22,50 @@ async function createRequest(id) {
         request.generateExamplesTime = element.generateExamplesTime
         request.generateDocsTime = element.generateDocsTime
         request.validationTime = element.validationTime
-        request.env = {}
-        request.authentication = 'None'
+        request.env = element.env
+        request.authentication = element.authentication
+        request.conf = JSON.parse(element.conf)
+        request.pathToSpecs = element.pathToSpecs
+        request.languages = element.languages
+        request.apiNames = element.apiNames
+        request.type = element.type
+        request.stage = element.stage
+        request.validate = element.validate
+        request.validationLanguages = element.validationLanguages
 
         resolve(request)
-      })
-    } else {
-      request.id = Guid.create().value
-      request.createdDate = getDate()
-      request.env = {}
-      request.authentication = 'None'
-
-      resolve(request)
-    }
+      }
+    })
   })
 }
 
+async function createRequest (id) {
+  return new Promise((resolve, reject) => {
+    var request = new RequestInfo()
+
+    if (id) {
+      request.id = id
+    } else {
+      request.id = Guid.create().value
+    }
+
+    request.createdDate = getDate()
+    request.env = {}
+    request.authentication = 'None'
+
+    resolve(request)
+  })
+}
+
+async function createFalseRequest (id) {
+  return new Promise((resolve, reject) => {
+    var request = new RequestInfo()
+    request.id = id
+    resolve(request)
+  })
+}
 class RequestInfo {
-  createRequestFolder() {
+  createRequestFolder () {
     try {
       fs.mkdirSync(this.getRequestFolder())
     } catch (err) {
@@ -49,7 +74,7 @@ class RequestInfo {
     }
   }
 
-  getRequestFolder() {
+  getRequestFolder () {
     var fileName = constants.TEMP_FILES_FOLDER + 'request_' + this.id + '/'
     if (info.onWindows) {
       fileName = fileName.replace(/\\/g, '/')
@@ -58,19 +83,19 @@ class RequestInfo {
     return fileName
   }
 
-  getGenerationLogFile() {
+  getGenerationLogFile () {
     return this.getRequestFolder() + constants.GENERATION_LOG_FILE
   }
 
-  getValidationLogFile() {
+  getValidationLogFile () {
     return this.getRequestFolder() + constants.VALIDATION_LOG_FILE
   }
 
-  getArchive() {
+  getArchive () {
     return this.getRequestFolder() + constants.ARCHIVE_NAME
   }
 
-  getGeneratedSamplesFolder() {
+  getGeneratedSamplesFolder () {
     var folder = this.getRequestFolder() + constants.GENERATED_EXAMPLES_FOLDER
     try {
       if (!fs.existsSync(folder)) {
@@ -84,23 +109,23 @@ class RequestInfo {
     return folder
   }
 
-  getDocsPage() {
+  getDocsPage () {
     return this.getRequestFolder() + constants.DOCS_PAGE
   }
 
-  getDocsBuild() {
+  getDocsBuild () {
     return this.getRequestFolder() + constants.DOCS_BUILD
   }
 
-  getDocsSource() {
+  getDocsSource () {
     return this.getRequestFolder() + constants.DOCS_SOURCE
   }
 
-  setLanguages(fields) {
+  setLanguages (fields) {
     this.languages = ['slate', 'java']
 
     for (var language in info.acceptedLanguages) {
-      if (fields[info.acceptedLanguages[language]] === 'on') {
+      if (fields[info.acceptedLanguages[language]] === 'true') {
         this.languages.push(info.acceptedLanguages[language])
       }
     }
@@ -111,9 +136,32 @@ class RequestInfo {
 
     this.validationLanguages = this.languages.filter(lang => info.acceptedValidationLanguages.indexOf(lang) !== -1)
   }
+
+  getElementForDB () {
+    return {
+      id: this.id,
+      failedTests: this.failedTests,
+      totalTests: this.totalTests,
+      createdDate: this.createdDate,
+      IP: this.IP,
+      generateExamplesTime: this.generateExamplesTime,
+      generateDocsTime: this.generateDocsTime,
+      validationTime: this.validationTime,
+      authentication: this.authentication,
+      env: this.env,
+      conf: JSON.stringify(this.conf),
+      languages: this.languages,
+      pathToSpecs: this.pathToSpecs,
+      apiNames: this.apiNames,
+      type: this.type,
+      stage: this.stage,
+      validate: this.validate,
+      validationLanguages: this.validationLanguages
+    }
+  }
 }
 
-function getDate() {
+function getDate () {
   const ts = Date.now()
 
   const dateOb = new Date(ts)
@@ -125,5 +173,7 @@ function getDate() {
 
 module.exports = {
   RequestInfo,
-  createRequest
+  createRequest,
+  createFalseRequest,
+  getRequest
 }

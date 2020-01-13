@@ -1,92 +1,140 @@
 const formidable = require('formidable')
 const fs = require('fs-extra')
-const archiver = require('archiver')
 const info = require('./info')
 const express = require('express')
 const app = express()
 var port = 80
-const validator = require('./validation/code-validator')
 const generator = require('./generation/code-generator')
+const validator = require('./validation/code-validator')
 const requestInfo = require('./RequestInfo')
 const mongoDBManager = require('./mongoDBManager')
-
-var fileReady = {}
+const Guid = require('guid')
 
 app.use(express.static('public'))
+app.use(express.json())
 
 app.post('/fileupload', (req, res) => {
   var form = new formidable.IncomingForm()
-
   form.parse(req, function (err, fields, files) {
     if (err) {
       req.app.locals.errorMessage = 'Form could not be loaded.'
       res.redirect('/ErrorPage')
     }
 
-    requestInfo.createRequest().then((request) => {
-      request.createRequestFolder()
-      request.IP = req.connection.remoteAddress
+    var newId = Guid.create().value
+    res.writeHead(200, { 'Content-Type': 'application/json' })
+    res.write(JSON.stringify({ requestId: newId, origin: req.headers.origin, validate: (fields.validate === 'true') }))
+    res.end()
 
-      request.logFileStream = fs.createWriteStream(request.getGenerationLogFile(), { flags: 'w' })
+    requestInfo.createRequest(newId).then((request) => {
+      info.requestReady[request.id] = false
+      info.generationLogPosition[request.id] = 0
+      info.validationLogPosition[request.id] = 0
 
-      generator.generateSamples(fields, files, request).then((samplesPath) => {
-        if (samplesPath === '') {
-          req.app.locals.errorMessage = 'API specification not found'
-          res.redirect('/ErrorPage')
-        } else {
-          request.logFileStream = fs.createWriteStream(request.getValidationLogFile(), { flags: 'w' })
-          fields.samplespath = samplesPath
+      setImmediate(function () {
+        request.createRequestFolder()
+        request.IP = req.connection.remoteAddress
 
-          var archive = archiver('zip')
-          archive.directory(samplesPath, 'samples')
-
-          var archiveFile = fs.createWriteStream(request.getArchive(), { flags: 'w' })
-          archive.pipe(archiveFile)
-          archive.finalize()
-
-          if (fields.validate === 'on') {
-            // fileReady[validationLogFile] = false
-          }
-          validator.validateGeneratedSamples(fields, files, request).then(() => {
-            const newElement = {
-              id: request.id,
-              failedTests: request.failedTests,
-              totalTests: request.totalTests,
-              createdDate: request.createdDate,
-              IP: request.IP,
-              generateExamplesTime: request.generateExamplesTime,
-              generateDocsTime: request.generateDocsTime,
-              validationTime: request.validationTime
-            }
-
-            mongoDBManager.insertOne('Generation', newElement)
-
-            fs.readFile('index.html', function (err, data) {
-              if (!err) {
-                res.writeHead(200, { 'Content-Type': 'text/html' })
-
-                data += '<div id="logs"><center><p style="color: #9073FF;">If you want to see the results later save next link: </p>'
-                data += '<p><a href="/results?requestID=' + request.id + '" class="link">' + req.headers.origin + '/results?requestID=' + request.id + '</a></p>'
-                data += '<p><a download href="/generationLogFile?requestID=' + request.id + '" class="link">Generation Log File</a></p>\n'
-                if (fields.validate === 'on') {
-                  data += '<p><a download href="/validationLogFile?requestID=' + request.id + '" class="link" onclick="isValidationReady()">Validation Log File</a></p>\n'
-                }
-                data += '<p style="color: #9073FF;">Generated examples:</p>'
-                data += '<p><a download href="/archive?requestID=' + request.id + '" class="link">Download</a><center>'
-                data += '<p><a target="_blank" href="/docsOfTrust?requestID=' + request.id + '" class="link">View</a></center><div>\n'
-
-                res.write(data)
-              }
-
-              res.end()
-            })
-
-            fileReady[request.getValidationLogFile()] = true
-          })
-        }
+        generator.saveFormInfoToRequest(fields, files, request)
       })
     })
   })
+})
+
+app.get('/progress', (req, res) => {
+  if (info.requestReady[req.query.requestId]) {
+    res.writeHead(200, { 'Content-Type': 'application/json' })
+    res.write(JSON.stringify({ ready: true }))
+    res.end()
+  } else {
+    var stage = parseInt(req.query.stage)
+
+    requestInfo.getRequest(req.query.requestId).then((request) => {
+      var newLog = ''
+      if (request) {
+        try {
+          var data = fs.readFileSync(request.getGenerationLogFile(), 'utf8')
+          if (info.generationLogPosition[request.id] !== data.length) {
+            if (info.generationLogPosition[request.id] === 0) {
+              newLog += 'Generation:\n'
+            }
+
+            newLog += data.slice(info.generationLogPosition[request.id])
+            info.generationLogPosition[request.id] = data.length
+          }
+        } catch (err) {
+          console.log('Error: Generation file not ready')
+        }
+
+        if (req.query.validate === 'true') {
+          try {
+            data = fs.readFileSync(request.getValidationLogFile(), 'utf8')
+            if (info.validationLogPosition[request.id] !== data.length) {
+              if (info.validationLogPosition[request.id] === 0) {
+                newLog += '\nValidation:\n'
+              }
+
+              newLog += data.slice(info.validationLogPosition[request.id])
+              info.validationLogPosition[request.id] = data.length
+            }
+          } catch (err) {
+            console.log('Error: Validation file not ready')
+          }
+        }
+
+        var content = JSON.stringify({ ready: false, newLog: newLog, stage: request.stage })
+
+        res.writeHead(200, { 'Content-Type': 'application/json', 'Content-Length': content.length })
+        res.write(content)
+        res.end()
+
+        switch (stage) {
+          case 0:
+            if (!info.started[request.id]) {
+              setImmediate(generator.generateSamples, request)
+              info.started[request.id] = 1
+            }
+            break
+
+          case 1:
+            if (info.started[request.id] === 1) {
+              setImmediate(generator.generateDocs, request)
+              info.started[request.id] = 2
+            }
+            break
+
+          case 2:
+            if (info.started[request.id] === 2) {
+              setImmediate(generator.generateArchive, request)
+              info.started[request.id] = 3
+            }
+            break
+
+          case 3:
+            if (info.started[request.id] === 3) {
+              setImmediate(validator.validateGeneratedSamples, request)
+              info.started[request.id] = 4
+            }
+            break
+        }
+      } else {
+        content = JSON.stringify({ ready: false, newLog: '', stage: req.query.stage })
+
+        res.writeHead(200, { 'Content-Type': 'application/json', 'Content-Length': content.length })
+        res.write(content)
+        res.end()
+      }
+    })
+  }
+})
+
+app.get('/readyindex', (req, res) => {
+  req.app.locals.requestId = req.query.requestId
+  req.app.locals.validate = (req.query.validate === 'true')
+  req.app.locals.origin = req.query.origin
+  req.app.locals.ready = true
+
+  res.redirect('/')
 })
 
 app.get('/', (req, res) => {
@@ -94,6 +142,19 @@ app.get('/', (req, res) => {
     if (err) {
       req.app.locals.errorMessage = 'Page not found'
       res.redirect('/ErrorPage')
+    }
+
+    if (req.app.locals.ready) {
+      req.app.locals.ready = false
+      data += '<div id="logs"><center><p style="color: #9073FF;">If you want to see the results later save next link: </p>'
+      data += '<p><a href="/results?requestID=' + req.app.locals.requestId + '" class="link">' + req.app.locals.origin + '/results?requestID=' + req.app.locals.requestId + '</a></p>'
+      data += '<p><a download href="/generationLogFile?requestID=' + req.app.locals.requestId + '" class="link">Generation Log File</a></p>\n'
+      if (req.app.locals.validate) {
+        data += '<p><a download href="/validationLogFile?requestID=' + req.app.locals.requestId + '" class="link" onclick="isValidationReady()">Validation Log File</a></p>\n'
+      }
+      data += '<p style="color: #9073FF;">Generated examples:</p>'
+      data += '<p><a download href="/archive?requestID=' + req.app.locals.requestId + '" class="link">Download</a><center>'
+      data += '<p><a target="_blank" href="/docsOfTrust?requestID=' + req.app.locals.requestId + '" class="link">View</a></center><div>\n'
     }
 
     res.writeHead(200, { 'Content-Type': 'text/html', 'Content-Length': data.length })
@@ -201,12 +262,6 @@ app.get('/archive', (req, res) => {
       })
     }
   })
-})
-
-app.get('/readyLogFile', (req, res) => {
-  console.log(req)
-
-  // res.send({ready: readFile[req.]});
 })
 
 app.get('/docsOfTrust', (req, res) => {

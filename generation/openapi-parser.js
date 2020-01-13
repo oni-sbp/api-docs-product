@@ -5,7 +5,7 @@ const SwaggerParser = require('swagger-parser')
 const ramlParser = require('./raml-parser')
 const reporter = require('../reporter')
 
-async function parse(path, rootDirectory, examplesPath, params, request) {
+async function parse (path, rootDirectory, examplesPath, params, request) {
   reporter.log(request, 'Parsing ' + path)
   var api = await SwaggerParser.dereference(path).catch((error) => {
     console.log(error)
@@ -109,7 +109,6 @@ async function parse(path, rootDirectory, examplesPath, params, request) {
         params.query_string = null
         params.pyBody = null
         params.javaHeaders = null
-
       }
     }
   }
@@ -117,7 +116,7 @@ async function parse(path, rootDirectory, examplesPath, params, request) {
   return title
 }
 
-function getDebug(dict, debug) {
+function getDebug (dict, debug) {
   for (var key in dict) {
     var data = dict[key]
 
@@ -153,11 +152,9 @@ function getDebug(dict, debug) {
       }
     }
   }
-
-
 }
 
-function get2xxResponse(operation) {
+function get2xxResponse (operation) {
   var noExample = { status: '', body: '' }
   if (operation.responses) {
     for (var response in operation.responses) {
@@ -178,7 +175,7 @@ function get2xxResponse(operation) {
   return noExample
 }
 
-function getQueryString(operation) {
+function getQueryString (operation) {
   var params = {}
   if (operation.parameters) {
     for (var parameterIndex in operation.parameters) {
@@ -203,7 +200,7 @@ function getQueryString(operation) {
   return null
 }
 
-function getBody(operation, request) {
+function getBody (operation, request) {
   var hasBody = false
 
   if (operation.requestBody) {
@@ -246,7 +243,7 @@ function getBody(operation, request) {
   return null
 }
 
-function setBody(operation, params) {
+function setBody (operation, params) {
   if (params.body) {
     params.pyBody = params.body
     var checkBoolValue = params.pyBody.split('"')
@@ -277,8 +274,7 @@ function setBody(operation, params) {
   }
 }
 
-
-function setHeaders(operation, contentType, params, request) {
+function setHeaders (operation, contentType, params, request) {
   var headers = {}
 
   if (operation.parameters) {
@@ -295,7 +291,6 @@ function setHeaders(operation, contentType, params, request) {
         }
       }
     }
-
   }
 
   if (contentType && !headers['Content-Type'] && params.body != null && JSON.stringify(params.body) !== JSON.stringify({})) {
@@ -316,7 +311,7 @@ function setHeaders(operation, contentType, params, request) {
   } else { params.javaHeaders = '' }
 }
 
-function getExample(parameter) {
+function getExample (parameter) {
   if (parameter.content) {
     for (var type in parameter.content) {
       var example = getExample(parameter.content[type])

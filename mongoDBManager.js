@@ -21,6 +21,29 @@ function insertOne (collectionName, element) {
   })
 }
 
+function updateOne (collectionName, id, values) {
+  mongo.connect(url, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  }, (err, client) => {
+    if (err) {
+      console.log(err)
+    }
+
+    const db = client.db(DBName)
+    const collection = db.collection(collectionName)
+
+    var myQuery = { id: id }
+    var newValues = { $set: values }
+    collection.updateOne(myQuery, newValues, function (err, res) {
+      if (err) {
+        console.log(err)
+      }
+      client.close()
+    })
+  })
+}
+
 async function getElementById (collectionName, id) {
   return new Promise(function (resolve, reject) {
     mongo.connect(url, {
@@ -30,6 +53,7 @@ async function getElementById (collectionName, id) {
       if (err) {
         console.error(err)
       }
+
       const db = client.db(DBName)
       const collection = db.collection(collectionName)
 
@@ -83,5 +107,6 @@ async function getStatistics () {
 module.exports = {
   insertOne,
   getElementById,
-  getStatistics
+  getStatistics,
+  updateOne
 }

@@ -4,6 +4,8 @@ const NodeRunner = require('./runners/js').NodeRunner
 const TestExecutionResultMap = require('./validation-classes').TestExecutionResultMap
 const ResourceRegistry = require('./resources/resource-registry').ResourceRegistry
 const Reporter = require('../reporter').Reporter
+const info = require('../info')
+const mongoDBManager = require('../mongoDBManager')
 
 class TestSession {
   constructor (request, samples) {
@@ -20,59 +22,77 @@ class TestSession {
   }
 
   async run () {
-    var reporter = new Reporter(this.request)
     var samplesByLang = {
       'unirest.node': [],
       python: [],
       curl: []
     }
 
-    var results = []
-
     for (var sampleIndex in this.samples) {
       var sample = this.samples[sampleIndex]
       samplesByLang[sample.language()].push(sample)
     }
 
-    for (var lang in samplesByLang) {
-      results = results.concat(await this.runApiTestsForLang(samplesByLang[lang], lang))
-    }
-
-    reporter.printTestSessionReport(results)
-    var failedCount = 0
-    for (var result in results) {
-      failedCount += results[result].failed() ? 1 : 0
-    }
-
-    return failedCount
+    setImmediate(this.runSamplesForLang, this, samplesByLang, [])
   }
 
-  async runApiTestsForLang (samples, lang) {
-    Reporter.showLanguageScopeRun(lang, this.request)
+  runSamplesForLang (testSession, samplesByLang, results) {
+    // If there is no language left
+    if (!Object.keys(samplesByLang).length) {
+      var reporter = new Reporter(testSession.request)
+      reporter.printTestSessionReport(results)
+      var failedCount = 0
+      for (var result in results) {
+        failedCount += results[result].failed() ? 1 : 0
+      }
 
-    var testResults = []
-    var dataSubstitutions = {}
-    var allSubstitutions = {}
+      testSession.request.failedTests = failedCount
+      mongoDBManager.insertOne('Generation', testSession.request.getElementForDB())
+      info.requestReady[testSession.request.id] = true
 
-    for (var sampleIndex in samples) {
-      var sample = samples[sampleIndex]
-      var prerequisiteSubs = await this.extractPrerequisiteSubs(sample)
-      var substitutions = await this.getSubstitutions(sample, lang, dataSubstitutions, allSubstitutions, prerequisiteSubs)
-      allSubstitutions = Object.assign(allSubstitutions, substitutions)
-
-      Reporter.showTestIsRunning(sample, this.request)
-      var testResult = this.runners[lang].runSample(sample, substitutions)
-
-      this._testResultsMap.put(testResult, this.request.conf.resp_attr_replacements[sample.name], prerequisiteSubs)
-      testResults.push(testResult)
-
-      dataSubstitutions = Object.assign(dataSubstitutions, this.requestSubstitutions(sample))
-      dataSubstitutions = Object.assign(dataSubstitutions, this.makeSubstitutions(testResult.jsonBody))
-      Reporter.showShortTestStatus(testResult, this.request)
+      return
     }
 
-    await this._resourceRegistry.cleanup()
-    return testResults
+    // We run tests for the first language left, after that we remove it
+    for (var lang in samplesByLang) {
+      Reporter.showLanguageScopeRun(lang, testSession.request)
+
+      var samples = samplesByLang[lang].slice()
+      delete samplesByLang[lang]
+
+      setImmediate(testSession.runSample, testSession, samples, 0, {}, {}, samplesByLang, results, lang)
+
+      break
+    }
+  }
+
+  async runSample (testSession, samples, index, dataSubstitutions, allSubstitutions, samplesByLang, results, lang) {
+    // When all samples for this language are done
+    if (index === samples.length) {
+      await testSession._resourceRegistry.cleanup()
+
+      setImmediate(testSession.runSamplesForLang, testSession, samplesByLang, results)
+
+      return
+    }
+
+    // We run the current index sample
+    var sample = samples[index]
+    var prerequisiteSubs = await testSession.extractPrerequisiteSubs(sample)
+    var substitutions = await testSession.getSubstitutions(sample, lang, dataSubstitutions, allSubstitutions, prerequisiteSubs)
+    allSubstitutions = Object.assign(allSubstitutions, substitutions)
+
+    Reporter.showTestIsRunning(sample, testSession.request)
+    var testResult = testSession.runners[lang].runSample(sample, substitutions)
+
+    testSession._testResultsMap.put(testResult, testSession.request.conf.resp_attr_replacements[sample.name], prerequisiteSubs)
+    results.push(testResult)
+
+    dataSubstitutions = Object.assign(dataSubstitutions, testSession.requestSubstitutions(sample))
+    dataSubstitutions = Object.assign(dataSubstitutions, testSession.makeSubstitutions(testResult.jsonBody))
+    Reporter.showShortTestStatus(testResult, testSession.request)
+
+    setImmediate(testSession.runSample, testSession, samples, index + 1, dataSubstitutions, allSubstitutions, samplesByLang, results, lang)
   }
 
   async getSubstitutions (sample, lang, dataSubstitutions, allSubstitutions, prerequisiteSubs) {

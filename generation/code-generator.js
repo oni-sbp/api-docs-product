@@ -5,17 +5,67 @@ const pathLib = require('path')
 const utils = require('../utils')
 const Config = require('../conf/conf').Config
 const runShellCommand = require('../validation/utils').runShellCommand
+const archiver = require('archiver')
+const reporter = require('../reporter')
+const mongoDBManager = require('../mongoDBManager')
 
-async function generateSamples (fields, files, request) {
+async function saveFormInfoToRequest (fields, files, request) {
+  return new Promise(function (resolve, reject) {
+    request.setLanguages(fields)
+
+    if (fields.authentication !== 'none') {
+      if (fields.authentication === 'basic') {
+        request.authentication = 'Basic'
+      } else if (fields.authentication === 'bearer') {
+        request.authentication = 'Bearer'
+      }
+    } else {
+      request.authentication = 'None'
+    }
+
+    var host = fields.host
+    request.scheme = fields.scheme
+    request.host = host
+
+    if (host !== '') {
+      request.env.TESTING_API_URL = host
+    }
+    request.env.AUTH_TOKEN = fields.auth_token
+
+    request.keyword = fields.keyword
+    request.validate = (fields.validate === 'true')
+
+    request.stage = 1
+
+    utils.getConfigFile(fields, files, request).then((configFile) => {
+      request.conf = new Config()
+      request.conf.loadConfigFile(request, configFile)
+
+      if (files.file && files.file.size !== 0) {
+        // I received a file or archive
+        utils.createTempSourceFileFromFile(files.file).then((path) => {
+          request.pathToSpecs = path
+          mongoDBManager.insertOne('Generation', request.getElementForDB())
+
+          resolve()
+        })
+      } else {
+        // I received an URL
+        utils.createTempSourceFileFromUrl(fields.url).then((path) => {
+          request.pathToSpecs = path
+          mongoDBManager.insertOne('Generation', request.getElementForDB())
+
+          resolve()
+        })
+      }
+    })
+  })
+}
+
+async function generateSamples (request) {
+  request.logFileStream = fs.createWriteStream(request.getGenerationLogFile(), { flags: 'w' })
   const firstTimerStart = Date.now()
-  var path
-  if (files.file.size !== 0) {
-    // I received a file or archive
-    path = await utils.createTempSourceFileFromFile(files.file)
-  } else {
-    // I received an URL
-    path = await utils.createTempSourceFileFromUrl(fields.url)
-  }
+  var path = request.pathToSpecs
 
   var allFiles = getAllFiles(path)
 
@@ -29,26 +79,9 @@ async function generateSamples (fields, files, request) {
     request.type = 'swagger'
   }
 
-  var host = fields.host
-  var scheme = fields.scheme
-
-  request.setLanguages(fields)
-
-  if (fields.authentication !== 'none') {
-    if (fields.authentication === 'basic') {
-      request.authentication = 'Basic'
-    } else if (fields.authentication === 'bearer') {
-      request.authentication = 'Bearer'
-    }
-  } else {
-    request.authentication = 'None'
-  }
   var rootDirectory = process.cwd()
   var examplesFullPath = request.getGeneratedSamplesFolder()
 
-  var configFile = await utils.getConfigFile(fields, files, request)
-  request.conf = new Config()
-  request.conf.loadConfigFile(request, configFile)
   var apiNames = []
 
   for (var fileIndex in allFiles) {
@@ -66,20 +99,39 @@ async function generateSamples (fields, files, request) {
       }
     }
 
-    apiNames.push(await fileParser.parse(allFiles[fileIndex], rootDirectory, examplePath, host, scheme, request))
+    apiNames.push(await fileParser.parse(allFiles[fileIndex], rootDirectory, examplePath, request))
   }
 
   const firstTimerEnd = Date.now()
-  request.generateExamplesTime = ((firstTimerEnd - firstTimerStart) / 1000).toString() + ' s'
-  const secondTimerStart = Date.now()
-  generateDocs(request, allFiles, apiNames, path)
-  const secondTimerEnd = Date.now()
-  request.generateDocsTime = ((secondTimerEnd - secondTimerStart) / 1000).toString() + ' s'
-  return examplesFullPath
+  request.generateExamplesTime = ((firstTimerEnd - firstTimerStart) / 1000).toString() + 's'
+  request.apiNames = apiNames
+
+  mongoDBManager.updateOne('Generation', request.id, { generateExamplesTime: request.generateExamplesTime, apiNames: request.apiNames, type: request.type, stage: 2 })
 }
 
-function generateDocs (request, allFiles, apiNames, path) {
+function generateArchive (request) {
+  request.logFileStream = fs.createWriteStream(request.getGenerationLogFile(), { flags: 'a' })
+  reporter.log(request, 'Generating archive')
+
+  var archive = archiver('zip')
+  archive.directory(request.getGeneratedSamplesFolder(), 'samples')
+
+  var archiveFile = fs.createWriteStream(request.getArchive(), { flags: 'w' })
+  archive.pipe(archiveFile)
+  archive.finalize()
+
+  mongoDBManager.updateOne('Generation', request.id, { stage: 4 })
+}
+
+function generateDocs (request) {
+  const secondTimerStart = Date.now()
+  request.logFileStream = fs.createWriteStream(request.getGenerationLogFile(), { flags: 'a' })
+  reporter.log(request, 'Generating docs page')
+
   var examplesFullPath = request.getGeneratedSamplesFolder()
+  var path = request.pathToSpecs
+  var allFiles = getAllFiles(path)
+  var apiNames = request.apiNames
 
   for (var fileIndex in allFiles) {
     if (apiNames[fileIndex]) {
@@ -98,6 +150,11 @@ function generateDocs (request, allFiles, apiNames, path) {
       break
     }
   }
+  request.logFileStream.end()
+  const secondTimerEnd = Date.now()
+  request.generateDocsTime = ((secondTimerEnd - secondTimerStart) / 1000).toString() + 's'
+
+  mongoDBManager.updateOne('Generation', request.id, { generateDocsTime: request.generateDocsTime, stage: 3 })
 }
 
 function generateDocsForFile (request, path, apiName, examplesPath) {
@@ -178,5 +235,8 @@ function recursiveSearch (currentDirectory, files) {
 }
 
 module.exports = {
-  generateSamples
+  generateSamples,
+  generateDocs,
+  generateArchive,
+  saveFormInfoToRequest
 }

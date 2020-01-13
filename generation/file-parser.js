@@ -1,15 +1,15 @@
 const ramlParser = require('./raml-parser')
 const openAPIParser = require('./openapi-parser')
 
-async function parse (path, rootDirectory, examplesPath, host, scheme, request) {
+async function parse (path, rootDirectory, examplesPath, request) {
   var params = {}
 
-  if (scheme !== '') {
-    params.scheme = scheme
+  if (request.scheme !== '') {
+    params.scheme = request.scheme
   }
 
-  if (host !== '') {
-    params.server_name = host
+  if (request.host !== '') {
+    params.server_name = request.host
   }
 
   if (path.endsWith('.raml')) {

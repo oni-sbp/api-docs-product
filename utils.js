@@ -91,7 +91,8 @@ async function createTempSourceFileFromUrl (url) {
 
 async function getConfigFile (fields, files, request) {
   var configFile = 'validation/conf.yaml'
-  if (files.config.size > 0) {
+
+  if (files.config && files.config.size > 0) {
     if (files.config.name.endsWith('.yaml')) {
       configFile = await this.createTempSourceFileFromFile(files.config)
     } else {

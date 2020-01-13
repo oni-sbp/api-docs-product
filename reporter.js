@@ -1,4 +1,5 @@
 const color = require('node-colorify')
+const mongoDBManager = require('./mongoDBManager')
 
 function debug (request, message) {
   console.log(color.colorItSync(message, { fColor: 'blue' }))
@@ -201,9 +202,12 @@ class Reporter {
       }
     }
     overallTime /= 1000
-    log(this.request, 'Time spent: ' + overallTime.toFixed(1) + 's')
-    var description = testResults.length + ' total, ' + passedCount + ' passed, ' + failedCount + ' failed, ' + ignoredCount + ' ignored'
+    this.request.validationTime = (this.request.validationTime + overallTime).toString() + 's'
+    mongoDBManager.updateOne('Generation', this.request.id, { validationTime: this.request.validationTime })
 
+    log(this.request, 'Time spent: ' + overallTime.toFixed(1) + 's')
+
+    var description = testResults.length + ' total, ' + passedCount + ' passed, ' + failedCount + ' failed, ' + ignoredCount + ' ignored'
     logFn(this.request, '\n== ' + conclusion + ' ==\n' + description)
   }
 
@@ -223,7 +227,7 @@ class Reporter {
     var terminalWidth = process.stdout.columns
     var spaces = 2
     var statusLen = 8
-    var dotsCount = terminalWidth - message.length - spaces - statusLen - (6 - sample.httpMethod.length)
+    var dotsCount = terminalWidth - message.length - spaces - statusLen - (6 - sample.httpMethod.length) - 100 // -100 is added for the interface terminal
     var dots = (dotsCount > 0) ? '.'.repeat(dotsCount) : ''
 
     log(request, messageSpaces + message + ' ' + dots + ' ', true)

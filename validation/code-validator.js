@@ -1,53 +1,38 @@
 const loader = require('./loader')
-const Config = require('../conf/conf').Config
 const TestSession = require('./session').TestSession
 const pathLib = require('path')
-const utils = require('../utils')
+const fs = require('fs')
+const info = require('../info')
 
-async function validateGeneratedSamples (fields, files, request) {
+async function validateGeneratedSamples (request) {
+  request.logFileStream = fs.createWriteStream(request.getValidationLogFile(), { flags: 'w' })
   const timerStart = Date.now()
-  if (fields.validate !== 'on') {
+
+  if (!request.validate) {
     request.validationTime = '0s'
     request.totalTests = 0
     request.failedTests = 0
 
+    info.requestReady[request.id] = true
+
     return
   }
 
-  var samplesPath = await makeValidationConfigurations(fields, files, request)
+  var samplesPath = getSamplesPath(request)
 
-  var samples = loader.loadCodeSamples(request, samplesPath, fields.keyword)
-  var testSession = new TestSession(request, samples)
-  request.failedTests = await testSession.run()
-  const timerEnd = Date.now()
-
-  request.validationTime = ((timerEnd - timerStart) / 1000).toString() + 's'
+  var samples = loader.loadCodeSamples(request, samplesPath, request.keyword)
   request.totalTests = samples.length
+  console.log(samples)
+
+  var testSession = new TestSession(request, samples)
+  const timerEnd = Date.now()
+  request.validationTime = (timerEnd - timerStart) / 1000
+
+  await testSession.run()
 }
 
-async function makeValidationConfigurations (fields, files, request) {
-  request.setLanguages(fields)
-
-  if (fields.authentication !== 'None') {
-    if (fields.authentication === 'basic') {
-      request.authentication = 'Basic'
-    } else if (fields.authentication === 'bearer') {
-      request.authentication = 'Bearer'
-    }
-  } else {
-    request.authentication = 'None'
-  }
-  request.env.AUTH_TOKEN = fields.auth_token
-
-  if (fields.host !== '') {
-    request.env.TESTING_API_URL = fields.host
-  }
-
-  var configFile = await utils.getConfigFile(fields, files, request)
-  request.conf = new Config()
-  request.conf.loadConfigFile(request, configFile)
-
-  var samplesPath = fields.samplespath
+function getSamplesPath (request) {
+  var samplesPath = request.getGeneratedSamplesFolder()
   if (!samplesPath.endsWith(pathLib.sep)) {
     samplesPath += pathLib.sep
   }
