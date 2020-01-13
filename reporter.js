@@ -224,7 +224,7 @@ class Reporter {
   static showTestIsRunning (sample, request) {
     var message = sample.httpMethod + ': ' + sample.name
     var messageSpaces = sample.httpMethod.length < 6 ? ' '.repeat(6 - sample.httpMethod.length) : ''
-    var terminalWidth = process.stdout.columns
+    var terminalWidth = 200 // process.stdout.columns
     var spaces = 2
     var statusLen = 8
     var dotsCount = terminalWidth - message.length - spaces - statusLen - (6 - sample.httpMethod.length) - 100 // -100 is added for the interface terminal
