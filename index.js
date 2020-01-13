@@ -87,7 +87,7 @@ app.get('/progress', (req, res) => {
         res.writeHead(200, { 'Content-Type': 'application/json', 'Content-Length': content.length })
         res.write(content)
         res.end()
-
+        console.log(info.started[request.id], stage)
         switch (stage) {
           case 0:
             if (!info.started[request.id]) {

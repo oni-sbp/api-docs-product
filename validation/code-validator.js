@@ -3,9 +3,12 @@ const TestSession = require('./session').TestSession
 const pathLib = require('path')
 const fs = require('fs')
 const info = require('../info')
+const mongoDBManager = require('../mongoDBManager')
 
 async function validateGeneratedSamples (request) {
   request.logFileStream = fs.createWriteStream(request.getValidationLogFile(), { flags: 'w' })
+  mongoDBManager.updateOne('Generation', request.id, { stage: 4 })
+
   const timerStart = Date.now()
 
   if (!request.validate) {

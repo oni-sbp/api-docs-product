@@ -35,7 +35,7 @@ async function saveFormInfoToRequest (fields, files, request) {
     request.keyword = fields.keyword
     request.validate = (fields.validate === 'true')
 
-    request.stage = 1
+    request.stage = 0
 
     utils.getConfigFile(fields, files, request).then((configFile) => {
       request.conf = new Config()
@@ -106,7 +106,7 @@ async function generateSamples (request) {
   request.generateExamplesTime = ((firstTimerEnd - firstTimerStart) / 1000).toString() + 's'
   request.apiNames = apiNames
 
-  mongoDBManager.updateOne('Generation', request.id, { generateExamplesTime: request.generateExamplesTime, apiNames: request.apiNames, type: request.type, stage: 2 })
+  mongoDBManager.updateOne('Generation', request.id, { generateExamplesTime: request.generateExamplesTime, apiNames: request.apiNames, type: request.type, stage: 1 })
 }
 
 function generateArchive (request) {
@@ -120,7 +120,7 @@ function generateArchive (request) {
   archive.pipe(archiveFile)
   archive.finalize()
 
-  mongoDBManager.updateOne('Generation', request.id, { stage: 4 })
+  mongoDBManager.updateOne('Generation', request.id, { stage: 3 })
 }
 
 function generateDocs (request) {
@@ -154,7 +154,7 @@ function generateDocs (request) {
   const secondTimerEnd = Date.now()
   request.generateDocsTime = ((secondTimerEnd - secondTimerStart) / 1000).toString() + 's'
 
-  mongoDBManager.updateOne('Generation', request.id, { generateDocsTime: request.generateDocsTime, stage: 3 })
+  mongoDBManager.updateOne('Generation', request.id, { generateDocsTime: request.generateDocsTime, stage: 2 })
 }
 
 function generateDocsForFile (request, path, apiName, examplesPath) {
