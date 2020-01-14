@@ -18,7 +18,7 @@ public class Java {
 	public static void main(String[] args) throws Exception {
 
 		Java obj = new Java();
-		String path="<%= scheme %>://<%=server_name%><%=uri%><% if (locals.query_string) { %><%="?"%><%- query_string %>"<% } %>";
+		String path="<%= scheme %>://<%=server_name%><%=uri%><% if (locals.query_string) { %><%="?"%><%- query_string %><% } %>";
 
 		try {<% if(request_method == "post"){ %>
 			obj.sendPost(path);
@@ -29,7 +29,7 @@ public class Java {
 <% } %><% if(request_method == "delete"){ %>
 			obj.sendDelete(path);
 <% } %>		} catch (Exception e) {
-		e.printStackTrace();
+			e.printStackTrace();
 		}
 		obj.close();
 	}

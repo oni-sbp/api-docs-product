@@ -254,7 +254,9 @@
                   }
                 }
               } else {
-                stageHeader.innerHTML = stages[stage + 1]
+                if(stage != 3) {
+                  stageHeader.innerHTML = stages[stage + 1]
+                }
               }
 
               setTimeout(function () {

@@ -285,7 +285,7 @@ app.get('/docsOfTrust', (req, res) => {
 })
 
 app.get('/results', (req, res) => {
-  requestInfo.createRequest(req.query.requestID).then((request) => {
+  requestInfo.getRequest(req.query.requestID).then((request) => {
     if (!request) {
       req.app.locals.errorMessage = 'Page not found'
       res.redirect('/ErrorPage')

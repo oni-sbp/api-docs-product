@@ -17,6 +17,7 @@ async function validateGeneratedSamples (request) {
     request.failedTests = 0
 
     info.requestReady[request.id] = true
+    mongoDBManager.updateOne('Generation', request.id, { validationTime: request.validationTime, totalTests: request.totalTests, failedTests: request.failedTests })
 
     return
   }
