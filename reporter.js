@@ -215,7 +215,8 @@ class Reporter {
     var prettyName = {
       'unirest.node': 'JavaScript',
       python: 'Python',
-      curl: 'cURL'
+      curl: 'cURL',
+      java: 'Java'
     }
 
     log(request, '======== ' + prettyName[language] + ' ========')

@@ -144,7 +144,9 @@ function getDebug (dict, debug) {
         paramKey = key.replace('?', '')
         debug[paramKey] = 'STUB'
       } else {
-        getDebug(data, debug)
+        setTimeout(function () {
+          getDebug(data, debug)
+        }, 0)
       }
     } else if (data.constructor === Array) {
       for (var index in data) {

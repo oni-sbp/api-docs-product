@@ -1,21 +1,21 @@
-var acceptedLanguages = ['python', 'unirest.node', 'curl', '2xx-response', 'slate', 'java']
+var acceptedLanguages = ['python', 'unirest.node', 'java', '2xx-response', 'slate', 'curl']
 
-var acceptedValidationLanguages = ['unirest.node', 'python', 'curl']
+var acceptedValidationLanguages = ['unirest.node', 'python', 'java', 'curl']
 
 var extension = {
   python: '.py',
   'unirest.node': '.js',
+  java: '.java',
   curl: '',
   '2xx-response': '.json',
-  slate: '.md',
-  java: '.java'
+  slate: '.md'
 }
 var fileNameEnding = {
   python: '.py',
   'unirest.node': '.js',
+  java: '.java',
   curl: 'curl',
-  '2xx-response': '.json',
-  java: '.java'
+  '2xx-response': '.json'
 }
 
 var httpMethods = ['POST', 'GET', 'PUT', 'DELETE']

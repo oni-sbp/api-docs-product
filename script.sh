@@ -1,18 +1,18 @@
 # Install MongoDB
 # https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/
-wget -qO - https://www.mongodb.org/static/pgp/server-4.2.asc | sudo apt-key add -
-sudo apt-get install gnupg
-wget -qO - https://www.mongodb.org/static/pgp/server-4.2.asc | sudo apt-key add -
-echo "deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.2 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.2.list
-sudo apt-get update
-sudo apt-get install -y mongodb-org
-echo "mongodb-org hold" | sudo dpkg --set-selections
-echo "mongodb-org-server hold" | sudo dpkg --set-selections
-echo "mongodb-org-shell hold" | sudo dpkg --set-selections
-echo "mongodb-org-mongos hold" | sudo dpkg --set-selections
-echo "mongodb-org-tools hold" | sudo dpkg --set-selections
-sudo service mongod start
-sudo service mongod status
+#wget -qO - https://www.mongodb.org/static/pgp/server-4.2.asc | sudo apt-key add -
+#sudo apt-get install gnupg
+#wget -qO - https://www.mongodb.org/static/pgp/server-4.2.asc | sudo apt-key add -
+#echo "deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.2 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.2.list
+#sudo apt-get update
+#sudo apt-get install -y mongodb-org
+#echo "mongodb-org hold" | sudo dpkg --set-selections
+#echo "mongodb-org-server hold" | sudo dpkg --set-selections
+#echo "mongodb-org-shell hold" | sudo dpkg --set-selections
+#echo "mongodb-org-mongos hold" | sudo dpkg --set-selections
+#echo "mongodb-org-tools hold" | sudo dpkg --set-selections
+#sudo service mongod start
+#sudo service mongod status
 
 
 # Install ruby
@@ -26,8 +26,15 @@ sudo service mongod status
 # Install pip
 # apt install python-pip
 
+# Install Java
+sudo add-apt-repository ppa:linuxuprising/java
+sudo apt-get update
+sudo apt-get install oracle-java13-installer
+java --version
+
+
 cd api-docs-product
-mkdir resources/Temp-Files
+#mkdir resources/Temp-Files
 
 chmod +x index.js
 npm install
@@ -44,7 +51,7 @@ npm install
 # cd ..
 # cd ..
 
-cp service/codegen.service /etc/systemd/system/codegen.service
+#cp service/codegen.service /etc/systemd/system/codegen.service
 
 
 sudo systemctl enable codegen.service

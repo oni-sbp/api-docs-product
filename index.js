@@ -63,12 +63,12 @@ app.get('/progress', (req, res) => {
             info.generationLogPosition[request.id] = data.length
           }
         } catch (err) {
-          console.log('Error: Generation file not ready')
         }
 
         if (req.query.validate === 'true') {
           try {
             data = fs.readFileSync(request.getValidationLogFile(), 'utf8')
+
             if (info.validationLogPosition[request.id] !== data.length) {
               if (info.validationLogPosition[request.id] === 0) {
                 newLog += '\nValidation:\n'
@@ -78,7 +78,6 @@ app.get('/progress', (req, res) => {
               info.validationLogPosition[request.id] = data.length
             }
           } catch (err) {
-            console.log('Error: Validation file not ready')
           }
         }
 
@@ -87,7 +86,7 @@ app.get('/progress', (req, res) => {
         res.writeHead(200, { 'Content-Type': 'application/json', 'Content-Length': content.length })
         res.write(content)
         res.end()
-        console.log(info.started[request.id], stage)
+
         switch (stage) {
           case 0:
             if (!info.started[request.id]) {

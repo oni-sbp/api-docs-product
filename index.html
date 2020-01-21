@@ -109,7 +109,7 @@
 
       var acceptedExtensions = ['raml', 'json', 'yaml', 'zip']
 
-      if (!acceptedExtensions.includes(extension)) {
+      if (!(acceptedExtensions.indexOf(extension) > -1)) {
         document.getElementById("validatorFileExtension").style.display = "block";
       } else {
         document.getElementById("validatorFileExtension").style.display = "none";
@@ -141,7 +141,7 @@
 
       var acceptedExtensions = ['yaml']
 
-      if (!acceptedExtensions.includes(extension)) {
+      if (!(acceptedExtensions.indexOf(extension) > -1)) {
         document.getElementById("validatorExtension").style.display = "block";
       } else {
         document.getElementById("validatorExtension").style.display = "none";
@@ -157,6 +157,8 @@
     }
 
     $(function () {
+      var validate = false
+
       $("#form").submit(function (e) {
         e.preventDefault();
 
@@ -189,7 +191,7 @@
             data: formData,
             success: function (data) {
               console.log('initial response', data);
-
+              validate = data.validate
               getSubmitLog(data.requestId, data.origin, data.validate, 0)
             },
             error: function () {
@@ -201,63 +203,87 @@
         }
       })
 
-      function getSubmitLog(requestId, origin, validate, stage) {
-        var stages = [
-          'Processing submitted data',
-          'Generating samples',
-          'Generating docs',
-          'Generating archive',
-          'Installing prerequisites',
-          'Running samples for '
-        ]
+      var stages = [
+        'Processing submitted data',
+        'Generating samples',
+        'Generating docs',
+        'Generating archive',
+        'Installing prerequisites',
+        'Running samples for '
+      ]
 
-        var languages = [
-          'JavaScript',
-          'Python',
-          'cURL'
-        ]
+      var languages = [
+        'JavaScript',
+        'Python',
+        'cURL',
+        'Java'
+      ]
+
+      var content = []
+      var contentIndex = 0
+
+      displayConsole()
+      function displayConsole() {
+        while (content.length > contentIndex) {
+          if (content[contentIndex].log.length != 0) {
+            break;
+          }
+          ++contentIndex;
+        }
+
+        if (content.length > contentIndex) {
+          var line = content[contentIndex].log.split('\n')[0] + '\n';
+          content[contentIndex].log = content[contentIndex].log.replace(line, '');
+
+          var textarea = $("#Console")
+          textarea.val(textarea.val() + line)
+          textarea.scrollTop(textarea[0].scrollHeight)
+
+          var stage = content[contentIndex].stage
+          var stageHeader = document.getElementById("Stage");
+          if (stage === 4) {
+            var fullLog = textarea.val()
+            var pos = -1
+            var max = -1
+
+            for (var langIndex in languages) {
+              var position = fullLog.indexOf('======== ' + languages[langIndex] + ' ========')
+              if (position > max) {
+                max = position
+                pos = langIndex
+              }
+            }
+
+            if (validate) {
+              if (pos == -1) {
+                stageHeader.innerHTML = stages[4]
+              } else {
+                stageHeader.innerHTML = stages[5] + languages[pos]
+              }
+            }
+          } else {
+            stageHeader.innerHTML = stages[stage]
+          }
+        }
+        setTimeout(function () {
+          displayConsole()
+        }, 100)
+      }
+
+      function getSubmitLog(requestId, origin, validate, stage) {
 
         $.ajax({
           type: "GET",
-          url: "progress?requestId=" + requestId + "&stage=" + stage + "&validate=" + validate,
+          url: "progress?requestId=" + requestId + "&stage=" + stage + "&validate=" + validate + "&random=" + Math.random(),
           success: function (data) {
             if (data.ready) {
               window.location.href = '/readyindex?validate=' + validate + '&origin=' + origin + '&requestId=' + requestId;
             } else {
               // write log
-              console.log(data)
-              var textarea = $("#Console")
-              textarea.val(textarea.val() + data.newLog)
-              textarea.scrollTop(textarea[0].scrollHeight)
+              //console.log(data)
 
               var stage = parseInt(data.stage)
-              var stageHeader = document.getElementById("Stage");
-
-              if (stage === 4) {
-                var fullLog = textarea.val()
-                var pos = -1
-                var max = -1
-
-                for (var langIndex in languages) {
-                  var position = fullLog.indexOf('======== ' + languages[langIndex] + ' ========')
-                  if (position > max) {
-                    max = position
-                    pos = langIndex
-                  }
-                }
-
-                if (validate) {
-                  if (pos == -1) {
-                    stageHeader.innerHTML = stages[4]
-                  } else {
-                    stageHeader.innerHTML = stages[5] + languages[pos]
-                  }
-                }
-              } else {
-                if(stage != 3) {
-                  stageHeader.innerHTML = stages[stage + 1]
-                }
-              }
+              content.push({ log: data.newLog, stage: stage })
 
               setTimeout(function () {
                 getSubmitLog(requestId, origin, validate, stage)
@@ -354,13 +380,14 @@
               <div id="validatorFile" class="validator">*No File or URL Selected</div>
               <div id="FileInitial" class="filename-div" onclick="callChooseFile('#FileUploadLabel')">
                 <img src="resources/document icon-14.png" height="14" width="14" class="icon-image" />
-                <input type="text" class="input-field filename-input" placeholder="No file selected" readonly
-                  onclick="callChooseFile('#FileUploadLabel')">
+                <label type="text" class="input-field filename-input"
+                  style="background-color: black;  color: #898989;">No
+                  file selected</label>
               </div>
               <div id="FileAfter" class="filename-div-after" style="display: none;">
                 <img src="resources/pot icons-16.png" height="14" width="14" class="icon-image-left" />
-                <input type="text" class="input-field filename-input" id="FileName" placeholder="No file selected"
-                  readonly onclick="callChooseFile('#FileUploadLabel')">
+                <input type="text" class="input-field filename-input" id="FileName" style="background-color: #9E8DE2;"
+                  readonly placeholder="No file selected">
                 <img src="resources/pot icons-20.png" height="14" width="14" class="icon-image-right"
                   onclick="cancelFile();" />
               </div>
@@ -416,13 +443,14 @@
                 <div id="validatorExtension" class="validator">*Unsupported file</div>
                 <div id="ConfigInitial" class="filename-div" onclick="callChooseFile('#ConfigUploadLabel')">
                   <img src="resources/document icon-14.png" height="14" width="14" class="icon-image" />
-                  <input type="text" class="input-field filename-input" placeholder="No file selected" readonly
-                    onclick="callChooseFile('#ConfigUploadLabel')">
+                  <label type="text" class="input-field filename-input"
+                    style="background-color: black;  color: #898989;">No
+                    file selected</label>
                 </div>
                 <div id="ConfigAfter" class="filename-div-after" style="display: none;">
                   <img src="resources/pot icons-16.png" height="14" width="14" class="icon-image-left" />
-                  <input type="text" class="input-field filename-input" id="ConfigFileName"
-                    placeholder="No file selected" readonly onclick="callChooseFile('#ConfigUploadLabel')">
+                  <input type="text" class="input-field filename-input" id="ConfigFileName" style="background-color: #9E8DE2;"
+                    placeholder="No file selected" readonly>
                   <img src="resources/pot icons-20.png" height="14" width="14" class="icon-image-right"
                     onclick="cancelConfigFile();" />
                 </div>

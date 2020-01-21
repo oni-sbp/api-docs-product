@@ -10,7 +10,7 @@ class Config {
     this.js_project_dir_name = '.pot-node'
     this.substitutions = {}
     this.resp_attr_replacements = {}
-    this.always_create_environments = false
+    this.always_create_environments = true
     this.debug = false
     this.before_sample = {}
     this.ignore_failures = {}

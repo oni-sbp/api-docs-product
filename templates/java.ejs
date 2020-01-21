@@ -42,7 +42,18 @@ public class Java {
 <%- javaHeaders %><% if (locals.javaBody) { %>			StringEntity params =new StringEntity("<%- javaBody %>");
 			request.setEntity(params);
  <% } %> 			HttpResponse response = httpClient.execute(request);
-			System.out.println(EntityUtils.toString(response.getEntity()));
+			String Value = "";
+			 try{
+				Value = EntityUtils.toString(response.getEntity()).toString();
+				if(Value.charAt(0) != '{' && Value.charAt(0) != '[')
+				Value = "\"" + Value + "\"" ;
+			 }
+			 catch(Exception ex)
+			 {
+				 Value = "{}";
+			 }
+			System.out.println( "{\"raw_body\":" + Value
+					+ ",\n\"status\":" + "\"" + response.getStatusLine() + "\""  + ",\n\"code\":" + "\"" +  response.getStatusLine().getStatusCode() + "\""  + "}");
 		}catch (Exception ex) {
 		} finally {
 		}
@@ -55,7 +66,18 @@ public class Java {
 <%- javaHeaders %><% if (locals.javaBody) { %>			StringEntity params =new StringEntity("<%- javaBody %>");
 			request.setEntity(params);
  <% } %>			HttpResponse response = httpClient.execute(request);
-			System.out.println(EntityUtils.toString(response.getEntity()));
+			String Value = "";
+			 try{
+				Value = EntityUtils.toString(response.getEntity()).toString();
+				if(Value.charAt(0) != '{' && Value.charAt(0) != '[')
+				Value = "\"" + Value + "\"" ;
+			 }
+			 catch(Exception ex)
+			 {
+				 Value = "{}";
+			 }
+			System.out.println( "{\"raw_body\":" + Value
+					+ ",\n\"status\":" + "\"" + response.getStatusLine() + "\""  + ",\n\"code\":" + "\"" +  response.getStatusLine().getStatusCode() + "\""  + "}");
 		}catch (Exception ex) {
 		} finally {
 		}
@@ -68,7 +90,18 @@ public class Java {
 <%- javaHeaders %><% if (locals.javaBody) { %>			StringEntity params =new StringEntity("<%- javaBody %>");
 			request.setEntity(params);
  <% } %>			HttpResponse response = httpClient.execute(request);
-			System.out.println(EntityUtils.toString(response.getEntity()));
+			String Value = "";
+			 try{
+				Value = EntityUtils.toString(response.getEntity()).toString();
+				if(Value.charAt(0) != '{' && Value.charAt(0) != '[')
+				Value = "\"" + Value + "\"" ;
+			 }
+			 catch(Exception ex)
+			 {
+				 Value = "{}";
+			 }
+			System.out.println( "{\"raw_body\":" + Value
+					+ ",\n\"status\":" + "\"" + response.getStatusLine() + "\""  + ",\n\"code\":" + "\"" +  response.getStatusLine().getStatusCode() + "\""  + "}");
 		}catch (Exception ex) {
 		} finally {
 		}
@@ -81,7 +114,18 @@ public class Java {
 <%- javaHeaders %><% if (locals.javaBody) { %>			StringEntity params =new StringEntity("<%- javaBody %>");
 			request.setEntity(params);
  <% } %>			HttpResponse response = httpClient.execute(request);
-			System.out.println(EntityUtils.toString(response.getEntity()));
+			String Value = "";
+			 try{
+				Value = EntityUtils.toString(response.getEntity()).toString();
+				if(Value.charAt(0) != '{' && Value.charAt(0) != '[')
+				Value = "\"" + Value + "\"" ;
+			 }
+			 catch(Exception ex)
+			 {
+				 Value = "{}";
+			 }
+			System.out.println( "{\"raw_body\":" + Value
+					+ ",\n\"status\":" + "\"" + response.getStatusLine() + "\""  + ",\n\"code\":" + "\"" +  response.getStatusLine().getStatusCode() + "\""  + "}");
 		}catch (Exception ex) {
 		} finally {
 		}

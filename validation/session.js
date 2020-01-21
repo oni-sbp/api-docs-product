@@ -1,6 +1,7 @@
 const PythonRunner = require('./runners/python').PythonRunner
 const CurlRunner = require('./runners/curl').CurlRunner
 const NodeRunner = require('./runners/js').NodeRunner
+const JavaRunner = require('./runners/java').JavaRunner
 const TestExecutionResultMap = require('./validation-classes').TestExecutionResultMap
 const ResourceRegistry = require('./resources/resource-registry').ResourceRegistry
 const Reporter = require('../reporter').Reporter
@@ -12,7 +13,8 @@ class TestSession {
     this.runners = {
       'unirest.node': new NodeRunner(request),
       python: new PythonRunner(request),
-      curl: new CurlRunner(request)
+      curl: new CurlRunner(request),
+      java: new JavaRunner(request)
     }
 
     this.samples = samples
@@ -25,7 +27,8 @@ class TestSession {
     var samplesByLang = {
       'unirest.node': [],
       python: [],
-      curl: []
+      curl: [],
+      java: []
     }
 
     for (var sampleIndex in this.samples) {
@@ -60,7 +63,7 @@ class TestSession {
       var samples = samplesByLang[lang].slice()
       delete samplesByLang[lang]
 
-      setImmediate(testSession.runSample, testSession, samples, 0, {}, {}, samplesByLang, results, lang)
+      setTimeout(testSession.runSample, 100, testSession, samples, 0, {}, {}, samplesByLang, results, lang)
 
       break
     }
