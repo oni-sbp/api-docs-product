@@ -6,10 +6,11 @@ const pathLib = require('path')
 const reporter = require('../reporter')
 
 async function parse (path, rootDirectory, examplesPath, params, request) {
-  reporter.log(request, 'Parsing ' + path)
+  var filename = pathUtility.parse(path).base
+
+  reporter.log(request, 'Parsing ' + filename)
 
   var directory = pathLib.dirname(path)
-  var filename = pathUtility.parse(path).base
 
   process.chdir(directory)
   var model = await wap.raml10.parse(`file://${filename}`).catch((err) => {

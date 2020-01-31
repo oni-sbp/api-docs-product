@@ -3,7 +3,7 @@ const fs = require('fs-extra')
 const info = require('./info')
 const express = require('express')
 const app = express()
-var port = 80
+var httpsPort = 443
 const generator = require('./generation/code-generator')
 const validator = require('./validation/code-validator')
 const requestInfo = require('./RequestInfo')
@@ -311,7 +311,31 @@ app.get('/results', (req, res) => {
 })
 
 if (info.onWindows) {
-  port = 8081
+  httpsPort = 8081
 }
 
-app.listen(port)
+//app.listen(port)
+
+const https = require('https');
+https.createServer({
+  key: fs.readFileSync('./certificate/star_oftrust_net_key.txt'),
+  cert: fs.readFileSync('./certificate/star.oftrust.net.crt'),
+  ca: fs.readFileSync('./certificate/star.oftrust.net.ca-bundle')
+}, app)
+.listen(httpsPort);
+
+var httpPort = 80
+if (info.onWindows) {
+  httpPort = 8082
+}
+
+const httpApp = express()
+httpApp.get('/*', (req, res) => {
+  var host = req.headers.host
+  if(host.endsWith(':' + httpPort)) {
+    host = host.replace(':' + httpPort, ':' + httpsPort);
+  }
+  res.redirect('https://' + host + req.url);
+});
+httpApp.listen(httpPort);
+

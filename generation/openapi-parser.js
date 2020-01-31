@@ -6,7 +6,9 @@ const ramlParser = require('./raml-parser')
 const reporter = require('../reporter')
 
 async function parse (path, rootDirectory, examplesPath, params, request) {
-  reporter.log(request, 'Parsing ' + path)
+  var filename = pathUtility.parse(path).base
+
+  reporter.log(request, 'Parsing ' + filename)
   var api = await SwaggerParser.dereference(path).catch((error) => {
     console.log(error)
   })
@@ -15,7 +17,6 @@ async function parse (path, rootDirectory, examplesPath, params, request) {
     return ''
   }
 
-  var filename = pathUtility.parse(path).base
   var title = filename.split('.')[0]
 
   if (api.info && api.info.title) {
