@@ -26,7 +26,6 @@ async function validateGeneratedSamples (request) {
 
   var samples = loader.loadCodeSamples(request, samplesPath, request.keyword)
   request.totalTests = samples.length
-  console.log(samples)
 
   var testSession = new TestSession(request, samples)
   const timerEnd = Date.now()

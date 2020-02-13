@@ -86,7 +86,7 @@ class NodeRunner extends CodeRunner {
 
     var nodeBin = 'node'
 
-    return utils.runShellCommand(nodeBin + ' ' + samplePath, null, this._projectDirPath)
+    return utils.runShellCommand(nodeBin + ' ' + samplePath, this.request.conf.sample_timeout, this._projectDirPath)
   }
 
   _parseStdout (stdout, allowNonJSONResponse) {

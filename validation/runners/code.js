@@ -93,9 +93,11 @@ class CodeRunner {
       match = matchString.match(regexCurlArrayFirst)
 
       var jsonArray = JSON.stringify(debug[match.groups.name])
-      var escapedJsonArray = jsonArray.replace(/"/g, '\\"')
+      if(jsonArray) {
+        var escapedJsonArray = jsonArray.replace(/"/g, '\\"')
 
-      substitutions[match.groups.paramValue] = escapedJsonArray
+        substitutions[match.groups.paramValue] = escapedJsonArray
+      }
     }
 
     var matchPython = sourceCode.match(regexPython)

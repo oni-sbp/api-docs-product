@@ -797,6 +797,9 @@ body {
 .content h4[id^='http-request'] {
 	display: none
 }
+.content h4[id^='HTTP-Request'] {
+    display:none;
+  }
 
 .content h3[id^='get'] {
 	text-transform: uppercase;

@@ -402,6 +402,9 @@ html, body {
     display:none;
   }
 
+  h4[id^='HTTP-Request'] {
+    display:none;
+  }
 
   h3[id^='get'] {
     text-transform: uppercase;

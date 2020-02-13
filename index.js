@@ -322,7 +322,7 @@ https.createServer({
   cert: fs.readFileSync('./certificate/star.oftrust.net.crt'),
   ca: fs.readFileSync('./certificate/star.oftrust.net.ca-bundle')
 }, app)
-.listen(httpsPort);
+  .listen(httpsPort);
 
 var httpPort = 80
 if (info.onWindows) {
@@ -332,7 +332,7 @@ if (info.onWindows) {
 const httpApp = express()
 httpApp.get('/*', (req, res) => {
   var host = req.headers.host
-  if(host.endsWith(':' + httpPort)) {
+  if (host.endsWith(':' + httpPort)) {
     host = host.replace(':' + httpPort, ':' + httpsPort);
   }
   res.redirect('https://' + host + req.url);

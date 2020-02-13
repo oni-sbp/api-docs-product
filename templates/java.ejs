@@ -1,137 +1,43 @@
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.entity.StringEntity;
+<%if(request_method == "delete"){%>import org.apache.http.client.methods.HttpDelete;
+<% }%><%if(request_method == "get"){%>import org.apache.http.client.methods.HttpGet;
+<% }%><%if(request_method == "post"){%>import org.apache.http.client.methods.HttpPost;
+<% }%>%><%if(request_method == "put"){%>import org.apache.http.client.methods.HttpPut;
+<% }%>import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import java.io.IOException;
+import org.apache.http.StatusLine;
 
 public class Java {
-
-	private final CloseableHttpClient httpClient = HttpClients.createDefault();
-
-	public static void main(String[] args) throws Exception {
-
-		Java obj = new Java();
-		String path="<%= scheme %>://<%=server_name%><%=uri%><% if (locals.query_string) { %><%="?"%><%- query_string %><% } %>";
-
-		try {<% if(request_method == "post"){ %>
-			obj.sendPost(path);
-<% } %><% if(request_method == "get"){ %>
-			obj.sendGet(path);
-<% } %><% if(request_method == "put"){ %>
-			obj.sendPut(path);
-<% } %><% if(request_method == "delete"){ %>
-			obj.sendDelete(path);
-<% } %>		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		obj.close();
-	}
-
-<% if(request_method == "post"){ %>
-	public void sendPost(String path) throws Exception {
-		HttpClient httpClient = HttpClientBuilder.create().build();
+	public static void main(String[] args) {
 		try {
-			HttpPost request = new HttpPost(path);
-<%- javaHeaders %><% if (locals.javaBody) { %>			StringEntity params =new StringEntity("<%- javaBody %>");
-			request.setEntity(params);
- <% } %> 			HttpResponse response = httpClient.execute(request);
-			String Value = "";
-			 try{
-				Value = EntityUtils.toString(response.getEntity()).toString();
-				if(Value.charAt(0) != '{' && Value.charAt(0) != '[')
-				Value = "\"" + Value + "\"" ;
-			 }
-			 catch(Exception ex)
-			 {
-				 Value = "{}";
-			 }
-			System.out.println( "{\"raw_body\":" + Value
-					+ ",\n\"status\":" + "\"" + response.getStatusLine() + "\""  + ",\n\"code\":" + "\"" +  response.getStatusLine().getStatusCode() + "\""  + "}");
-		}catch (Exception ex) {
-		} finally {
-		}
-	}
-<% } %><% if(request_method == "get"){ %>
-	public void sendGet(String path) throws Exception{
-		HttpClient httpClient = HttpClientBuilder.create().build();
-		try {
-			HttpGet request = new HttpGet(path);
-<%- javaHeaders %><% if (locals.javaBody) { %>			StringEntity params =new StringEntity("<%- javaBody %>");
-			request.setEntity(params);
- <% } %>			HttpResponse response = httpClient.execute(request);
-			String Value = "";
-			 try{
-				Value = EntityUtils.toString(response.getEntity()).toString();
-				if(Value.charAt(0) != '{' && Value.charAt(0) != '[')
-				Value = "\"" + Value + "\"" ;
-			 }
-			 catch(Exception ex)
-			 {
-				 Value = "{}";
-			 }
-			System.out.println( "{\"raw_body\":" + Value
-					+ ",\n\"status\":" + "\"" + response.getStatusLine() + "\""  + ",\n\"code\":" + "\"" +  response.getStatusLine().getStatusCode() + "\""  + "}");
-		}catch (Exception ex) {
-		} finally {
-		}
-	}
-<% } %><% if(request_method == "put"){ %>
-	public void sendPut(String path) throws Exception{
-		HttpClient httpClient = HttpClientBuilder.create().build();
-		try {
-		HttpPut request = new HttpPut(path);
-<%- javaHeaders %><% if (locals.javaBody) { %>			StringEntity params =new StringEntity("<%- javaBody %>");
-			request.setEntity(params);
- <% } %>			HttpResponse response = httpClient.execute(request);
-			String Value = "";
-			 try{
-				Value = EntityUtils.toString(response.getEntity()).toString();
-				if(Value.charAt(0) != '{' && Value.charAt(0) != '[')
-				Value = "\"" + Value + "\"" ;
-			 }
-			 catch(Exception ex)
-			 {
-				 Value = "{}";
-			 }
-			System.out.println( "{\"raw_body\":" + Value
-					+ ",\n\"status\":" + "\"" + response.getStatusLine() + "\""  + ",\n\"code\":" + "\"" +  response.getStatusLine().getStatusCode() + "\""  + "}");
-		}catch (Exception ex) {
-		} finally {
-		}
-	}
-<% } %><% if(request_method == "delete"){ %>
-	public void sendDelete(String path)throws Exception{
-		HttpClient httpClient = HttpClientBuilder.create().build();
-		try {
-			HttpDelete request = new HttpDelete(path);
-<%- javaHeaders %><% if (locals.javaBody) { %>			StringEntity params =new StringEntity("<%- javaBody %>");
-			request.setEntity(params);
- <% } %>			HttpResponse response = httpClient.execute(request);
-			String Value = "";
-			 try{
-				Value = EntityUtils.toString(response.getEntity()).toString();
-				if(Value.charAt(0) != '{' && Value.charAt(0) != '[')
-				Value = "\"" + Value + "\"" ;
-			 }
-			 catch(Exception ex)
-			 {
-				 Value = "{}";
-			 }
-			System.out.println( "{\"raw_body\":" + Value
-					+ ",\n\"status\":" + "\"" + response.getStatusLine() + "\""  + ",\n\"code\":" + "\"" +  response.getStatusLine().getStatusCode() + "\""  + "}");
-		}catch (Exception ex) {
-		} finally {
-		}
-	}
+			String path = "<%= scheme %>://<%=server_name%><%=uri%><% if (locals.query_string) { %><%="?"%><%- query_string %><% } %>";
+<% if (locals.javaBody) { %>			StringEntity params = new StringEntity("<%- javaBody %>");
+<% } %>			String Value;
+
+			HttpClient httpClient = HttpClientBuilder.create().build();
+<% if(request_method == "post"){ %>			HttpPost request = new HttpPost(path);
+<% } %><% if(request_method == "get"){ %>			HttpGet request = new HttpGet(path);
+<% } %><% if(request_method == "put"){ %>			HttpPut request = new HttpPut(path);
+<% } %><% if(request_method == "delete"){ %>			HttpDelete request = new HttpDelete(path);
+<% } %><%- javaHeaders %><% if (locals.javaBody) { %>			request.setEntity(params);
 <% } %>
-	public void close() throws IOException {
-		httpClient.close();
+ 			HttpResponse response = httpClient.execute(request);
+			try {
+				Value = EntityUtils.toString(response.getEntity()).toString();
+				if (Value.charAt(0) != '{' && Value.charAt(0) != '[')
+					Value = "\"" + Value + "\"" ;
+			} catch (Exception ex) {
+				Value = "{}";
+			}
+
+			StatusLine status = response.getStatusLine();
+			System.out.printf("{\"raw_body\":%s,\n\"status\":\"%s\",\n\"code\":\"%s\"}", Value, status, status.getStatusCode());
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		} 
 	}
 }

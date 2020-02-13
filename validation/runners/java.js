@@ -82,11 +82,11 @@ class JavaRunner extends CodeRunner {
     if (info.onWindows) {
       utils.runShellCommand('del Java.class', 20, this._projectDirPath)
       utils.runShellCommand('javac -cp * Java.java', 20, this._projectDirPath)
-      return utils.runShellCommand('java -cp .;* Java', 20, this._projectDirPath)
+      return utils.runShellCommand('java -cp .;* Java', this.request.conf.sample_timeout, this._projectDirPath)
     } else {
       utils.runShellCommand('rm Java.class', 20, this._projectDirPath)
       utils.runShellCommand('javac -cp "*" Java.java', 20, this._projectDirPath)
-      return utils.runShellCommand('java -cp .:* Java', 20, this._projectDirPath)
+      return utils.runShellCommand('java -cp .:* Java', this.request.conf.sample_timeout, this._projectDirPath)
     }
   }
 

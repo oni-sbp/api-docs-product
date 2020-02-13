@@ -133,6 +133,8 @@ function generateDocs (request) {
   var allFiles = getAllFiles(path)
   var apiNames = request.apiNames
 
+  initiateDocsGeneration(request)
+
   for (var fileIndex in allFiles) {
     if (apiNames[fileIndex]) {
       var folder = allFiles[fileIndex].replace(path, '')
@@ -146,10 +148,12 @@ function generateDocs (request) {
       }
 
       generateDocsForFile(request, allFiles[fileIndex], apiNames[fileIndex], examplePath)
-
-      break
     }
   }
+
+  concatenateSlates(request)
+  generateIndexHtml(request)
+
   request.logFileStream.end()
   const secondTimerEnd = Date.now()
   request.generateDocsTime = ((secondTimerEnd - secondTimerStart) / 1000).toString() + 's'
@@ -160,28 +164,46 @@ function generateDocs (request) {
 function generateDocsForFile (request, path, apiName, examplesPath) {
   path = path.replace(/\\/g, '/')
   if (info.onWindows) {
-    var arg = 'python build.py --type ' + request.type + ' --path "' + path + '" --apiname "' + apiName + '" --requestfolder "' + request.getRequestFolder() + '" --examples "' + examplesPath + '"'
+    var arg_build = 'python build.py --type ' + request.type + ' --path "' + path + '" --apiname "' + apiName + '" --requestfolder "' + request.getRequestFolder() + '" --examples "' + examplesPath + '"'
+    runShellCommand(arg_build, 20, process.cwd() + '/docs/raml2markdown')
+  } else {
+    arg_build = 'python3 build.py --type ' + request.type + ' --path "' + path + '" --apiname "' + apiName + '" --requestfolder "' + request.getRequestFolder() + '" --examples "' + examplesPath + '"'
+    runShellCommand(arg_build, 20, process.cwd() + '/docs/raml2markdown')
+  }
+}
 
+function initiateDocsGeneration (request) {
+  if (info.onWindows) {
     runShellCommand('mkdir "' + request.getDocsBuild() + '"', 20, process.cwd())
     runShellCommand('mkdir "' + request.getDocsSource() + '"', 20, process.cwd())
     runShellCommand('mkdir "' + request.getRequestFolder() + 'slate/"', 20, process.cwd())
     runShellCommand('mkdir "' + request.getRequestFolder() + 'OAS/"', 20, process.cwd())
 
     runShellCommand('XCOPY /E .\\docs\\source "' + request.getDocsSource() + '"', 20, process.cwd())
-
-    runShellCommand(arg, 20, process.cwd() + '/docs/raml2markdown')
-    runShellCommand('bundle exec middleman build --source "' + request.getDocsSource().replace(process.cwd().replace(/\\/g, '/'), '..') + '" --build-dir "' + request.getDocsBuild() + '"', 20, process.cwd() + '/docs')
   } else {
-    arg = 'python3 build.py --type ' + request.type + ' --path "' + path + '" --apiname "' + apiName + '" --requestfolder "' + request.getRequestFolder() + '" --examples "' + examplesPath + '"'
-
     runShellCommand('mkdir "' + request.getDocsBuild() + '"', 20, process.cwd())
     runShellCommand('mkdir "' + request.getDocsSource() + '"', 20, process.cwd())
     runShellCommand('mkdir "' + request.getRequestFolder() + 'slate/"', 20, process.cwd())
     runShellCommand('mkdir "' + request.getRequestFolder() + 'OAS/"', 20, process.cwd())
 
     runShellCommand('cp -r ./docs/source "' + request.getRequestFolder() + '"', 20, process.cwd())
+  }
+}
 
-    runShellCommand(arg, 20, process.cwd() + '/docs/raml2markdown')
+function concatenateSlates(request) {
+  if (info.onWindows) {
+    var arg_concatenate = 'python concatenate.py --requestfolder ' + request.getRequestFolder()
+    runShellCommand(arg_concatenate, 20, process.cwd() + '/docs/raml2markdown')
+  } else {
+    arg_concatenate = 'python3 concatenate.py --requestfolder ' + request.getRequestFolder()
+    runShellCommand(arg_concatenate, 20, process.cwd() + '/docs/raml2markdown')
+  }
+}
+
+function generateIndexHtml(request) {
+  if (info.onWindows) {
+    runShellCommand('bundle exec middleman build --source "' + request.getDocsSource().replace(process.cwd().replace(/\\/g, '/'), '..') + '" --build-dir "' + request.getDocsBuild() + '"', 20, process.cwd() + '/docs')
+  } else {
     runShellCommand('export PATH="/usr/share/rvm/gems/ruby-2.4.2/bin:/usr/share/rvm/gems/ruby-2.4.2@global/bin:/usr/share/rvm/rubies/ruby-2.4.2/bin:$PATH" && bundle exec middleman build --source "' + request.getDocsSource().replace(process.cwd().replace(/\\/g, '/'), '..') + '" --build-dir "' + request.getDocsBuild() + '"', 20, process.cwd() + '/docs')
   }
 }
