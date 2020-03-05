@@ -14,6 +14,3 @@ jobs:
   - template: './templates/jobs/build-docker-image.yaml'
     parameters:
       component: 'services/router'
-  - template: './templates/jobs/release-component.yaml'
-    parameters:
-      component: 'services/router'
