@@ -1,0 +1,57 @@
+parameters:
+  component: '<component name to build image for, e.g apis/application>'
+  azureRegistry: 'platformoftrust'
+  containerRegistry: 'platformoftrust.azurecr.io'
+  acrConnection: 'PoT ACR'
+  timeoutInMinutes: 20
+
+jobs:
+  - job: 'buildImage'
+    displayName: 'Build docker image'
+    timeoutInMinutes: '${{ parameters.timeoutInMinutes }}'
+    cancelTimeoutInMinutes: 2
+    steps:
+      # used to set up download artifact task
+      - script: |
+          echo "Pipeline ID: "$(System.DefinitionId)
+        displayName: 'Show pipeline information'
+      - script: |
+          set -exu
+          BUILD_NUMBER=$(Build.SourceBranchName)-$(git rev-parse --short HEAD)-$(date +%Y%m%d-%H%M%S)
+          echo $BUILD_NUMBER > $(Pipeline.Workspace)/build-number.txt
+          echo "##vso[build.updatebuildnumber]$BUILD_NUMBER"
+        displayName: 'Set build name'
+      - script: |
+          env | sort
+        displayName: 'Display environment variables'
+      - script: |
+          poetry config settings.virtualenvs.create true
+          poetry install
+        displayName: 'Install release tool dependencies'
+      - script: |
+          poetry run invoke docker.build-images -c ${{ parameters.component }}
+        displayName: 'Build Docker image'
+      - task: 'Docker@2'
+        inputs:
+          containerRegistry: '${{ parameters.acrConnection }}'
+          command: 'login'
+        displayName: 'Login to Azure Container Registry'
+      - script: |
+          set -exu
+
+          # Sometimes Azure appends "'" symbol to the end of parameters for unknow reason
+          # e.g tag name becomes deploy-test-4bab592-20191120-060100'\''
+          TAG=`echo "$(Build.BuildNumber)" | tr -d "'"`
+
+          poetry run invoke docker.tag-and-push \
+            --component "${{ parameters.component }}" \
+            --registry "${{ parameters.containerRegistry }}" \
+            --tag "$TAG"
+
+          echo "##vso[task.setvariable variable=tag;isOutput=true]$(Build.BuildNumber)"
+        displayName: 'Tag and push image'
+        name: imageInfo # used as a reference to get TAG variable in other jobs
+      - task: 'PublishPipelineArtifact@1'
+        inputs:
+          targetPath: '$(Pipeline.Workspace)/build-number.txt'
+          artifact: 'build-number'
