@@ -1,17 +1,16 @@
 
 // To parse the Responses Object
-function parse(responses) {
+function parse (responses) {
+  const res = []
+  res.push('**Responses**\n')
+  res.push('| Code | Description |')
+  res.push('| ---- | ----------- |')
 
-    const res = [] 
-    res.push('**Responses**\n') 
-    res.push('| Code | Description |') 
-    res.push('| ---- | ----------- |') 
-
-    Object.keys(responses).map(response => {
-        let desc = responses[response] && responses[response].description || '';
-        res.push(`| ${response} | ${desc.replace(/[\r\n]/g, ' ') || ''} |`) 
-    }) 
-    return res.join('\n') 
+  Object.keys(responses).map(response => {
+    const desc = responses[response] && responses[response].description || ''
+    res.push(`| ${response} | ${desc.replace(/[\r\n]/g, ' ') || ''} |`)
+  })
+  return res.join('\n')
 }
 
-module.exports = {parse}
+module.exports = { parse }

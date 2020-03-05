@@ -8,6 +8,7 @@ const runShellCommand = require('../validation/utils').runShellCommand
 const archiver = require('archiver')
 const reporter = require('../reporter')
 const mongoDBManager = require('../mongoDBManager')
+const constants = require('../constants')
 
 async function saveFormInfoToRequest (fields, files, request) {
   return new Promise(function (resolve, reject) {
@@ -34,8 +35,6 @@ async function saveFormInfoToRequest (fields, files, request) {
 
     request.keyword = fields.keyword
     request.validate = (fields.validate === 'true')
-
-    request.stage = 0
 
     utils.getConfigFile(fields, files, request).then((configFile) => {
       request.conf = new Config()
@@ -64,6 +63,7 @@ async function saveFormInfoToRequest (fields, files, request) {
 
 async function generateSamples (request) {
   request.logFileStream = fs.createWriteStream(request.getGenerationLogFile(), { flags: 'w' })
+
   const firstTimerStart = Date.now()
   var path = request.pathToSpecs
 
@@ -106,7 +106,10 @@ async function generateSamples (request) {
   request.generateExamplesTime = ((firstTimerEnd - firstTimerStart) / 1000).toString() + 's'
   request.apiNames = apiNames
 
-  mongoDBManager.updateOne('Generation', request.id, { generateExamplesTime: request.generateExamplesTime, apiNames: request.apiNames, type: request.type, stage: 1 })
+  if (!info.commandLine) {
+    mongoDBManager.updateOne('Generation', request.id, { generateExamplesTime: request.generateExamplesTime, apiNames: request.apiNames, type: request.type, stage: 1 })
+  }
+  info.stageReady[request.id] = true
 }
 
 function generateArchive (request) {
@@ -120,7 +123,11 @@ function generateArchive (request) {
   archive.pipe(archiveFile)
   archive.finalize()
 
-  mongoDBManager.updateOne('Generation', request.id, { stage: 3 })
+  if (!info.commandLine) {
+    mongoDBManager.updateOne('Generation', request.id, { stage: 3 })
+  }
+
+  info.stageReady[request.id] = true
 }
 
 function generateDocs (request) {
@@ -158,17 +165,20 @@ function generateDocs (request) {
   const secondTimerEnd = Date.now()
   request.generateDocsTime = ((secondTimerEnd - secondTimerStart) / 1000).toString() + 's'
 
-  mongoDBManager.updateOne('Generation', request.id, { generateDocsTime: request.generateDocsTime, stage: 2 })
+  if (!info.commandLine) {
+    mongoDBManager.updateOne('Generation', request.id, { generateDocsTime: request.generateDocsTime, stage: 2 })
+  }
+  info.stageReady[request.id] = true
 }
 
 function generateDocsForFile (request, path, apiName, examplesPath) {
   path = path.replace(/\\/g, '/')
   if (info.onWindows) {
-    var arg_build = 'python build.py --type ' + request.type + ' --path "' + path + '" --apiname "' + apiName + '" --requestfolder "' + request.getRequestFolder() + '" --examples "' + examplesPath + '"'
-    runShellCommand(arg_build, 20, process.cwd() + '/docs/raml2markdown')
+    var argBuild = 'python build.py --type ' + request.type + ' --path "' + path + '" --apiname "' + apiName + '" --requestfolder "' + request.getRequestFolder() + '" --examples "' + examplesPath + '"'
+    runShellCommand(argBuild, 20, process.cwd() + '/docs/raml2markdown')
   } else {
-    arg_build = 'python3 build.py --type ' + request.type + ' --path "' + path + '" --apiname "' + apiName + '" --requestfolder "' + request.getRequestFolder() + '" --examples "' + examplesPath + '"'
-    runShellCommand(arg_build, 20, process.cwd() + '/docs/raml2markdown')
+    argBuild = 'python3 build.py --type ' + request.type + ' --path "' + path + '" --apiname "' + apiName + '" --requestfolder "' + request.getRequestFolder() + '" --examples "' + examplesPath + '"'
+    runShellCommand(argBuild, 20, process.cwd() + '/docs/raml2markdown')
   }
 }
 
@@ -190,21 +200,36 @@ function initiateDocsGeneration (request) {
   }
 }
 
-function concatenateSlates(request) {
+function concatenateSlates (request) {
   if (info.onWindows) {
-    var arg_concatenate = 'python concatenate.py --requestfolder ' + request.getRequestFolder()
-    runShellCommand(arg_concatenate, 20, process.cwd() + '/docs/raml2markdown')
+    var argConcatenate = 'python concatenate.py --requestfolder ' + request.getRequestFolder()
+    runShellCommand(argConcatenate, 20, process.cwd() + '/docs/raml2markdown')
   } else {
-    arg_concatenate = 'python3 concatenate.py --requestfolder ' + request.getRequestFolder()
-    runShellCommand(arg_concatenate, 20, process.cwd() + '/docs/raml2markdown')
+    argConcatenate = 'python3 concatenate.py --requestfolder ' + request.getRequestFolder()
+    runShellCommand(argConcatenate, 20, process.cwd() + '/docs/raml2markdown')
   }
 }
 
-function generateIndexHtml(request) {
+function generateIndexHtml (request) {
   if (info.onWindows) {
     runShellCommand('bundle exec middleman build --source "' + request.getDocsSource().replace(process.cwd().replace(/\\/g, '/'), '..') + '" --build-dir "' + request.getDocsBuild() + '"', 20, process.cwd() + '/docs')
   } else {
     runShellCommand('export PATH="/usr/share/rvm/gems/ruby-2.4.2/bin:/usr/share/rvm/gems/ruby-2.4.2@global/bin:/usr/share/rvm/rubies/ruby-2.4.2/bin:$PATH" && bundle exec middleman build --source "' + request.getDocsSource().replace(process.cwd().replace(/\\/g, '/'), '..') + '" --build-dir "' + request.getDocsBuild() + '"', 20, process.cwd() + '/docs')
+  }
+
+  try {
+    var data = fs.readFileSync(request.getDocsPage(), 'utf8')
+
+    if (info.commandLine) {
+      data = data.replace(constants.HEAD_PLACEHOLDER_ANALYTICS, constants.HEAD_ANALYTICS)
+      data = data.replace(constants.BODY_PLACEHOLDER_ANALYTICS, constants.BODY_ANALYTICS)
+    } else {
+      data = data.replace(constants.HEAD_PLACEHOLDER_ANALYTICS, '')
+      data = data.replace(constants.BODY_PLACEHOLDER_ANALYTICS, '')
+    }
+    fs.writeFileSync(request.getDocsPage(), data)
+  } catch (err) {
+    console.log(err)
   }
 }
 

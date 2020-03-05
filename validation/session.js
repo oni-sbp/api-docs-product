@@ -50,7 +50,11 @@ class TestSession {
       }
 
       testSession.request.failedTests = failedCount
-      mongoDBManager.insertOne('Generation', testSession.request.getElementForDB())
+
+      if (!info.commandLine) {
+        mongoDBManager.insertOne('Generation', testSession.request.getElementForDB())
+      }
+
       info.requestReady[testSession.request.id] = true
 
       return

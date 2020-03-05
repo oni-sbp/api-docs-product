@@ -5,7 +5,7 @@ const SwaggerParser = require('swagger-parser')
 const ramlParser = require('./raml-parser')
 const reporter = require('../reporter')
 
-async function parse(path, rootDirectory, examplesPath, params, request) {
+async function parse (path, rootDirectory, examplesPath, params, request) {
   var filename = pathUtility.parse(path).base
 
   reporter.log(request, 'Parsing ' + filename)
@@ -117,7 +117,7 @@ async function parse(path, rootDirectory, examplesPath, params, request) {
   return title
 }
 
-function getDebug(dict, debug) {
+function getDebug (dict, debug) {
   for (var key in dict) {
     var data = dict[key]
 
@@ -157,7 +157,7 @@ function getDebug(dict, debug) {
   }
 }
 
-function get2xxResponse(operation) {
+function get2xxResponse (operation) {
   var noExample = { status: '', body: '' }
   if (operation.responses) {
     for (var response in operation.responses) {
@@ -178,7 +178,7 @@ function get2xxResponse(operation) {
   return noExample
 }
 
-function getQueryString(operation) {
+function getQueryString (operation) {
   var params = {}
   if (operation.parameters) {
     for (var parameterIndex in operation.parameters) {
@@ -203,7 +203,7 @@ function getQueryString(operation) {
   return null
 }
 
-function getBody(operation, request) {
+function getBody (operation, request) {
   var hasBody = false
 
   if (operation.requestBody) {
@@ -246,7 +246,7 @@ function getBody(operation, request) {
   return null
 }
 
-function setBody(operation, params) {
+function setBody (operation, params) {
   if (params.body) {
     params.pyBody = params.body
     var checkBoolValue = params.pyBody.split('"')
@@ -277,7 +277,7 @@ function setBody(operation, params) {
   }
 }
 
-function setHeaders(operation, contentType, params, request) {
+function setHeaders (operation, contentType, params, request) {
   var headers = {}
 
   if (operation.parameters) {
@@ -312,12 +312,12 @@ function setHeaders(operation, contentType, params, request) {
     }
     params.javaHeaders = ''
     for (var index = 1; index < toParseAsJavaHeader.length; index += 4) {
-      params.javaHeaders += '\t\t' + 'request.addHeader("' + toParseAsJavaHeader[index] + '", "' + toParseAsJavaHeader[index + 2] + '");\n'
+      params.javaHeaders += '\t\t\t' + 'request.addHeader("' + toParseAsJavaHeader[index] + '", "' + toParseAsJavaHeader[index + 2] + '");\n'
     }
   } else { params.javaHeaders = '' }
 }
 
-function getExample(parameter) {
+function getExample (parameter) {
   if (parameter.content) {
     for (var type in parameter.content) {
       var example = getExample(parameter.content[type])

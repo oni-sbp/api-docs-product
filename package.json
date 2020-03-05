@@ -50,7 +50,8 @@
   "standard": {
     "ignore": [
       "docs/",
-      "public/"
+      "public/",
+      "doc-generation/"
     ],
     "globals": [
       "describe",

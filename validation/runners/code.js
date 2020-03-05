@@ -93,7 +93,7 @@ class CodeRunner {
       match = matchString.match(regexCurlArrayFirst)
 
       var jsonArray = JSON.stringify(debug[match.groups.name])
-      if(jsonArray) {
+      if (jsonArray) {
         var escapedJsonArray = jsonArray.replace(/"/g, '\\"')
 
         substitutions[match.groups.paramValue] = escapedJsonArray

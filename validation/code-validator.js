@@ -7,7 +7,10 @@ const mongoDBManager = require('../mongoDBManager')
 
 async function validateGeneratedSamples (request) {
   request.logFileStream = fs.createWriteStream(request.getValidationLogFile(), { flags: 'w' })
-  mongoDBManager.updateOne('Generation', request.id, { stage: 4 })
+
+  if (!info.commandLine) {
+    mongoDBManager.updateOne('Generation', request.id, { stage: 4 })
+  }
 
   const timerStart = Date.now()
 
@@ -17,7 +20,10 @@ async function validateGeneratedSamples (request) {
     request.failedTests = 0
 
     info.requestReady[request.id] = true
-    mongoDBManager.updateOne('Generation', request.id, { validationTime: request.validationTime, totalTests: request.totalTests, failedTests: request.failedTests })
+
+    if (!info.commandLine) {
+      mongoDBManager.updateOne('Generation', request.id, { validationTime: request.validationTime, totalTests: request.totalTests, failedTests: request.failedTests })
+    }
 
     return
   }
@@ -32,6 +38,8 @@ async function validateGeneratedSamples (request) {
   request.validationTime = (timerEnd - timerStart) / 1000
 
   await testSession.run()
+
+  info.stageReady[request.id] = true
 }
 
 function getSamplesPath (request) {

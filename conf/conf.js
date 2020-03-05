@@ -11,7 +11,7 @@ class Config {
     this.substitutions = {}
     this.resp_attr_replacements = {}
     this.always_create_environments = true
-    this.debug = false
+    this.debug = true
     this.before_sample = {}
     this.ignore_failures = {}
     this.substitutions_before_sample = {}

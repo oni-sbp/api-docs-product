@@ -15,25 +15,23 @@ const dataTypes = {
     'date-time': 'dateTime',
     password: 'password'
   }
-} 
+}
 
 // Export the datatypes conversion
 module.exports = (type, format = null) => {
-
   // If dataType is present in the above array
   if (type in dataTypes) {
-
     if (format) {
       return format in dataTypes[type]
         ? dataTypes[type][format]
-        : `${type} (${format})` 
+        : `${type} (${format})`
     }
-    return type 
+    return type
   }
 
   // If dataType is not present in the above array return the same type
   if (format) {
-    return `${type} (${format})` 
+    return `${type} (${format})`
   }
-  return type 
-} 
+  return type
+}

@@ -7,67 +7,60 @@ const SecurityDefinitions = require('./objects/securityDefinations')
 const ExternalDocs = require('./objects/externalDocs')
 
 // Wrapper function for the markdown method
-function convertToMd(input, output) {
+function convertToMd (input, output) {
+  if (input) {
+    // for storing the markdown document
+    const mdDoc = []
 
-    if (input) {
+    try {
+      // To store the input document in json formate to fetch the values
+      var inputDoc
 
-        // for storing the markdown document
-        const mdDoc = []
+      // Get the file extension (YAML, JSON) and convert to Json
+      var fileType = readFileExtesnion(input)
+      if (fileType == 'json') { inputDoc = JSON.parse(fs.readFileSync(input, 'utf8')) } else if (fileType == 'yaml') {
+        inputDoc = yaml.safeLoad(fs.readFileSync(input, 'utf8'))
+      }
 
-        try {
+      if (!inputDoc) { throw "Can't read the file: " + input + '\n    Please provide the full path of the files.' }
 
-            // To store the input document in json formate to fetch the values
-            var inputDoc
+      // Output file name
+      const outputFile = output || input.replace(/(yaml|json)$/i, 'md')
 
-            // Get the file extension (YAML, JSON) and convert to Json
-            var fileType = readFileExtesnion(input)
-            if (fileType == 'json')
-                inputDoc = JSON.parse(fs.readFileSync(input, 'utf8'))
-            else if (fileType == 'yaml') {
-                inputDoc = yaml.safeLoad(fs.readFileSync(input, 'utf8'))
-            }
+      // Process info object
+      if ('info' in inputDoc) {
+        mdDoc.push(Info.parse(inputDoc.info))
+      }
 
-            if (!inputDoc)
-                throw "Can't read the file: " + input + "\n    Please provide the full path of the files."
+      // Process external doc object
+      if ('externalDocs' in inputDoc) {
+        mdDoc.push(ExternalDocs.parse(inputDoc.externalDocs))
+      }
 
-            // Output file name
-            const outputFile = output || input.replace(/(yaml|json)$/i, 'md')
+      // Process Security definitions object
+      if ('securityDefinitions' in inputDoc) {
+        mdDoc.push(SecurityDefinitions.parse(inputDoc.securityDefinitions))
+      }
 
-            // Process info object
-            if ('info' in inputDoc) {
-                mdDoc.push(Info.parse(inputDoc.info))
-            }
+      // Process Paths
+      if ('paths' in inputDoc) {
+        Object.keys(inputDoc.paths).map(
+          path => mdDoc.push(Path.parse(path, inputDoc.paths[path], inputDoc))
+        )
+      }
 
-            // Process external doc object
-            if ('externalDocs' in inputDoc) {
-                mdDoc.push(ExternalDocs.parse(inputDoc.externalDocs))
-            }
+      mdDoc.push('<!-- Converted with the swagger-to-slate https://github.com/lavkumarv/swagger-to-slate -->\n')
 
-            // Process Security definitions object
-            if ('securityDefinitions' in inputDoc) {
-                mdDoc.push(SecurityDefinitions.parse(inputDoc.securityDefinitions))
-            }
-
-            // Process Paths
-            if ('paths' in inputDoc) {
-                Object.keys(inputDoc.paths).map(
-                    path => mdDoc.push(Path.parse(path, inputDoc.paths[path], inputDoc))
-                )
-            }
-
-            mdDoc.push(`<!-- Converted with the swagger-to-slate https://github.com/lavkumarv/swagger-to-slate -->\n`)
-
-            fs.writeFileSync(outputFile, mdDoc.join('\n'))
-        } catch (e) {
-            console.log(e)
-        }
+      fs.writeFileSync(outputFile, mdDoc.join('\n'))
+    } catch (e) {
+      console.log(e)
     }
-
+  }
 }
 
-function readFileExtesnion(filename) {
-    return filename.split('.').pop()
+function readFileExtesnion (filename) {
+  return filename.split('.').pop()
 }
 
 // Export the function
-module.exports = convertToMd 
+module.exports = convertToMd

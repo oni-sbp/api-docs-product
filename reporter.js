@@ -1,5 +1,6 @@
 const color = require('node-colorify')
 const mongoDBManager = require('./mongoDBManager')
+const info = require('./info')
 
 function debug (request, message) {
   console.log(color.colorItSync(message, { fColor: 'blue' }))
@@ -203,7 +204,9 @@ class Reporter {
     }
     overallTime /= 1000
     this.request.validationTime = (this.request.validationTime + overallTime).toString() + 's'
-    mongoDBManager.updateOne('Generation', this.request.id, { validationTime: this.request.validationTime })
+    if (!info.commandLine) {
+      mongoDBManager.updateOne('Generation', this.request.id, { validationTime: this.request.validationTime })
+    }
 
     log(this.request, 'Time spent: ' + overallTime.toFixed(1) + 's')
 

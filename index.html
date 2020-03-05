@@ -1,4 +1,22 @@
 <head>
+  <!-- Google Tag Manager -->
+  <script>
+    (function (w, d, s, l, i) {
+      w[l] = w[l] || [];
+      w[l].push({
+        'gtm.start': new Date().getTime(),
+        event: 'gtm.js'
+      });
+      var f = d.getElementsByTagName(s)[0],
+        j = d.createElement(s),
+        dl = l != 'dataLayer' ? '&l=' + l : '';
+      j.async = true;
+      j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+      f.parentNode.insertBefore(j, f);
+    })(window, document, 'script', 'dataLayer', 'GTM-PF6T7H3');
+  </script>
+  <!-- End Google Tag Manager -->
+
   <title>
     API Docs 2.0 - Platform Of Trust Documentation
   </title>
@@ -168,7 +186,7 @@
             success: function (data) {
               console.log('initial response', data);
               validate = data.validate
-              getSubmitLog(data.requestId, data.origin, data.validate, 0)
+              getSubmitLog(data.requestId, data.origin, data.validate)
             },
             error: function () {
               alert("Submission failed!");
@@ -197,7 +215,8 @@
 
       var content = []
       var contentIndex = 0
-
+      var stage = 0
+      $("#Console").val('')
       displayConsole()
       function displayConsole() {
         while (content.length > contentIndex) {
@@ -215,7 +234,10 @@
           textarea.val(textarea.val() + line)
           textarea.scrollTop(textarea[0].scrollHeight)
 
-          var stage = content[contentIndex].stage
+          if(stage < 4 && textarea.val().indexOf(stages[stage + 1]) > 0) {
+            stage += 1
+          }
+          
           var stageHeader = document.getElementById("Stage");
           if (stage === 4) {
             var fullLog = textarea.val()
@@ -246,37 +268,37 @@
         }, 100)
       }
 
-      function getSubmitLog(requestId, origin, validate, stage) {
-
+      function getSubmitLog(requestId, origin, validate) {
         $.ajax({
           type: "GET",
-          url: "progress?requestId=" + requestId + "&stage=" + stage + "&validate=" + validate + "&random=" + Math.random(),
+          url: "progress?requestId=" + requestId + "&validate=" + validate + "&random=" + Math.random(),
           success: function (data) {
             if (data.ready) {
               window.location.href = '/readyindex?validate=' + validate + '&origin=' + origin + '&requestId=' + requestId;
             } else {
-              // write log
-              //console.log(data)
-
-              var stage = parseInt(data.stage)
-              content.push({ log: data.newLog, stage: stage })
+              content.push({ log: data.newLog })
 
               setTimeout(function () {
-                getSubmitLog(requestId, origin, validate, stage)
+                getSubmitLog(requestId, origin, validate)
               }, 500)
             }
           }
         })
       }
-
-
-
     })
   </script>
 </head>
 
 <body class="mainBody">
-  <!-- Trigger the modal with a button -->
+  <!-- Google Tag Manager (noscript) -->
+  <noscript>
+    <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PF6T7H3" height="0" width="0"
+      style="display:none;visibility:hidden">
+    </iframe>
+  </noscript>
+  <!-- End Google Tag Manager (noscript) -->
+
+
   <button id="OpenModalButton" style="display:none;" type="button" class="btn btn-info btn-lg" data-toggle="modal"
     data-target="#LogModal">Open Modal</button>
 
@@ -425,8 +447,8 @@
                 </div>
                 <div id="ConfigAfter" class="filename-div-after" style="display: none;">
                   <img src="resources/pot icons-16.png" height="14" width="14" class="icon-image-left" />
-                  <input type="text" class="input-field filename-input" id="ConfigFileName" style="background-color: #9E8DE2;"
-                    placeholder="No file selected" readonly>
+                  <input type="text" class="input-field filename-input" id="ConfigFileName"
+                    style="background-color: #9E8DE2;" placeholder="No file selected" readonly>
                   <img src="resources/pot icons-20.png" height="14" width="14" class="icon-image-right"
                     onclick="cancelConfigFile();" />
                 </div>

@@ -26,7 +26,12 @@ var requestReady = {}
 var generationLogPosition = {}
 var validationLogPosition = {}
 
-var started = {}
+// To know the stage of the process of generation and validation
+var stage = {}
+var stageReady = {}
+
+// To know if is the server or the command line tool
+var commandLine = false
 
 module.exports = {
   extension,
@@ -38,5 +43,7 @@ module.exports = {
   requestReady,
   validationLogPosition,
   generationLogPosition,
-  started
+  stage,
+  stageReady,
+  commandLine
 }

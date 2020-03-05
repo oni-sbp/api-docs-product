@@ -36,6 +36,9 @@ app.post('/fileupload', (req, res) => {
         request.IP = req.connection.remoteAddress
 
         generator.saveFormInfoToRequest(fields, files, request)
+
+        info.stage[request.id] = 0
+        info.stageReady[request.id] = true
       })
     })
   })
@@ -47,8 +50,6 @@ app.get('/progress', (req, res) => {
     res.write(JSON.stringify({ ready: true }))
     res.end()
   } else {
-    var stage = parseInt(req.query.stage)
-
     requestInfo.getRequest(req.query.requestId).then((request) => {
       var newLog = ''
       if (request) {
@@ -81,43 +82,36 @@ app.get('/progress', (req, res) => {
           }
         }
 
-        var content = JSON.stringify({ ready: false, newLog: newLog, stage: request.stage })
+        var content = JSON.stringify({ ready: false, newLog: newLog })
 
         res.writeHead(200, { 'Content-Type': 'application/json', 'Content-Length': content.length })
         res.write(content)
         res.end()
 
-        switch (stage) {
-          case 0:
-            if (!info.started[request.id]) {
+        if (info.stageReady[request.id]) {
+          info.stageReady[request.id] = false
+          info.stage[request.id] += 1
+
+          switch (info.stage[request.id]) {
+            case 1:
               setImmediate(generator.generateSamples, request)
-              info.started[request.id] = 1
-            }
-            break
+              break
 
-          case 1:
-            if (info.started[request.id] === 1) {
+            case 2:
               setImmediate(generator.generateDocs, request)
-              info.started[request.id] = 2
-            }
-            break
+              break
 
-          case 2:
-            if (info.started[request.id] === 2) {
+            case 3:
               setImmediate(generator.generateArchive, request)
-              info.started[request.id] = 3
-            }
-            break
+              break
 
-          case 3:
-            if (info.started[request.id] === 3) {
+            case 4:
               setImmediate(validator.validateGeneratedSamples, request)
-              info.started[request.id] = 4
-            }
-            break
+              break
+          }
         }
       } else {
-        content = JSON.stringify({ ready: false, newLog: '', stage: req.query.stage })
+        content = JSON.stringify({ ready: false, newLog: '' })
 
         res.writeHead(200, { 'Content-Type': 'application/json', 'Content-Length': content.length })
         res.write(content)
@@ -314,15 +308,13 @@ if (info.onWindows) {
   httpsPort = 8081
 }
 
-//app.listen(port)
-
-const https = require('https');
+const https = require('https')
 https.createServer({
   key: fs.readFileSync('./certificate/star_oftrust_net_key.txt'),
   cert: fs.readFileSync('./certificate/star.oftrust.net.crt'),
   ca: fs.readFileSync('./certificate/star.oftrust.net.ca-bundle')
 }, app)
-  .listen(httpsPort);
+  .listen(httpsPort)
 
 var httpPort = 80
 if (info.onWindows) {
@@ -333,9 +325,8 @@ const httpApp = express()
 httpApp.get('/*', (req, res) => {
   var host = req.headers.host
   if (host.endsWith(':' + httpPort)) {
-    host = host.replace(':' + httpPort, ':' + httpsPort);
+    host = host.replace(':' + httpPort, ':' + httpsPort)
   }
-  res.redirect('https://' + host + req.url);
-});
-httpApp.listen(httpPort);
-
+  res.redirect('https://' + host + req.url)
+})
+httpApp.listen(httpPort)

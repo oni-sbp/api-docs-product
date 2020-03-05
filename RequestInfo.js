@@ -29,7 +29,6 @@ async function getRequest (id) {
         request.languages = element.languages
         request.apiNames = element.apiNames
         request.type = element.type
-        request.stage = element.stage
         request.validate = element.validate
         request.validationLanguages = element.validationLanguages
 
@@ -122,19 +121,39 @@ class RequestInfo {
   }
 
   setLanguages (fields) {
-    this.languages = ['slate']
-
-    for (var language in info.acceptedLanguages) {
-      if (fields[info.acceptedLanguages[language]] === 'true') {
-        this.languages.push(info.acceptedLanguages[language])
-      }
-    }
-
-    if (this.languages.length === 1) {
+    if (info.commandLine) {
       this.languages = info.acceptedLanguages
+      this.validationLanguages = info.acceptedValidationLanguages
+    } else {
+      this.languages = ['slate']
+
+      for (var language in info.acceptedLanguages) {
+        if (fields[info.acceptedLanguages[language]] === 'true') {
+          this.languages.push(info.acceptedLanguages[language])
+        }
+      }
+
+      if (this.languages.length === 1) {
+        this.languages = info.acceptedLanguages
+      }
+
+      this.validationLanguages = this.languages.filter(lang => info.acceptedValidationLanguages.indexOf(lang) !== -1)
+    }
+  }
+
+  saveInfoFromArgs (args) {
+    this.pathToSpecs = args.input // From where to get the specs
+    this.pathToDocs = args.output // Where to put the generated docs page
+
+    this.scheme = args.scheme || ''
+    this.host = args.host || ''
+    if (args.host) {
+      this.env.TESTING_API_URL = args.host
     }
 
-    this.validationLanguages = this.languages.filter(lang => info.acceptedValidationLanguages.indexOf(lang) !== -1)
+    this.env.AUTH_TOKEN = args.auth_token || ''
+
+    this.validate = args.validate || false
   }
 
   getElementForDB () {
@@ -154,7 +173,6 @@ class RequestInfo {
       pathToSpecs: this.pathToSpecs,
       apiNames: this.apiNames,
       type: this.type,
-      stage: this.stage,
       validate: this.validate,
       validationLanguages: this.validationLanguages
     }
