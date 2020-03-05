@@ -1,0 +1,19 @@
+name: 'Release HAProxy service'
+
+trigger:
+  branches:
+    include:
+      - 'master'
+  paths:
+    include:
+      - '*'
+pool:
+  name: 'Platform of Trust'
+
+jobs:
+  - template: './templates/jobs/build-docker-image.yaml'
+    parameters:
+      component: 'services/router'
+  - template: './templates/jobs/release-component.yaml'
+    parameters:
+      component: 'services/router'
